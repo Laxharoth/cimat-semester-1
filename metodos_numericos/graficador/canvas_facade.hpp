@@ -1,0 +1,3 @@
+#ifndef CANVAS_FACADE_HPP
+#define CANVAS_FACADE_HPP
+#endif /* CANVAS_FACADE_HPP */
