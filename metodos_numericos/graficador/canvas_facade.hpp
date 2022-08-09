@@ -10,8 +10,10 @@ namespace canvas_facade{
 class CanvasFacade{
     public:
     point origin;
-    double min_x;
-    double min_y;
+    point min_value;
+    point max_value;
+    double scale_x;
+    double scale_y;
     void set_origin(const point &new_origin);
     void draw_line(cairo_t *cr, const point &point_1, const point &point_2) const;
 };
