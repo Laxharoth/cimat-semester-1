@@ -4,8 +4,8 @@ namespace canvas_facade{
         this->origin.x = new_origin.x;
         this->origin.y = new_origin.y;
     }
-    void CanvasFacade::draw_line(cairo_t *cr, const point &point_1, const point &point_2){
     cairo_set_line_width(cr, 1.0);
+    void CanvasFacade::draw_line(cairo_t *cr, const point &point_1, const point &point_2) const{
         cairo_set_source_rgb(cr,0.0,0.0,0.0);
         cairo_move_to(cr, point_1.x - this->origin.x, this->origin.y - point_1.y);
         cairo_line_to(cr, point_2.x - this->origin.x, this->origin.y - point_2.y);
