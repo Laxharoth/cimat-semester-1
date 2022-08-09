@@ -9,7 +9,7 @@
 
 using canvas_facade::CanvasFacade;
 
-void init_points(GtkWidget *graph, double (*single_variable_func)(double), const double &min_x, const double &max_x);
+void init_points(GtkWidget *graph, double (*single_variable_func)(double), double min_x, double max_x);
 gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data);
 std::string trim_double_to_str(const double &num, const int &precision);
 void on_destroy();
@@ -68,7 +68,8 @@ void draw_axis(cairo_t * cr, const gint width, const gint height, const double &
     cairo_stroke(cr);
 }
 
-void init_points(GtkWidget *graph, double (*single_variable_func)(double), const double &min_x, const double &max_x){
+void init_points(GtkWidget *graph, double (*single_variable_func)(double), double min_x, double max_x){
+    if(min_x > max_x) std::swap(min_x, max_x);
     double min_y{}, max_y{};
     analize_single_var_function(single_variable_func, min_x, max_x, min_y, max_y, points);
     drawer.min_value.x = min_x; drawer.min_value.y = min_y;
