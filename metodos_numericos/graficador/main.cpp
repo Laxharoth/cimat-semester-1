@@ -43,6 +43,39 @@ int main(int argc, char *argv[]){
 
     return EXIT_SUCCESS;
 }
+void draw_axis(cairo_t * cr, const gint width, const gint height, const double &min_x, const double &max_x, const double &min_y, const double max_y){
+    const gint axis_lines = 10;
+    const gint middle_width   = width / 2, middle_height = height/ 2;
+    const gint distance_width = width / axis_lines, distance_height = height/ axis_lines;
+    const double middle_x   = (max_x + min_x) / 2, middle_y = (max_y + min_y)/ 2;
+    const double change_x   = (max_x - min_x) / axis_lines, change_y = (max_y - min_y) / axis_lines;
+    cairo_move_to(cr, 0, middle_height); cairo_line_to(cr, width , middle_height);
+    cairo_move_to(cr, middle_width, 0); cairo_line_to(cr, middle_width , height);
+    for(gint line = 0; line < axis_lines / 2 ; ++line ){
+        // right
+        cairo_move_to(cr, middle_width + distance_width * line, middle_height - 4);
+        cairo_line_to(cr, middle_width + distance_width * line, middle_height + 4);
+        cairo_move_to(cr, middle_width + distance_width * line + 4, middle_height + 10);
+        cairo_show_text(cr, trim_double_to_str(middle_x + change_x * line, 2).c_str());
+        // up
+        cairo_move_to(cr, middle_width - 4, middle_height - distance_height * line);
+        cairo_line_to(cr, middle_width + 4, middle_height - distance_height * line);
+        cairo_move_to(cr, middle_width + 4, middle_height - distance_height * line - 10);
+        cairo_show_text(cr, trim_double_to_str(middle_y + change_y * line, 2).c_str());
+        if(line == 0) continue;
+        // left
+        cairo_move_to(cr, middle_width - distance_width * line, middle_height - 4);
+        cairo_line_to(cr, middle_width - distance_width * line, middle_height + 4);
+        cairo_move_to(cr, middle_width - distance_width * line + 4, middle_height + 10);
+        cairo_show_text(cr, trim_double_to_str(middle_x - change_x * line, 2).c_str());
+        // down
+        cairo_move_to(cr, middle_width - 4, middle_height + distance_height * line);
+        cairo_line_to(cr, middle_width + 4, middle_height + distance_height * line);
+        cairo_move_to(cr, middle_width + 4, middle_height + distance_height * line - 10);
+        cairo_show_text(cr, trim_double_to_str(middle_y - change_y * line, 2).c_str());
+    }
+    cairo_stroke(cr);
+}
 
 void init_points(GtkWidget *graph, double (*single_variable_func)(double), const double &min_x, const double &max_x){
     double min_y{}, max_y{};
