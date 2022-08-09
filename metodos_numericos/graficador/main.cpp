@@ -15,6 +15,7 @@ using canvas_facade::CanvasFacade;
 
 void init_points(GtkWidget *graph, double (*single_variable_func)(double), const double &min_x, const double &max_x);
 gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data);
+std::string trim_double_to_str(const double &num, const int &precision);
 void on_destroy();
 CanvasFacade drawer;
 
@@ -98,4 +99,11 @@ gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data){
     drawer.draw_multiline(cr, points.data(), points.size());
     draw_axis(cr, width, height, drawer.min_value.x, drawer.max_value.x, drawer.min_value.y, drawer.max_value.y);
     return FALSE;
+}
+
+std::string trim_double_to_str(const double &num, const int &precision){
+    std::string n_to_s = std::to_string(num);
+    int cut =  n_to_s.find(".");
+    if( cut < 0 || cut + precision + 1 > n_to_s.length() )return n_to_s;
+    return n_to_s.substr(0, cut + precision + 1);
 }
