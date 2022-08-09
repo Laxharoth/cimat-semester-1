@@ -20,7 +20,7 @@ class CanvasFacade{
 point choose_origin_helper( const double &min_x, const double &min_y,
                             const double &scale_x, const double &scale_y,
                             const double &canvas_heigh);
+double choose_scale_helper(const double &min, const double &max, const double &space);
 }
-
 
 #endif /* CANVAS_FACADE_HPP */
