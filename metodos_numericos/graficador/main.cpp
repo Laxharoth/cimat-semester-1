@@ -88,10 +88,14 @@ void init_points(GtkWidget *graph, double (*single_variable_func)(double), const
 void on_destroy(){
     gtk_main_quit();
 }
+
 gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data){
-    g_printerr("origin: (%f,%f)" ,drawer.origin.x, drawer.origin.y);
-    for(size_t i = 0; i < points.size() - 1 ; ++i){
-        drawer.draw_line(cr, points[i], points[i +1 ]);
-    }
+    gint width = gtk_widget_get_allocated_width(graph);
+    gint height= gtk_widget_get_allocated_height(graph);
+    drawer.scale_x = canvas_facade::choose_scale_helper(drawer.min_value.x, drawer.max_value.x, width);
+    drawer.scale_y = canvas_facade::choose_scale_helper(drawer.min_value.y, drawer.max_value.y, height);
+    drawer.set_origin( canvas_facade::choose_origin_helper(drawer.min_value.x, drawer.min_value.y,drawer.scale_x,drawer.scale_y, height) );
+    drawer.draw_multiline(cr, points.data(), points.size());
+    draw_axis(cr, width, height, drawer.min_value.x, drawer.max_value.x, drawer.min_value.y, drawer.max_value.y);
     return FALSE;
 }
