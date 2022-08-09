@@ -7,28 +7,39 @@
 #include <gtk/gtkx.h>
 #include <gtk/gtk.h>
 
+#include <cmath>
+
 using canvas_facade::CanvasFacade;
 
 void init_points(GtkWidget *graph, double (*single_variable_func)(double), double min_x, double max_x);
 gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data);
+void on_btn_graph_click(GtkWidget *btn, gpointer data);
 std::string trim_double_to_str(const double &num, const int &precision);
 void on_destroy();
 
 CanvasFacade drawer;
 std::array<point, PARTITIONS_NUM> points;
+GtkWidget  *graph;
+GtkWidget  *min_x_limit;
+GtkWidget  *max_x_limit;
+auto func = [](double x){ return 1/x; };
 
 gint main(int argc, char *argv[]){
     gtk_init(&argc, &argv);
     GtkBuilder *builder = gtk_builder_new_from_file("graph.glade");
     GtkWidget  *window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
-    GtkWidget  *graph = GTK_WIDGET(gtk_builder_get_object(builder, "graph"));
+    graph = GTK_WIDGET(gtk_builder_get_object(builder, "graph"));
+    min_x_limit = GTK_WIDGET(gtk_builder_get_object(builder, "min_x_limit"));
+    max_x_limit = GTK_WIDGET(gtk_builder_get_object(builder, "max_x_limit"));
+    GtkWidget  *btn_graph = GTK_WIDGET(gtk_builder_get_object(builder, "btn_graph"));
     g_object_unref(builder);
     g_signal_connect(window, "destroy", G_CALLBACK(on_destroy), NULL);
     g_signal_connect(graph, "draw", G_CALLBACK(on_graph_draw), NULL);
+    g_signal_connect(btn_graph, "clicked", G_CALLBACK(on_btn_graph_click), NULL);
     gtk_window_set_keep_above( GTK_WINDOW(window), TRUE );
     gtk_widget_show(window);
 
-    init_points(graph,[](double x){ return 1/x; }, -1.0, 1.0);
+    init_points(graph, func, -1.0, 1.0);
 
     gtk_main();
 
@@ -91,7 +102,16 @@ gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data){
     draw_axis(cr, width, height, drawer.min_value.x, drawer.max_value.x, drawer.min_value.y, drawer.max_value.y);
     return FALSE;
 }
-
+void on_btn_graph_click(GtkWidget *btn, gpointer data){
+    const char *min_x_str = gtk_entry_get_text (GTK_ENTRY (min_x_limit));
+    const char *max_x_str = gtk_entry_get_text (GTK_ENTRY (max_x_limit));
+    try{
+        double min_x = std::stod(min_x_str);
+        double max_x = std::stod(max_x_str);
+        if(min_x == max_x)return;
+        init_points(graph, func, min_x, max_x);
+    }catch(std::exception& e){}
+}
 std::string trim_double_to_str(const double &num, const int &precision){
     std::string n_to_s = std::to_string(num);
     int cut =  n_to_s.find(".");
