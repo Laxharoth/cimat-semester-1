@@ -4,7 +4,8 @@ namespace canvas_facade{
         this->origin.x = new_origin.x;
         this->origin.y = new_origin.y;
     }
-    void CanvasFacade::draw_line(cairo_t *cr, const point &point_1, const point &point_2) const{
+    void CanvasFacade::draw_line(void *drawing_context, const point &point_1, const point &point_2) const{
+        cairo_t *cr = (cairo_t *)drawing_context;
         if(point_1.is_nan || point_2.is_nan) return;
         cairo_set_line_width(cr, 1.0);
         cairo_set_source_rgb(cr,0.0,0.0,0.0);
@@ -12,7 +13,8 @@ namespace canvas_facade{
         cairo_line_to(cr, point_2.x * scale_x - this->origin.x, this->origin.y - point_2.y * scale_y);
         cairo_stroke(cr);
     }
-    void CanvasFacade::draw_multiline(cairo_t *cr, point *points, size_t lenght) const{
+    void CanvasFacade::draw_multiline(void *drawing_context, point *points, size_t lenght) const{
+        cairo_t *cr = (cairo_t *)drawing_context;
         cairo_set_line_width(cr, 1.0);
         cairo_set_source_rgb(cr,0.0,0.0,0.0);
         size_t start = 0;

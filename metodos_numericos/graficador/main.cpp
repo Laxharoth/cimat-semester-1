@@ -86,7 +86,7 @@ gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data){
     drawer.scale_x = canvas_facade::choose_scale_helper(drawer.min_value.x, drawer.max_value.x, width);
     drawer.scale_y = canvas_facade::choose_scale_helper(drawer.min_value.y, drawer.max_value.y, height);
     drawer.set_origin( canvas_facade::choose_origin_helper(drawer.min_value.x, drawer.min_value.y,drawer.scale_x,drawer.scale_y, height) );
-    drawer.draw_multiline(cr, points.data(), points.size());
+    drawer.draw_multiline((void*)cr, points.data(), points.size());
     draw_axis(cr, width, height, drawer.min_value.x, drawer.max_value.x, drawer.min_value.y, drawer.max_value.y);
     return FALSE;
 }
