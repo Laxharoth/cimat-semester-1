@@ -13,7 +13,7 @@
 
 using canvas_facade::CanvasFacade;
 
-void init_points(GtkWidget *graph);
+void init_points(GtkWidget *graph, double (*single_variable_func)(double), const double &min_x, const double &max_x);
 gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data);
 void on_destroy();
 CanvasFacade drawer;
@@ -36,24 +36,20 @@ int main(int argc, char *argv[]){
     gtk_window_set_keep_above( GTK_WINDOW(window), TRUE );
 
     gtk_widget_show(window);
-    init_points(graph);
-    gtk_widget_queue_draw(graph);
+
+    init_points(graph,[](double x){ return 1/x; }, -1.0, 1.0);
 
     gtk_main();
 
     return EXIT_SUCCESS;
 }
 
-void init_points(GtkWidget *graph){
-    double min_y{};
-    double max_y{};
-    gint width{}, height{};
-    width = gtk_widget_get_allocated_width(graph);
-    height= gtk_widget_get_allocated_height(graph);
-    analize_single_var_function([](double x){ return x*x; }, -10, 10, min_y, max_y, points);
-    drawer.min_x = points[0].x;
-    drawer.min_y = min_y;
-    drawer.set_origin( canvas_facade::choose_origin_helper(points[0].x, min_y, height) );
+void init_points(GtkWidget *graph, double (*single_variable_func)(double), const double &min_x, const double &max_x){
+    double min_y{}, max_y{};
+    analize_single_var_function(single_variable_func, min_x, max_x, min_y, max_y, points);
+    drawer.min_value.x = min_x; drawer.min_value.y = min_y;
+    drawer.max_value.x = max_x; drawer.max_value.y = max_y;
+    gtk_widget_queue_draw(graph);
 }
 
 void on_destroy(){
