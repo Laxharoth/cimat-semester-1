@@ -9,8 +9,8 @@ simple_function_analizer.o: simple_function_analizer.cpp point.hpp simple_functi
 main.o: main.cpp point.hpp simple_function_analizer.hpp
 	g++ $(gkt_include) -c main.cpp
 
-canvas_facade.o: canvas_facade.cpp canvas_facade.hpp point.hpp
-	g++ $(gkt_include) -c canvas_facade.cpp
+canvas_facade.o: canvas_cairo_facade.cpp canvas_facade.hpp point.hpp
+	g++ $(gkt_include) -c canvas_cairo_facade.cpp -o canvas_facade.o
 
 one_go: simple_function_analizer.o main.o canvas_facade.o
 	g++ $(gkt_include) -o programa main.cpp simple_function_analizer.cpp canvas_facade.cpp $(gkt_include)
