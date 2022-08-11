@@ -36,16 +36,8 @@ function_operator_strategy* parse_commands(vector<string>::iterator *ptr_current
     if(current == end || *current ==")"){ return arg1;}
     std::string operator_keyword_binary = *current;
     ++current;
-    if(current == end || *current ==")") return arg1;
-    std::string operator_keyword_binary = "";
-    operator_keyword_binary = *current;
-    ++current;
-    auto t =  new function_operator_strategy_binary(
-        arg1, 
-        parse_commands(ptr_current, end, variable),
-        operator_keyword_binary
-    );
-    return t;
+    return  binary_strategy_factory(arg1, parse_commands(ptr_current, end, variable), operator_keyword_binary);
+}
 FunctionParser::FunctionParser():func(nullptr){ this->variable = new double; }
 FunctionParser::FunctionParser(const std::string &func_rep):func(nullptr){
     this->variable = new double;
