@@ -46,9 +46,11 @@ class FunctionParser{
     double *variable{nullptr};
     function_operator_strategy *func;
     public:
+    FunctionParser();
     FunctionParser(const std::string &func_rep);
     ~FunctionParser();
     double calc(double x);
+    void parse(const std::string &func_rep);
 };
 function_operator_strategy * parse_commands(std::vector<std::string>::iterator *current, std::vector<std::string>::iterator end, const double *variable);
 
