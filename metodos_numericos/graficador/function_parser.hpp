@@ -26,21 +26,21 @@ public:
     double calc() const;
 };
 class function_operator_strategy_uniary : public function_operator_strategy{
+protected:
     function_operator_strategy *arg;
-    string operator_keyword;
 public:
-    function_operator_strategy_uniary(function_operator_strategy *arg, const std::string &operator_keyword);
+    explicit function_operator_strategy_uniary(function_operator_strategy *arg);
     ~function_operator_strategy_uniary();
-    double calc() const;
+    virtual double calc() const = 0;
 };
 class function_operator_strategy_binary  : public function_operator_strategy{
+protected:
     function_operator_strategy *arg1;
     function_operator_strategy *arg2;
-    string operator_keyword;
 public:
-    function_operator_strategy_binary(function_operator_strategy *arg1, function_operator_strategy *arg2,const std::string &operator_keyword);
+    explicit function_operator_strategy_binary(function_operator_strategy *arg1, function_operator_strategy *arg2);
     ~function_operator_strategy_binary();
-    double calc() const;
+    virtual double calc() const = 0;
 };
 class FunctionParser{
     double *variable{nullptr};
@@ -51,6 +51,10 @@ class FunctionParser{
     double calc(double x);
 };
 function_operator_strategy * parse_commands(std::vector<std::string>::iterator *current, std::vector<std::string>::iterator end, const double *variable);
+
+function_operator_strategy * uniary_strategy_factory(function_operator_strategy *arg, const std::string &operator_keyword);
+function_operator_strategy * binary_strategy_factory(function_operator_strategy *arg1, function_operator_strategy *arg2, const std::string &operator_keyword);
 }
+
 
 #endif /* FUNCTION_PARSER_HPP */
