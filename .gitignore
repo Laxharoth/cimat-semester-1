@@ -4,3 +4,6 @@
 *test*
 *.log
 *.exe
+*.inc
+*.hh
+*.cc
