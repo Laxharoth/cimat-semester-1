@@ -1,6 +1,7 @@
 #include "point.hpp"
 #include "simple_function_analizer.hpp"
 #include "canvas_facade.hpp"
+#include "fparser.hh"
 
 #include <array>
 #include <iostream>
@@ -18,6 +19,7 @@ std::string trim_double_to_str(const double &num, const int &precision);
 void on_destroy();
 
 CanvasFacade drawer;
+FunctionParser parser;
 std::array<point, PARTITIONS_NUM> points;
 GtkWidget  *graph;
 GtkWidget  *min_x_limit;
@@ -80,9 +82,15 @@ void draw_axis(cairo_t * cr, const gint width, const gint height, const double &
 }
 
 void init_points(GtkWidget *graph, double (*single_variable_func)(double), double min_x, double max_x){
+    const char *func_rep = gtk_entry_get_text (GTK_ENTRY (function_rep));
+    try{
+        parser.Parse(func_rep, "x");
+    }catch(...){
+        parser.Parse("x", "x");
+    }
     if(min_x > max_x) std::swap(min_x, max_x);
     double min_y{}, max_y{};
-    analize_single_var_function(single_variable_func, min_x, max_x, min_y, max_y, points);
+    analize_single_var_function([](double x){return parser.Eval(&x);}, min_x, max_x, min_y, max_y, points);
     drawer.min_value.x = min_x; drawer.min_value.y = min_y;
     drawer.max_value.x = max_x; drawer.max_value.y = max_y;
     gtk_widget_queue_draw(graph);
