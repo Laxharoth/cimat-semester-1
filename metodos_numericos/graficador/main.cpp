@@ -55,6 +55,10 @@ void draw_axis(cairo_t * cr, const gint width, const gint height, const double &
     const gint distance_width = width / axis_lines, distance_height = height/ axis_lines;
     const double middle_x   = (max_x + min_x) / 2, middle_y = (max_y + min_y)/ 2;
     const double change_x   = (max_x - min_x) / axis_lines, change_y = (max_y - min_y) / axis_lines;
+    cairo_set_line_width(cr, 0.5);
+    if(middle_x == 0 && middle_x == 0)
+        cairo_set_line_width(cr, 1.5);
+    cairo_set_source_rgb(cr,0.0,0.0,0.0);
     cairo_move_to(cr, 0, middle_height); cairo_line_to(cr, width , middle_height);
     cairo_move_to(cr, middle_width, 0); cairo_line_to(cr, middle_width , height);
     for(gint line = 0; line < axis_lines / 2 ; ++line ){
@@ -79,6 +83,23 @@ void draw_axis(cairo_t * cr, const gint width, const gint height, const double &
         cairo_line_to(cr, middle_width + 4, middle_height + distance_height * line);
         cairo_move_to(cr, middle_width + 4, middle_height + distance_height * line - 10);
         cairo_show_text(cr, trim_double_to_str(middle_y - change_y * line, 2).c_str());
+    }
+    cairo_stroke(cr);
+    cairo_set_line_width(cr, 0.5);
+    for(gint line = 0; line < axis_lines / 2 ; ++line ){
+        if(line == 0) continue;
+        // right
+        cairo_move_to(cr, middle_width + distance_width * line, 0);
+        cairo_line_to(cr, middle_width + distance_width * line, height);
+        // up
+        cairo_move_to(cr, 0, middle_height - distance_height * line);
+        cairo_line_to(cr, width + 4, middle_height - distance_height * line);
+        // left
+        cairo_move_to(cr, middle_width - distance_width * line, 0);
+        cairo_line_to(cr, middle_width - distance_width * line, height);
+        // down
+        cairo_move_to(cr, 0, middle_height + distance_height * line);
+        cairo_line_to(cr, width, middle_height + distance_height * line);
     }
     cairo_stroke(cr);
 }
