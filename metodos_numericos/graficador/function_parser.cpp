@@ -32,7 +32,11 @@ function_operator_strategy* parse_commands(vector<string>::iterator *ptr_current
             ++current;
             if(operator_keyword_binary == "^"){
                 arg2 = binary_strategy_factory(arg2, get_single_argument(ptr_current, end, variable), "^");
+                if(current == end || *current ==")"){
+                    return binary_strategy_factory(arg1, arg2, "*");
+                }
                 operator_keyword_binary = *current;
+                ++current;
             }
             arg1 = binary_strategy_factory(arg1, arg2, "*");
         }
@@ -45,11 +49,16 @@ function_operator_strategy* get_single_argument(vector<string>::iterator *ptr_cu
     bool is_uniary = false;
     std::string operator_keyword = "";
     function_operator_strategy* arg1 = nullptr;
+    double sign = 1;
+    while(*current == "+" || *current == "-"){
+        if(*current == "-") sign *= -1;
+        ++current;
+    }
     if(*current == "("){
         ++current;
         arg1 = parse_commands(ptr_current, end, variable);
         ++current;
-        return arg1;
+        return binary_strategy_factory(arg1, new function_operator_strategy_identity(sign), "*");
     }
     if( my_string_functions::contains( unitary_operators, *current ) ){
         is_uniary = true;
@@ -60,7 +69,7 @@ function_operator_strategy* get_single_argument(vector<string>::iterator *ptr_cu
     else if(*current == "x")arg1 = new function_operator_strategy_identity(variable);
     else arg1= new function_operator_strategy_identity(std::stod(*current));
     if(*current != ")")++current;
-    return arg1;
+    return binary_strategy_factory(arg1, new function_operator_strategy_identity(sign), "*");
 }
 
 FunctionParser::FunctionParser():func(nullptr){ this->variable = new double; }
