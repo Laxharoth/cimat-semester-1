@@ -111,11 +111,9 @@ gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data){
     return FALSE;
 }
 void on_btn_graph_click(GtkWidget *btn, gpointer data){
-    const char *min_x_str = gtk_entry_get_text (GTK_ENTRY (min_x_limit));
-    const char *max_x_str = gtk_entry_get_text (GTK_ENTRY (max_x_limit));
+    const double min_x = gtk_spin_button_get_value (GTK_SPIN_BUTTON (min_x_limit));
+    const double max_x = gtk_spin_button_get_value (GTK_SPIN_BUTTON (max_x_limit));
     try{
-        double min_x = std::stod(min_x_str);
-        double max_x = std::stod(max_x_str);
         if(min_x == max_x)return;
         init_points(graph, func, min_x, max_x);
     }catch(std::exception& e){}
