@@ -25,4 +25,12 @@ bool contains(const std::vector<std::string>& tokens, const std::string& str){
     }
     return false;
 }
+std::string rm_double_space(std::string str){
+    size_t double_space = str.find("  ");
+    while( double_space != std::string::npos ){
+        str.erase(double_space, 1);
+        double_space = str.find("  ");
+    }
+    return str;
+}
 }
