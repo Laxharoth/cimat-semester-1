@@ -24,6 +24,7 @@ std::array<point, PARTITIONS_NUM> points;
 GtkWidget  *graph;
 GtkWidget  *min_x_limit;
 GtkWidget  *max_x_limit;
+GtkWidget  *function_rep;
 auto func = [](double x){ return 1/x; };
 
 gint main(int argc, char *argv[]){
@@ -33,6 +34,7 @@ gint main(int argc, char *argv[]){
     graph = GTK_WIDGET(gtk_builder_get_object(builder, "graph"));
     min_x_limit = GTK_WIDGET(gtk_builder_get_object(builder, "min_x_limit"));
     max_x_limit = GTK_WIDGET(gtk_builder_get_object(builder, "max_x_limit"));
+    function_rep = GTK_WIDGET(gtk_builder_get_object(builder, "function_rep"));
     GtkWidget  *btn_graph = GTK_WIDGET(gtk_builder_get_object(builder, "btn_graph"));
     g_object_unref(builder);
     g_signal_connect(window, "destroy", G_CALLBACK(on_destroy), NULL);
