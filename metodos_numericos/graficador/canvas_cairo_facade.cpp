@@ -1,4 +1,6 @@
 #include "canvas_facade.hpp"
+#include "canvas_facade.cpp"
+
 namespace canvas_facade{
     void CanvasFacade::set_origin(const point &new_origin){
         this->origin.x = new_origin.x;
@@ -35,13 +37,5 @@ namespace canvas_facade{
             cairo_line_to(cr, current.x * scale_x - this->origin.x, this->origin.y - current.y * scale_y);
         }
         cairo_stroke(cr);
-    }
-    point choose_origin_helper( const double &min_x, const double &min_y,
-                                const double &scale_x, const double &scale_y,
-                                const double &canvas_heigh){
-        return point{ min_x * scale_x, min_y * scale_y + canvas_heigh , false };
-    }
-    double choose_scale_helper(const double &min, const double &max, const double &space){
-        return space / (max - min);
     }
 }
