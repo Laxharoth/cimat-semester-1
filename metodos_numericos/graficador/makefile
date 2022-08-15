@@ -9,10 +9,9 @@ simple_function_analizer.o: simple_function_analizer.cpp point.hpp simple_functi
 	g++ -c simple_function_analizer.cpp
 main.o: main.cpp point.hpp simple_function_analizer.hpp
 	g++ $(gkt_include) -c main.cpp
-canvas_facade.o: canvas_cairo_facade.cpp canvas_facade.hpp point.hpp
+canvas_facade.o: canvas_cairo_facade.cpp canvas_facade.hpp canvas_facade.hpp point.hpp
 	g++ $(gkt_include) -c canvas_cairo_facade.cpp -o canvas_facade.o
 my_string_functions.o: my_string_functions.hpp my_string_functions.cpp
 	g++ -c my_string_functions.cpp
 fparser.o: fparser.hh fpconfig.hh fparser.cc
 	g++ -c fparser.cc
-	
