@@ -29,9 +29,8 @@ void solucion_triangular_inf( double **matriz, double *incognitas, double *resul
         incognitas[i] /= matriz[i][i];
     }
 }
-
 void solucion_triangular_sup( double **matriz, double *incognitas, double *result, const int &row){
-    for(int i = row - 1; i<=0; --i){
+    for(int i = row - 1; i>=0; --i){
         incognitas[i] = result[i];
         for(int j=i+1; j<=i - 1; ++j){
             incognitas[i] -= matriz[i][j] * incognitas[j];
