@@ -11,6 +11,7 @@
 #include <gtk/gtk.h>
 
 #include <cmath>
+#define Tolerancia_y 10E-6
 
 using canvas_facade::CanvasFacade;
 
@@ -150,6 +151,10 @@ void init_points(GtkWidget *graph, double (*single_variable_func)(double), doubl
     drawer.min_value.x = min_x; 
     drawer.max_value.x = max_x;
     analize_single_var_function([](double x){return current_function->eval(x);}, min_x, max_x, drawer.min_value.y, drawer.max_value.y, points);
+    if(drawer.max_value.y - drawer.min_value.y <= Tolerancia_y){
+        drawer.min_value.y -=1;
+        drawer.max_value.y +=1;
+    }
     gtk_widget_queue_draw(graph);
 }
 
