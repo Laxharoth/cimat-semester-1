@@ -1,3 +1,7 @@
+#Para ejecutar el programa se compila el con el comando make
+#Al terminar la compilación se ejecutara el programa
+#para ejecutar el programa de forma subsecuente se puede ejecutar como ./programa.run
+#Para compilar se requiere que la libreria gtk3 esté instalada
 gkt_include = `pkg-config --cflags --libs gtk+-3.0`
 object_files = simple_function_analizer.o main.o canvas_facade.o fparser.o
 exec: programa.run
