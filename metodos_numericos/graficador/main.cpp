@@ -12,15 +12,27 @@
 
 using canvas_facade::CanvasFacade;
 
+/**
+ * @brief Mapea los puntos en el intervalo especificado y actualiza los minimos y maximos de x y f(x)
+ */
 void init_points(GtkWidget *graph, double (*single_variable_func)(double), double min_x, double max_x);
+/**
+ * @brief Dibuja en la superficie cairo
+ */
 gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data);
+/**
+ * @brief vuelve a dibujar la funcion
+ */
 void on_btn_graph_click(GtkWidget *btn, gpointer data);
+/**
+ * @brief convierte un double a string con n puntos decimales (no redondea)
+ */
 std::string trim_double_to_str(const double &num, const int &precision);
 void on_destroy();
 
 CanvasFacade drawer;
 FunctionParser parser;
-std::array<point, PARTITIONS_NUM> points;
+std::array<point, PARTITIONS_NUM+1> points;
 GtkWidget  *graph;
 GtkWidget  *min_x_limit;
 GtkWidget  *max_x_limit;
@@ -40,9 +52,10 @@ gint main(int argc, char *argv[]){
     g_signal_connect(window, "destroy", G_CALLBACK(on_destroy), NULL);
     g_signal_connect(graph, "draw", G_CALLBACK(on_graph_draw), NULL);
     g_signal_connect(btn_graph, "clicked", G_CALLBACK(on_btn_graph_click), NULL);
-    gtk_window_set_keep_above( GTK_WINDOW(window), TRUE );
+    gtk_window_set_keep_above( GTK_WINDOW(window), FALSE );
     gtk_widget_show(window);
 
+    //dibuja la grafica por primera vez
     init_points(graph, func, -1.0, 1.0);
 
     gtk_main();
@@ -56,7 +69,7 @@ void draw_axis(cairo_t * cr, const gint width, const gint height, const double &
     const double middle_x   = (max_x + min_x) / 2, middle_y = (max_y + min_y)/ 2;
     const double change_x   = (max_x - min_x) / axis_lines, change_y = (max_y - min_y) / axis_lines;
     cairo_set_line_width(cr, 0.5);
-    if(middle_x == 0 && middle_x == 0)
+    if(middle_x == 0 && middle_y == 0)
         cairo_set_line_width(cr, 1.5);
     cairo_set_source_rgb(cr,0.0,0.0,0.0);
     cairo_move_to(cr, 0, middle_height); cairo_line_to(cr, width , middle_height);
@@ -105,17 +118,15 @@ void draw_axis(cairo_t * cr, const gint width, const gint height, const double &
 }
 
 void init_points(GtkWidget *graph, double (*single_variable_func)(double), double min_x, double max_x){
-    const char *func_rep = gtk_entry_get_text (GTK_ENTRY (function_rep));
     try{
-        parser.Parse(func_rep, "x");
+        parser.Parse(gtk_entry_get_text (GTK_ENTRY (function_rep)), "x");
     }catch(...){
         parser.Parse("x", "x");
     }
     if(min_x > max_x) std::swap(min_x, max_x);
-    double min_y{}, max_y{};
-    analize_single_var_function([](double x){return parser.Eval(&x);}, min_x, max_x, min_y, max_y, points);
-    drawer.min_value.x = min_x; drawer.min_value.y = min_y;
-    drawer.max_value.x = max_x; drawer.max_value.y = max_y;
+    drawer.min_value.x = min_x; 
+    drawer.max_value.x = max_x;
+    analize_single_var_function([](double x){return parser.Eval(&x);}, min_x, max_x, drawer.min_value.y, drawer.max_value.y, points);
     gtk_widget_queue_draw(graph);
 }
 
@@ -124,8 +135,8 @@ void on_destroy(){
 }
 
 gboolean on_graph_draw(GtkWidget *graph, cairo_t *cr, gpointer data){
-    gint width = gtk_widget_get_allocated_width(graph);
-    gint height= gtk_widget_get_allocated_height(graph);
+    const gint width = gtk_widget_get_allocated_width(graph);
+    const gint height= gtk_widget_get_allocated_height(graph);
     drawer.scale_x = canvas_facade::choose_scale_helper(drawer.min_value.x, drawer.max_value.x, width);
     drawer.scale_y = canvas_facade::choose_scale_helper(drawer.min_value.y, drawer.max_value.y, height);
     drawer.set_origin( canvas_facade::choose_origin_helper(drawer.min_value.x, drawer.min_value.y,drawer.scale_x,drawer.scale_y, height) );

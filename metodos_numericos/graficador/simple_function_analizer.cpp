@@ -1,10 +1,10 @@
 #include "simple_function_analizer.hpp"
 
-void analize_single_var_function( double (*func)(double), const double left, const double right ,double &min_y, double &max_y, std::array<point, PARTITIONS_NUM> &points ){
+void analize_single_var_function( double (*func)(double), const double left, const double right ,double &min_y, double &max_y, std::array<point, PARTITIONS_NUM+1> &points ){
     min_y = DBL_MAX;
     max_y = -min_y;
     const double increment = (right - left) / PARTITIONS_NUM;
-    for(unsigned int i = 0; i < PARTITIONS_NUM; ++i){
+    for(unsigned int i = 0; i <= PARTITIONS_NUM; ++i){
         point &current_point = points[i];
         current_point.is_nan = false;
         const double current_x = left + increment * i;
@@ -16,7 +16,7 @@ void analize_single_var_function( double (*func)(double), const double left, con
                 current_point.is_nan = true;
                 continue;
             }
-        }catch(std::exception &e){
+        }catch(...){
             current_point.is_nan = true;
             continue;
         }
