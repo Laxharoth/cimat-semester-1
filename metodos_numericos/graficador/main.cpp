@@ -151,6 +151,8 @@ void init_points(GtkWidget *graph, double (*single_variable_func)(double), doubl
     drawer.min_value.x = min_x; 
     drawer.max_value.x = max_x;
     analize_single_var_function([](double x){return current_function->eval(x);}, min_x, max_x, drawer.min_value.y, drawer.max_value.y, points);
+    // Si son casí iguales modifica los valores de maximos y minimos de y
+    //  si se quedan casí iguales la grafica tiene un comportaminto muy extraño.
     if(drawer.max_value.y - drawer.min_value.y <= Tolerancia_y){
         drawer.min_value.y -=1;
         drawer.max_value.y +=1;
