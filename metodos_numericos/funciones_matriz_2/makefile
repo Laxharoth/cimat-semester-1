@@ -15,10 +15,10 @@ test: test.run
 	./test.run
 test.run: test.o $(object_files)
 	g++ -o test.run test.o $(object_files)
-test.o: test.cpp funcion_matriz.hpp gauss_jordan.hpp factorizacion.hpp matrix_like/matriz_banda.hpp macros.hpp
+test.o: test.cpp funcion_matriz.hpp gauss_jordan.hpp factorizacion.hpp matrix_like/matrix_like.hpp matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp macros.hpp
 	g++ -c test.cpp 
 clean:
 	rm *.o
 matriz_banda.o: matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp
-	$(MAKE) matrix_like
+	$(MAKE) -C matrix_like
 	mv matrix_like/matriz_banda.o .
