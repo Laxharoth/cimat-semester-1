@@ -14,3 +14,10 @@ metodos_numericos/funciones_matriz_2/funcion_matriz.hpp
 metodos_numericos/graficador/fparser/makefile
 macros.hpp
 !metodos_numericos/macros.hpp
+matrix_like.hpp
+!metodos_numericos/matrix_like/matrix_like.hpp
+metodos_numericos/funciones_matriz_2/matrix_like/makefile
+matriz_banda.cpp
+matriz_banda.hpp
+!metodos_numericos/matrix_like/matriz_banda.cpp
+!metodos_numericos/matrix_like/matriz_banda.hpp
