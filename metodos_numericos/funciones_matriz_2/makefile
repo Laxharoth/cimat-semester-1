@@ -17,7 +17,7 @@ test: test.run
 	./test.run
 test.run: test.o $(object_files)
 	g++ -o test.run test.o $(object_files)
-test.o: test.cpp funcion_matriz.hpp gauss_jordan.hpp factorizacion.hpp matriz_banda.hpp
+test.o: test.cpp funcion_matriz.hpp gauss_jordan.hpp factorizacion.hpp matriz_banda.hpp macros.hpp
 	g++ -c test.cpp 
 clean:
 	rm *.o
