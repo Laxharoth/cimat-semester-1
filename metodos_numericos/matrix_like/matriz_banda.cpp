@@ -1,22 +1,16 @@
 #include "matriz_banda.hpp"
 
 MatrizBanda::MatrizBanda(const int &left, const int &right, const int &size):
-    left(left),right(right),size(size){
-    matriz = new double *[size];
-    for(int i=0; i<size; ++i){
-        matriz[i] = new double[left + right +1];
-    }
-    this->wrapper = new row_wrapper(this->matriz, this->left, this->right, this->size, 0);
+    left(left),right(right),size(size){ 
+    matriz = new matrix<double>(size, left + 1 + right);
+    this->wrapper = new row_wrapper(*(this->matriz), this->left, this->right, this->size, 0);
 }
 MatrizBanda::~MatrizBanda(){
     delete this->wrapper;
-    for(int i=0; i<size; ++i){
-        delete[] matriz[i];
-    }
-    delete[] matriz;
+    delete matriz;
 }
 
-MatrizBanda::row_wrapper::row_wrapper(double** &matriz, int &left, int &right, int &size, int row)
+MatrizBanda::row_wrapper::row_wrapper(matrix<double> &matriz, int &left, int &right, int &size, int row)
     :matriz(matriz),right(right),left(left),size(size),row(row){};
 
 double MatrizBanda::row_wrapper::default_value = 0;
