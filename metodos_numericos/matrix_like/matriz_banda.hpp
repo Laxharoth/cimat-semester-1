@@ -1,12 +1,14 @@
 #ifndef MATRIZ_BANDA_HPP
 #define MATRIZ_BANDA_HPP
 
-class MatrizBanda{
+#include "matrix_like.hpp"
+
+class MatrizBanda: public matrix_like<double>{
     class row_wrapper;
     double** matriz;
     row_wrapper *wrapper;
     int left{}, right{}, size{};
-class row_wrapper{
+class row_wrapper: public array_like<double>{
     static double default_value;
     double** &matriz;
     int &left, &right, &size;
