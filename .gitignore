@@ -12,3 +12,5 @@ metodos_numericos/graficador/function_wrapper/
 metodos_numericos/funciones_matriz_2/funcion_matriz.cpp
 metodos_numericos/funciones_matriz_2/funcion_matriz.hpp
 metodos_numericos/graficador/fparser/makefile
+macros.hpp
+!metodos_numericos/macros.hpp
