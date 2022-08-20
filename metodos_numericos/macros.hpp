@@ -1,5 +1,8 @@
 #include <iostream>
 #include <iomanip> 
+#include <chrono>
+
+using namespace std::chrono;
 
 #define matrix_to_ptr(matrix,ptr,size) for(int i = 0; i < size; ++i) ptr[i] = matrix[i];
 #define print_test( actual, expected ) \
