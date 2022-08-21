@@ -26,5 +26,24 @@ public:
     MatrizBanda(const size_t &left, const size_t &right, const size_t &size);
     ~MatrizBanda();
 };
+class MatrizDiagonal : public matrix_like<double> {
+    class row_wrapper;
+    size_t size;
+    double *data;
+    row_wrapper *wrapper;
+    class row_wrapper: public array_like<double>{
+    static double default_value;
+    double *data;
+    size_t size;
+    size_t row;
+    public:
+        row_wrapper(double *data, size_t size);
+        double & operator[](const size_t &col);
+        friend class MatrizDiagonal;
+    };
+    MatrizDiagonal(size_t size);
+    ~MatrizDiagonal();
+    row_wrapper & operator[](const size_t &col);
 
+};
 #endif /* MATRIZ_BANDA_HPP */
