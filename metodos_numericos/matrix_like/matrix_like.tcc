@@ -4,6 +4,7 @@
 #include "matrix_exception.hpp"
 #include <initializer_list>
 #include <cstdlib>
+#include <string.h>
 
 template <class T>
 class array_like{
@@ -94,6 +95,13 @@ class matrix : public matrix_like<T>{
             }
             j = 0;
         }
+    }
+    matrix(const matrix<T> &other){
+        this->shape_y = other.get_shape_y();
+        this->shape_x = other.get_shape_x();
+        data = new T[this->shape_y*this->shape_x];
+        array = new marray<T>(this->data, this->shape_y, this->shape_x);
+        memcpy(this->data, other->data, sizeof(T) * this->shape_y, this->shape_x);
     }
     ~matrix(){ delete array; delete[] data; }
     marray<T> &operator[](const size_t &row) { array->row = row; return *array; }
