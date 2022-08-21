@@ -10,6 +10,7 @@ protected:
     size_t size;
 public:
     virtual T &operator[](const size_t &row) = 0;
+    size_t get_size() const { return size; };
 };
 template <class T>
 class matrix_like{
@@ -18,6 +19,8 @@ protected:
     size_t shape_x;
 public:
     virtual array_like<T> &operator[](const size_t &row) = 0;
+    size_t get_shape_y() const { return shape_y; };
+    size_t get_shape_x() const { return shape_x; };
 };
 template <class T>
 class marray: public array_like<T>{
