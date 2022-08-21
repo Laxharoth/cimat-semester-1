@@ -13,6 +13,22 @@ public:
     size_t get_size() const { return size; };
 };
 template <class T>
+class vector : public array_like<T>{
+    T *data;
+    public:
+    vector(size_t size) { this->size = size ;data = new T[this->size]; }
+    vector(std::initializer_list<T> initial) { 
+        this->size = initial.size();
+        data = new T[this->size];
+        auto it = initial.begin();
+        for(size_t i = 0; i < this->size; ++i) {
+            data[i] = *it++;
+        }
+    }
+    ~vector() { delete[] data; }
+    T &operator[](const size_t &row) { return data[row]; }
+};
+template <class T>
 class matrix_like{
 protected:
     size_t shape_y;
