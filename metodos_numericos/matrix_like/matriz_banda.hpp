@@ -1,7 +1,7 @@
 #ifndef MATRIZ_BANDA_HPP
 #define MATRIZ_BANDA_HPP
 
-#include "matrix_like.hpp"
+#include "matrix_like.tcc"
 #include <cstdlib>
 
 class MatrizBanda: public matrix_like<double>{
