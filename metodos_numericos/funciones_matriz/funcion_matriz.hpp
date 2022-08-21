@@ -1,11 +1,15 @@
 #ifndef FUNCION_MATRIZ_HPP
 #define FUNCION_MATRIZ_HPP
 
-void solucion_diagonal(double *matriz, double *vector, double *result, int size);
-double determinante_diagonal(double *matriz_diagonal, const int &size);
-void inversa_diagonal(double *matriz_diagonal,double *inversa, const int &size);
-double determinante_triangular(double **matriz_triangular, const int &size);
-void solucion_triangular_inf( double **matriz, double *vector, double *result, const int &size);
-void solucion_triangular_sup( double **matriz, double *incognitas, double *result, const int &row);
+#include "matrix_like/matrix_like.tcc"
+
+#include <cstdlib>
+
+void solucion_diagonal(matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, size_t size);
+double determinante_diagonal(matrix_like<double> &matriz_diagonal, const size_t &size);
+void inversa_diagonal(matrix_like<double> &matriz_diagonal,array_like<double> &inversa, const size_t &size);
+double determinante_triangular(matrix_like<double> &matriz_triangular, const size_t &size);
+void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
+void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
 
 #endif /* FUNCION_MATRIZ_HPP */

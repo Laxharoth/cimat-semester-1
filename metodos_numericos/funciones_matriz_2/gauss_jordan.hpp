@@ -4,6 +4,6 @@
 #include "funcion_matriz.hpp"
 #include <string.h>
 
-void gauss_jordan( double **matriz, double *variables, double *resultados, const int  &size );
+void gauss_jordan( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados, const int &size );
 
 #endif /* GAUSS_JORDAN_HPP */
