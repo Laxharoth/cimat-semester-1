@@ -1,6 +1,7 @@
 #ifndef MATRIX_LIKE_HPP
 #define MATRIX_LIKE_HPP
 
+#include "matrix_exception.tcc"
 #include <initializer_list>
 #include <cstdlib>
 
@@ -37,6 +38,20 @@ public:
     virtual array_like<T> &operator[](const size_t &row) = 0;
     size_t get_shape_y() const { return shape_y; };
     size_t get_shape_x() const { return shape_x; };
+    vector<T> operator*(array_like<T>& vec){
+        if( vec.get_size() != this->shape_y )
+            throw wrong_shape_exception(this->get_shape_x(), this->get_shape_y(), vec.get_size(), 1);
+        vector<T> result(vec.get_size());
+        for(size_t i = 0; i < this->get_shape_y(); ++i) {
+            result[i] = 0;
+            for(size_t j = 0; j < this->get_shape_y(); ++j) {
+                T a = (*this)[j][i];
+                T b = vec[j];
+                result[i] += a * b;
+            }
+        }
+        return result;
+    };
 };
 template <class T>
 class marray: public array_like<T>{
