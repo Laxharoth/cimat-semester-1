@@ -2,27 +2,28 @@
 #define MATRIZ_BANDA_HPP
 
 #include "matrix_like.hpp"
+#include <cstdlib>
 
 class MatrizBanda: public matrix_like<double>{
     class row_wrapper;
     matrix<double> *matriz;
     row_wrapper *wrapper;
-    int left{}, right{}, size{};
+    size_t left{}, right{}, size{};
 class row_wrapper: public array_like<double>{
     static double default_value;
     matrix<double> &matriz;
-    int &left, &right, &size;
-    int row;
+    size_t &left, &right, &size;
+    size_t row;
 public:
-    row_wrapper(matrix<double> &matriz, int &left, int &right, int &size, int row);
-    double &get(const int &col);
-    double & operator[](const int &col);
+    row_wrapper(matrix<double> &matriz, size_t &left, size_t &right, size_t &size, size_t row);
+    double &get(const size_t &col);
+    double & operator[](const size_t &col);
     friend class MatrizBanda;
 };
 public:
-    row_wrapper &get(const int &row);
-    row_wrapper &operator[](const int &row);
-    MatrizBanda(const int &left, const int &right, const int &size);
+    row_wrapper &get(const size_t &row);
+    row_wrapper &operator[](const size_t &row);
+    MatrizBanda(const size_t &left, const size_t &right, const size_t &size);
     ~MatrizBanda();
 };
 
