@@ -1,7 +1,7 @@
 #ifndef MATRIX_LIKE_HPP
 #define MATRIX_LIKE_HPP
 
-#include "matrix_exception.tcc"
+#include "matrix_exception.hpp"
 #include <initializer_list>
 #include <cstdlib>
 
