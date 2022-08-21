@@ -21,3 +21,5 @@ matriz_banda.cpp
 matriz_banda.hpp
 !metodos_numericos/matrix_like/matriz_banda.cpp
 !metodos_numericos/matrix_like/matriz_banda.hpp
+matrix_exception.tcc
+!metodos_numericos/matrix_like/matrix_exception.tcc
