@@ -2,6 +2,7 @@
 #define MATRIZ_BANDA_HPP
 
 #include "matrix_like.tcc"
+#include <initializer_list>
 #include <cstdlib>
 
 class MatrizBanda: public matrix_like<double>{
@@ -42,6 +43,7 @@ class MatrizDiagonal : public matrix_like<double> {
         friend class MatrizDiagonal;
     };
     MatrizDiagonal(size_t size);
+    MatrizDiagonal(std::initializer_list<double> init);
     ~MatrizDiagonal();
     row_wrapper & operator[](const size_t &col);
 

@@ -36,9 +36,15 @@ double &MatrizBanda::row_wrapper::operator[](const size_t &col){
     return get(col);
 }
 MatrizDiagonal::MatrizDiagonal(size_t size):size(size){
-    this->shape_x = size;
-    this->shape_y = size;
-    this->data = new double[size];
+    this->shape_x = this->size;
+    this->shape_y = this->size;
+    this->data = new double[this->size];
+    this->wrapper = new MatrizDiagonal::row_wrapper(this->data, size);
+}
+MatrizDiagonal::MatrizDiagonal(std::initializer_list<double> init):size(init.size()){
+    this->shape_x = this->size;
+    this->shape_y = this->size;
+    this->data = new double[this->size];
     this->wrapper = new MatrizDiagonal::row_wrapper(this->data, size);
 }
 MatrizDiagonal::row_wrapper & MatrizDiagonal::operator[](const size_t &col){
@@ -46,6 +52,7 @@ MatrizDiagonal::row_wrapper & MatrizDiagonal::operator[](const size_t &col){
     return *(this->wrapper);
 }
 MatrizDiagonal::~MatrizDiagonal(){
+    delete this->wrapper;
     delete[] this->data;
 }
 MatrizDiagonal::row_wrapper::row_wrapper(double *data, size_t size):data(data),size(size){}
