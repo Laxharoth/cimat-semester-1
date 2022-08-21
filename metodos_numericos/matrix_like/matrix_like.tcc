@@ -101,7 +101,7 @@ class matrix : public matrix_like<T>{
         this->shape_x = other.get_shape_x();
         data = new T[this->shape_y*this->shape_x];
         array = new marray<T>(this->data, this->shape_y, this->shape_x);
-        memcpy(this->data, other->data, sizeof(T) * this->shape_y, this->shape_x);
+        memcpy(this->data, other.data, sizeof(T) * this->shape_y * this->shape_x);
     }
     ~matrix(){ delete array; delete[] data; }
     marray<T> &operator[](const size_t &row) { array->row = row; return *array; }
