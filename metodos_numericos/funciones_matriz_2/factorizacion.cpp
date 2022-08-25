@@ -50,3 +50,55 @@ const char* cant_factor_exception::what() const throw(){
     return "zero found in diagonal";
 }
 
+LDU_wrapper::LDU_wrapper(matrix_like *data,char type):data(data){
+    switch (type){
+    case LDU_wrapper::DIAGONAL:arr_wrapper = new LDU_wrapper::diagonal_strategy(data);
+        break;
+    case LDU_wrapper::CROUT:arr_wrapper = new LDU_wrapper::crout_strategy(data);
+        break;
+    case LDU_wrapper::DOOLITTLE:arr_wrapper = new LDU_wrapper::doolittle_strategy(data);
+        break;
+    default:
+    //TODO: make this exception
+        throw cant_factor_exception();
+        break;
+    }
+}
+LDU_wrapper LDU_wrapper::from(matrix_like *data,char type){
+    return LDU_wrapper(data, type);
+}
+array_like<double> &LDU_wrapper::operator[](const size_t &row){
+    (*(this->arr_wrapper)).row = row;
+    return *(this->arr_wrapper);
+}
+LDU_wrapper::array_wrapper::array_wrapper(matrix_like *data) :data(data),row(0){}
+double LDU_wrapper::array_wrapper::default_val = 0;
+double &LDU_wrapper::diagonal_strategy::operator[](const size_t &col){
+    if(row == col){
+        return (*data)[row][col];
+    }
+    default_val = 0;
+    return default_val;
+}
+double &LDU_wrapper::crout_strategy::operator[](const size_t &col){
+    if(row == col){
+        default_val = 1;
+        return default_val;
+    }
+    if(row > col){
+        default_val = 0;
+        return default_val;
+    }
+    return (*data)[row][col];
+}
+double &LDU_wrapper::doolittle_strategy::operator[](const size_t &col){
+    if(row == col){
+        default_val = 1;
+        return default_val;
+    }
+    if(row < col){
+        default_val = 0;
+        return default_val;
+    }
+    return (*data)[row][col];
+}
