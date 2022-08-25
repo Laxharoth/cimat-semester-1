@@ -15,6 +15,8 @@
 ############################################
 object_files =funcion_matriz.o matriz_banda.o factorizacion.o matrix_exception.o
 
+ matrix_like = matrix_like/matrix_like.tcc matrix_like/matrix_iterator.tcc
+
 programa: programa.run
 	./programa.run
 programa.run: main.o $(object_files)
@@ -30,7 +32,7 @@ test: test.run
 	./test.run
 test.run: test.o $(object_files)
 	g++ -o test.run test.o $(object_files)
-test.o: test.cpp funcion_matriz.hpp factorizacion.hpp matrix_like/matrix_like.tcc matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp macros.hpp function_wrapper/function_wrapper.hpp search_min_max.cpp
+test.o: test.cpp funcion_matriz.hpp factorizacion.hpp $(matrix_like) matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp macros.hpp function_wrapper/function_wrapper.hpp search_min_max.cpp
 	g++ -c test.cpp 
 clean:
 	rm *.o &
@@ -38,6 +40,6 @@ clean:
 matrix_exception.o: matrix_like/matrix_exception.hpp matrix_like/matrix_exception.cpp
 	$(MAKE) -C matrix_like matrix_exception.o
 	mv matrix_like/matrix_exception.o .
-matriz_banda.o: matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp matrix_like/matrix_like.tcc
+matriz_banda.o: matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp $(matrix_like)
 	$(MAKE) -C matrix_like matriz_banda.o
 	mv matrix_like/matriz_banda.o .
