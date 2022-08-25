@@ -27,6 +27,13 @@ class vector : public array_like<T>{
             data[i] = *it++;
         }
     }
+    vector(vector<T> &other){
+        this->size = other.get_size();
+        data = new T[this->size];
+        for(size_t i = 0; i < this->size; ++i) {
+            data[i] = other[i];
+        }
+    }
     ~vector() { delete[] data; }
     T &operator[](const size_t &row) { return data[row]; }
 };
