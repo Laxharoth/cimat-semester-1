@@ -7,6 +7,7 @@
 *.inc
 *.hh
 *.cc
+*.txt
 *.glade~
 metodos_numericos/graficador/function_wrapper/
 metodos_numericos/funciones_matriz_2/funcion_matriz.cpp
@@ -25,3 +26,6 @@ matrix_exception.hpp
 matrix_exception.cpp
 !metodos_numericos/matrix_like/matrix_exception.hpp
 !metodos_numericos/matrix_like/matrix_exception.cpp
+metodos_numericos/funciones_matriz_2/search_min_max.cpp
+metodos_numericos/funciones_matriz_2/biseccion.cpp
+metodos_numericos/funciones_matriz_2/function_wrapper/
