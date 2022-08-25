@@ -2,6 +2,7 @@
 #define FUNCION_MATRIZ_HPP
 
 #include "matrix_like/matrix_like.tcc"
+#include "factorizacion.hpp"
 
 #include <cstdlib>
 
@@ -12,5 +13,8 @@ double determinante_triangular(matrix_like<double> &matriz_triangular, const siz
 void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
 void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
 void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados, const int &size );
+void solucion_LDU( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
+void solucion_crout( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
+void solucion_doolittle( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
 
 #endif /* FUNCION_MATRIZ_HPP */

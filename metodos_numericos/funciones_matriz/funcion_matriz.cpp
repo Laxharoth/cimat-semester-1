@@ -32,11 +32,12 @@ void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &i
 void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size){
     for(int i = size - 1; i>=0; --i){
         incognitas[i] = result[i];
-        for(int j=i+1; j<=i - 1; ++j){
+        for(int j=i+1; j< size; ++j){
             incognitas[i] -= matriz[i][j] * incognitas[j];
         }
         incognitas[i] /= matriz[i][i];
     }
+}
 void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados, const int &size ){
     for( int i = 0 ; i < size ; ++i) variables[i] = resultados[i];
     for(int i=0; i<size; ++i){
@@ -57,3 +58,23 @@ void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_li
     solucion_triangular_sup(matriz, variables, resultados, size);
 }
 void solucion_LDU( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size){
+    auto matriz_doolittle = LDU_wrapper::from(&matriz, LDU_wrapper::DOOLITTLE);
+    auto matriz_crout = LDU_wrapper::from(&matriz, LDU_wrapper::CROUT);
+    vector<double> aux1(incognitas.get_size());
+    vector<double> aux2(incognitas.get_size());
+    solucion_triangular_inf( matriz_doolittle, aux1, result, size );
+    solucion_diagonal( matriz, aux2, aux1, size );
+    solucion_triangular_sup( matriz_crout, incognitas, aux2, size );
+}
+void solucion_crout( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size){
+    auto matriz_crout = LDU_wrapper::from(&matriz, LDU_wrapper::CROUT);
+    vector<double> aux1(incognitas.get_size());
+    solucion_triangular_inf( matriz, aux1, result, size );
+    solucion_triangular_sup( matriz_crout, incognitas, aux1, size );
+}
+void solucion_doolittle( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size){
+    auto matriz_doolittle = LDU_wrapper::from(&matriz, LDU_wrapper::DOOLITTLE);
+    vector<double> aux1(incognitas.get_size());
+    solucion_triangular_inf( matriz_doolittle, aux1, result, size );
+    solucion_triangular_sup( matriz, incognitas, aux1, size );
+}
