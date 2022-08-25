@@ -1,11 +1,26 @@
-object_files =gauss_jordan.o funcion_matriz.o matriz_banda.o factorizacion.o matrix_exception.o
+#******************************************#
+#   Para ejecutar las pruebas hechas       #
+#   como comprobación de la funcionalidad  #
+#   utilizar "make test"                   #
+#   Para ejecutar las pruebas hechas       #
+#   para la matriz en el archivo A.txt     #
+#   utilizar "make"                        #
+#******************************************#
+#	la funcion para encontrar maximos y minimos
+# se encuentra en el archivo search_min_max.cpp
+# 	las funciones para resolver ecuaciones 
+# se encuentran en los arhivos funcion_matriz.*
+# 	las funcions para factorizar matrices
+# se encuentran en los archivos factorizacion.*
+############################################
+object_files =funcion_matriz.o matriz_banda.o factorizacion.o matrix_exception.o
 
+programa: programa.run
+	./programa.run
 programa.run: main.o $(object_files)
 	g++ -o programa.run main.o $(object_files)
-main.o: main.cpp funcion_matriz.hpp gauss_jordan.hpp factorizacion.hpp matrix_like/matriz_banda.hpp
+main.o: main.cpp funcion_matriz.hpp factorizacion.hpp matrix_like/matriz_banda.hpp
 	g++ -c main.cpp
-gauss_jordan.o: gauss_jordan.hpp funcion_matriz.hpp gauss_jordan.cpp
-	g++ -c gauss_jordan.cpp
 funcion_matriz.o: funcion_matriz.hpp funcion_matriz.cpp
 	g++ -c funcion_matriz.cpp
 factorizacion.o: factorizacion.hpp factorizacion.cpp
@@ -15,10 +30,11 @@ test: test.run
 	./test.run
 test.run: test.o $(object_files)
 	g++ -o test.run test.o $(object_files)
-test.o: test.cpp funcion_matriz.hpp gauss_jordan.hpp factorizacion.hpp matrix_like/matrix_like.tcc matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp macros.hpp
+test.o: test.cpp funcion_matriz.hpp factorizacion.hpp matrix_like/matrix_like.tcc matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp macros.hpp function_wrapper/function_wrapper.hpp search_min_max.cpp
 	g++ -c test.cpp 
 clean:
-	rm *.o
+	rm *.o &
+	rm *.run &
 matrix_exception.o: matrix_like/matrix_exception.hpp matrix_like/matrix_exception.cpp
 	$(MAKE) -C matrix_like matrix_exception.o
 	mv matrix_like/matrix_exception.o .
