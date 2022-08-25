@@ -33,7 +33,7 @@ std::unique_ptr<std::vector<min_max_value>> search_min_max(FunctionWrapper *fw,c
         double y_izquierda = derivada.eval(x_izquierda);
         double y_derecha   = derivada.eval(x_izquierda + SEARCH_MIN_MAX_DELTA);
         if(y_izquierda * y_derecha > 0.0) continue;
-        double raiz = biseccion(&derivada, x_izquierda, x_izquierda + SEARCH_MIN_MAX_DELTA);
+        double raiz = biseccion(&derivada, x_izquierda, x_izquierda + SEARCH_MIN_MAX_DELTA, 1000, nullptr, nullptr);
         double aux_seleccionar_tipo = derivada_2.eval(raiz);
         if(aux_seleccionar_tipo > TOLERANCIA){
             puntos.push_back(min_max_value{ raiz, MIN });
