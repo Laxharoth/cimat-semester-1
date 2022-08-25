@@ -50,7 +50,7 @@ const char* cant_factor_exception::what() const throw(){
     return "zero found in diagonal";
 }
 
-LDU_wrapper::LDU_wrapper(matrix_like *data,char type):data(data){
+LDU_wrapper::LDU_wrapper(matrix_like *data,char type):matrix_like(data->get_shape_y(), data->get_shape_x()),data(data){
     switch (type){
     case LDU_wrapper::DIAGONAL:arr_wrapper = new LDU_wrapper::diagonal_strategy(data);
         break;
@@ -71,7 +71,7 @@ array_like<double> &LDU_wrapper::operator[](const size_t &row){
     (*(this->arr_wrapper)).row = row;
     return *(this->arr_wrapper);
 }
-LDU_wrapper::array_wrapper::array_wrapper(matrix_like *data) :data(data),row(0){}
+LDU_wrapper::array_wrapper::array_wrapper(matrix_like *data):array_like<double>(data->get_shape_x()),data(data),row(0){}
 double LDU_wrapper::array_wrapper::default_val = 0;
 double &LDU_wrapper::diagonal_strategy::operator[](const size_t &col){
     if(row == col){

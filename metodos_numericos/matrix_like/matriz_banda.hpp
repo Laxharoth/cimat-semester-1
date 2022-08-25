@@ -9,11 +9,11 @@ class MatrizBanda: public matrix_like<double>{
     class row_wrapper;
     matrix<double> *matriz;
     row_wrapper *wrapper;
-    size_t left{}, right{}, size{};
+    size_t left{}, right{},size{};
 class row_wrapper: public array_like<double>{
     static double default_value;
     matrix<double> &matriz;
-    size_t &left, &right, &size;
+    size_t &left, &right;
     size_t row;
 public:
     row_wrapper(matrix<double> &matriz, size_t &left, size_t &right, size_t &size, size_t row);
@@ -35,7 +35,6 @@ class MatrizDiagonal : public matrix_like<double> {
     class row_wrapper: public array_like<double>{
     static double default_value;
     double *data;
-    size_t size;
     size_t row;
     public:
         row_wrapper(double *data, size_t size);
