@@ -11,5 +11,6 @@ void inversa_diagonal(matrix_like<double> &matriz_diagonal,array_like<double> &i
 double determinante_triangular(matrix_like<double> &matriz_triangular, const size_t &size);
 void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
 void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size);
+void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados, const int &size );
 
 #endif /* FUNCION_MATRIZ_HPP */
