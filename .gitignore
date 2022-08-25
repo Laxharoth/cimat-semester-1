@@ -29,3 +29,5 @@ matrix_exception.cpp
 metodos_numericos/funciones_matriz_2/search_min_max.cpp
 metodos_numericos/funciones_matriz_2/biseccion.cpp
 metodos_numericos/funciones_matriz_2/function_wrapper/
+matrix_iterator.tcc
+!metodos_numericos/matrix_like/matrix_iterator.tcc
