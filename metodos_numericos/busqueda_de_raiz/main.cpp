@@ -7,45 +7,51 @@
 #include <string>
 #include <iostream>
 
+void run_test( FunctionWrapper *func,const char*, double lim_inf, double lim_sup, double x_init );
+void run_test_Newton(FunctionWrapper *func, double x_init,int iteraciones, double &error, double &res);
 int main(int argc, char** argv){
-    const char* funcion_str = argv[1];
-    const double x_inferior = std::stod(argv[2]);
-    const double x_superior = std::stod(argv[3]);
-
-    std::cout << funcion_str << std::endl;
-
+    const char *f1 = "x^3-21*x^2+120*x-100";
+    const char *f1_2 = "0.99*x^3-21*x^2+120*x-100";
+    const char *f1_3 = "1.01*x^3-21*x^2+120*x-100";
+    const char *f2 = "2 - log(x) / x";
+    const char *f3 = "log( x^2 +1) - 2.71828^(0.4*x)*cos(3.1416*x)";
     FunctionParser parser;
     FunctionParserAdapter_to_FWrapper fp( &parser );
 
-    parser.Parse(funcion_str, "x");
-    try{
-        double raiz_biseccion = biseccion( &fp, x_inferior, x_superior );
-        std::cout << "Raiz encontrada en (" << raiz_biseccion <<"," << fp.eval(raiz_biseccion) <<  ") por biseccion" << std::endl;
-        double raiz_newton = newton( &fp, x_superior);
-        std::cout << "Raiz encontrada en (" << raiz_newton <<"," << fp.eval(raiz_newton) <<  ") por Newton" << std::endl;
-        const char* min_max_funcion = "sin(x)";
-        parser.Parse(min_max_funcion,"x");
-        auto min_max_values = search_min_max(&fp, x_inferior, 10);
-        std::cout << "minimos y maximos encontrados en "<< min_max_funcion <<" desde " << x_inferior << "hasta" << x_superior << std::endl;
-        for(auto &&value : *min_max_values) {
-            std::cout << "raiz : " << value.x_value<< ", ";
-            switch(value.type) {
-                case MIN: std::cout << "type : "<< "min" << std::endl; break;
-                case MAX: std::cout << "type : "<< "max" << std::endl; break;
-                case SILLA: std::cout << "type : "<< "silla" << std::endl; break;
-            }
-        }
-    }
-    catch(const char* e){
-        if(e == ERROR_BAD_LIMITS){
-            std::cout << "No se puede encontrar una raiz_biseccion con los limites proporcionados";
-            return 1;
-        }
-        throw e;
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
+    parser.Parse(f1, "x");
+    run_test(&fp,f1,0.8,1.2,1.2);
+    parser.Parse(f1_2, "x");
+    run_test(&fp,f1_2,0.8,1.2,1.2);
+    parser.Parse(f1_3, "x");
+    run_test(&fp,f1_3,0.8,1.2,1.2);
+    parser.Parse(f2, "x");
+    std::cout << "Function:" << f2 << std::endl;
+    double error, res;
+    run_test_Newton(&fp,1,1000,error,res);
+    parser.Parse(f3, "x");
+    run_test(&fp,f3,3.6,3.8,3.8);
     return 0;
+}
+void run_test_Newton(FunctionWrapper *func, double x_init,int iteraciones, double &error, double &res){
+    std::cout << "Newton:" << std::endl;
+    std::cout << "x inicial:" <<x_init << std::endl;
+    std::cout << "valore iniciales:" <<func->eval(x_init)<< std::endl;
+    res = newton(func, x_init,10000, &iteraciones,&error);
+    std::cout << "raiz encontrada:" << res << std::endl;
+    std::cout << "iteraciones: " << iteraciones << std::endl;
+    std::cout << "error relativo: " << error << std::endl;
+}
+void run_test( FunctionWrapper *func,const char* fn_str, double lim_inf, double lim_sup, double x_init ){
+    double res{};
+    double error{};
+    int iteraciones{};
+    std::cout << "Function:" << fn_str << std::endl;
+    std::cout << "biseccion:" << std::endl;
+    std::cout << "intervalo inicial:" <<"["<<lim_inf<<","<<lim_sup<<"]" << std::endl;
+    std::cout << "valores iniciales:" <<"("<<func->eval(lim_inf)<<","<<func->eval(lim_sup)<<")" << std::endl;
+    res = biseccion(func, lim_inf, lim_sup,10000,&iteraciones,&error);
+    std::cout << "raiz encontrada:" << res << std::endl;
+    std::cout << "iteraciones" << iteraciones << std::endl;
+    std::cout << "error relativo: " << error << std::endl;
+    run_test_Newton(func,x_init,iteraciones,error,res);
 }
