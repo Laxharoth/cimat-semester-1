@@ -33,6 +33,15 @@ double &MatrizBanda::row_wrapper::get(const size_t &col){
     if(row < col){return matriz[col][left + col - row ]; }
     return matriz[col][ left - row  + col ];
 }
+size_t MatrizBanda::row_wrapper::get_rbegin_n() const{
+    if( row <= left ) return 0;
+    return  row - left;
+};
+size_t MatrizBanda::row_wrapper::get_rend_n() const{
+    if(row > right) return get_size();
+    return get_size() - right + row;
+};
+
 double &MatrizBanda::row_wrapper::operator[](const size_t &col){
     return get(col);
 }
@@ -62,3 +71,11 @@ double &MatrizDiagonal::row_wrapper::operator[](const size_t &col){
     default_value = 0;
     return default_value;
 }
+size_t MatrizDiagonal::row_wrapper::get_row() const {return row;}
+size_t MatrizBanda::row_wrapper::get_row() const {return row;}
+size_t MatrizDiagonal::row_wrapper::get_rbegin_n() const{
+    return row;
+};
+size_t MatrizDiagonal::row_wrapper::get_rend_n() const{
+    return row + 1;
+};

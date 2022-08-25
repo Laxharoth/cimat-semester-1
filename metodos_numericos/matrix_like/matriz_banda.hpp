@@ -20,6 +20,9 @@ public:
     double &get(const size_t &col);
     double & operator[](const size_t &col);
     friend class MatrizBanda;
+    size_t get_row() const;
+    size_t get_rbegin_n() const;
+    size_t get_rend_n() const;
 };
 public:
     row_wrapper &get(const size_t &row);
@@ -40,6 +43,9 @@ class MatrizDiagonal : public matrix_like<double> {
         row_wrapper(double *data, size_t size);
         double & operator[](const size_t &col);
         friend class MatrizDiagonal;
+        size_t get_row() const;
+        size_t get_rbegin_n() const;
+        size_t get_rend_n() const;
     };
     MatrizDiagonal(size_t size);
     MatrizDiagonal(std::initializer_list<double> init);

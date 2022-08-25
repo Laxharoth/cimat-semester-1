@@ -30,14 +30,20 @@ protected:
     class diagonal_strategy : public array_wrapper{
         using array_wrapper::array_wrapper;
         double &operator[](const size_t &col);
+        size_t get_rbegin_n() const;
+        size_t get_rend_n() const;
     };
     class crout_strategy : public array_wrapper{
         using array_wrapper::array_wrapper;
         double &operator[](const size_t &col);
+        size_t get_rbegin_n() const;
+        size_t get_rend_n() const;
     };
     class doolittle_strategy : public array_wrapper{
         using array_wrapper::array_wrapper;
         double &operator[](const size_t &col);
+        size_t get_rbegin_n() const;
+        size_t get_rend_n() const;
     };
     array_wrapper *arr_wrapper;
     public:

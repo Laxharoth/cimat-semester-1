@@ -26,23 +26,29 @@ void metodo_de_doolittle(matrix_like<double> &matriz, matrix_like<double> &matri
     }
 }
 void factorizacion_LDU(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_diagonal, matrix_like<double> &matriz_superior, const int &size){
-    auto calcular_factor_inferior = [&](const int &i, const int &j, matrix_like<double> &matriz_objetivo){
-        matriz_objetivo[i][j] = matriz[i][j];
+    auto calcular_factor_inferior = [&](const int &i, const int &j){
+        matriz_inferior[i][j] = matriz[i][j];
         for(int k = 0; k <= j-1; ++k)
-            matriz_objetivo[i][j] -= matriz_inferior[i][k] * matriz_superior[k][j]; 
+            matriz_inferior[i][j] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][j]; 
+        matriz_inferior[i][j]/= matriz_diagonal[j][j];
     };
     auto calcular_factor_superior = [&](const int &i, const int &j){
         matriz_superior[i][j] = matriz[i][j];
         for(int k = 0; k <= i-1; ++k)
-            matriz_superior[i][j] -= matriz_inferior[i][k] * matriz_superior[k][j];         
-        matriz_superior[i][j] /= matriz_inferior[i][i];
+            matriz_superior[i][j] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][j];
+        matriz_superior[i][j] /= matriz_diagonal[i][i];
+    };
+    auto calcular_factor_diagonal = [&](const int &i, const int &j){
+        matriz_diagonal[i][j] = matriz[i][j];
+        for(int k = 0; k <= j-1; ++k)
+            matriz_diagonal[i][j] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][j]; 
     };
     for(int i=0; i<size; ++i){
         for(int j=0; j<i; ++j){
-            calcular_factor_inferior(i,j,matriz_inferior);
+            calcular_factor_inferior(i,j);
             calcular_factor_superior(j,i);
         }
-        calcular_factor_inferior(i,i,matriz_diagonal);
+        calcular_factor_diagonal(i,i);
         if(matriz_inferior[i][i] == 0) throw cant_factor_exception();
     }
 }
@@ -80,6 +86,8 @@ double &LDU_wrapper::diagonal_strategy::operator[](const size_t &col){
     default_val = 0;
     return default_val;
 }
+size_t LDU_wrapper::diagonal_strategy::get_rbegin_n() const { return row; }
+size_t LDU_wrapper::diagonal_strategy::get_rend_n() const { return row+1; }
 double &LDU_wrapper::crout_strategy::operator[](const size_t &col){
     if(row == col){
         default_val = 1;
@@ -91,6 +99,8 @@ double &LDU_wrapper::crout_strategy::operator[](const size_t &col){
     }
     return (*data)[row][col];
 }
+size_t LDU_wrapper::crout_strategy::get_rbegin_n() const { return row; }
+size_t LDU_wrapper::crout_strategy::get_rend_n() const { return get_size(); }
 double &LDU_wrapper::doolittle_strategy::operator[](const size_t &col){
     if(row == col){
         default_val = 1;
@@ -102,3 +112,5 @@ double &LDU_wrapper::doolittle_strategy::operator[](const size_t &col){
     }
     return (*data)[row][col];
 }
+size_t LDU_wrapper::doolittle_strategy::get_rbegin_n() const { return 0; }
+size_t LDU_wrapper::doolittle_strategy::get_rend_n() const { return row+1; }
