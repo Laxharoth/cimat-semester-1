@@ -12,3 +12,6 @@ function_wrapper.o:
 fparser.o:
 	$(MAKE) -C fparser
 	mv fparser/fparser.o .
+clean:
+	rm *.o
+	rm *.run
