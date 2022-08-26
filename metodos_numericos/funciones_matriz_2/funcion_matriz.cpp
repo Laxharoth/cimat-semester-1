@@ -44,7 +44,7 @@ void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &i
         incognitas[i] /= matriz[i][i];
     }
 }
-void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados, const int &size ){
+void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados){
     const size_t size = matriz.get_shape_x();
     for( int i = 0 ; i < size ; ++i) variables[i] = resultados[i];
     for(int i=0; i<size; ++i){
@@ -73,13 +73,13 @@ void solucion_LDU( matrix_like<double> &matriz, array_like<double> &incognitas, 
     solucion_diagonal( matriz, aux2, aux1);
     solucion_triangular_sup( matriz_crout, incognitas, aux2);
 }
-void solucion_crout( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size){
+void solucion_crout( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
     auto matriz_crout = LDU_wrapper::from(&matriz, LDU_wrapper::CROUT);
     mymtx::vector<double> aux1(incognitas.get_size());
     solucion_triangular_inf( matriz, aux1, result);
     solucion_triangular_sup( matriz_crout, incognitas, aux1);
 }
-void solucion_doolittle( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result, const size_t &size){
+void solucion_doolittle( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
     auto matriz_doolittle = LDU_wrapper::from(&matriz, LDU_wrapper::DOOLITTLE);
     mymtx::vector<double> aux1(incognitas.get_size());
     solucion_triangular_inf( matriz_doolittle, aux1, result );
