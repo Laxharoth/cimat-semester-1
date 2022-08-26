@@ -6,13 +6,17 @@
 #include <cstdlib>
 #include <string.h>
 
+namespace mymtx{
+
 template <class T>
 class matrix_like;
 template <class T>
 class matrix;
 template <class T>
 class array_like;
+}
 #include "matrix_iterator.tcc"
+namespace mymtx{
 template <class T>
 class vector;
 template <class T>
@@ -148,4 +152,5 @@ class marray: public array_like<T>{
     size_t get_row() const {return row;}
 };
 
+}
 #endif /* MATRIX_LIKE_HPP */
