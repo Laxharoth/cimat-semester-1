@@ -31,7 +31,7 @@ test: test.run
 	clear 
 	./test.run
 test.run: test.o $(object_files)
-	g++ -o test.run test.o $(object_files)
+	g++ -pthread  -o test.run test.o $(object_files)
 test.o: test.cpp funcion_matriz.hpp factorizacion.hpp $(matrix_like) matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp macros.hpp function_wrapper/function_wrapper.hpp search_min_max.cpp
 	g++ -c test.cpp 
 clean:

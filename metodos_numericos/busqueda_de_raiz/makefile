@@ -1,3 +1,7 @@
+##############################
+# Para Ejecutar el programa  #
+#  utilizar el comando make  #
+##############################
 objetos = main.o function_wrapper.o fparser.o
 
 exec: programa.run
