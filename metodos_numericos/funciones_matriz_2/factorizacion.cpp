@@ -56,17 +56,17 @@ void factorizacion_LDU(matrix_like<double> &matriz, matrix_like<double> &matriz_
             matriz_superior[i][j] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][j];
         matriz_superior[i][j] /= matriz_diagonal[i][i];
     };
-    auto calcular_factor_diagonal = [&](const int &i, const int &j){
-        matriz_diagonal[i][j] = matriz[i][j];
-        for(int k = 0; k <= j-1; ++k)
-            matriz_diagonal[i][j] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][j]; 
+    auto calcular_factor_diagonal = [&](const int &i){
+        matriz_diagonal[i][i] = matriz[i][i];
+        for(int k = 0; k <= i-1; ++k)
+            matriz_diagonal[i][i] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][i]; 
     };
     for(int i=0; i<size; ++i){
         for(int j=0; j<i; ++j){
             calcular_factor_inferior(i,j);
             calcular_factor_superior(j,i);
         }
-        calcular_factor_diagonal(i,i);
+        calcular_factor_diagonal(i);
         if(matriz_inferior[i][i] == 0) throw cant_factor_exception();
     }
 }
