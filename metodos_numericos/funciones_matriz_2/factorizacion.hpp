@@ -3,6 +3,9 @@
 
 #include <exception>
 
+using mymtx::matrix_like;
+using mymtx::array_like;
+
 void metodo_de_crout(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_superior, const int &size);
 void metodo_de_doolittle(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_superior, const int &size);
 void factorizacion_LDU(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_diagonal, matrix_like<double> &matriz_superior, const int &size);

@@ -5,6 +5,8 @@
 #include <initializer_list>
 #include <cstdlib>
 
+namespace mymtx{
+
 class MatrizBanda: public matrix_like<double>{
     class row_wrapper;
     matrix<double> *matriz;
@@ -53,4 +55,5 @@ class MatrizDiagonal : public matrix_like<double> {
     row_wrapper & operator[](const size_t &col);
 
 };
+}
 #endif /* MATRIZ_BANDA_HPP */

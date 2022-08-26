@@ -13,7 +13,7 @@ int main(int argc, char **argv){
     size_t cols;
     f_matriz >> rows;
     f_matriz >> cols;
-    matrix<double> matriz(rows, cols);
+    mymtx::matrix<double> matriz(rows, cols);
     for(size_t i = 0; i < rows; ++i){
         for(size_t j = 0; j < cols; ++j){
             f_matriz >> matriz[i][j];
@@ -26,12 +26,12 @@ int main(int argc, char **argv){
     f_matriz >> rows;
     f_matriz >> cols;
 
-    vector<double> vec(rows);
+    mymtx::vector<double> vec(rows);
     for(size_t i = 0; i < rows; ++i){
         f_matriz >> vec[i];
     }
     f_vector.close();
-    vector<double> variables(vec.get_size());
+    mymtx::vector<double> variables(vec.get_size());
     {
         auto cpy = matriz;
         ANNOUNCE_TEST("Metodo: Gauss")

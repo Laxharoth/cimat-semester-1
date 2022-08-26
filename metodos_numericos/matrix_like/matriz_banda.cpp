@@ -1,5 +1,7 @@
 #include "matriz_banda.hpp"
 
+namespace mymtx{
+
 double MatrizBanda::row_wrapper::default_value = 0;
 double MatrizDiagonal::row_wrapper::default_value = 0;
 MatrizBanda::MatrizBanda(const size_t &left, const size_t &right, const size_t &size):
@@ -79,3 +81,5 @@ size_t MatrizDiagonal::row_wrapper::get_rbegin_n() const{
 size_t MatrizDiagonal::row_wrapper::get_rend_n() const{
     return row + 1;
 };
+
+}

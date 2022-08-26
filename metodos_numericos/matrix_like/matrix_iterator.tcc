@@ -3,6 +3,7 @@
 #include "matrix_like.tcc"
 #include <iterator>
 
+namespace mymtx{
 template<class T>
 class array_like_iterator : public std::iterator<std::forward_iterator_tag, T>{
     array_like_iterator(){}
@@ -32,5 +33,5 @@ public:
     {   return data==rhs.data && col<=rhs.col;  }
     T& operator*() {return (*data)[col];}
 };
-
+}
 #endif /* MATRIX_ITERATOR_TCC */
