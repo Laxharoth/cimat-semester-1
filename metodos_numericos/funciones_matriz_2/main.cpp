@@ -51,6 +51,13 @@ int main(int argc, char **argv){
         ANNOUNCE_TEST("Metodo: Solucion Doolittle")
         measure_time( solucion_doolittle( cpy, variables, vec, vec.get_size() ) );
     }
+    {
+        auto cpy = matriz;
+        ANNOUNCE_TEST("Metodo: Factorizacion LDU")
+        measure_time( metodo_de_doolittle( cpy,cpy,cpy,cpy.get_shape_y() ) );
+        ANNOUNCE_TEST("Metodo: Solucion LDU")
+        measure_time( solucion_LDU( cpy, variables, vec, vec.get_size() ) );
+    }
 
     return 0;
 }
