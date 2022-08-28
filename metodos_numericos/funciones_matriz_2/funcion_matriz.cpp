@@ -28,8 +28,9 @@ void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &i
     const size_t size = matriz.get_shape_x();
     for(int i=0; i<size; ++i){
         incognitas[i] = result[i];
-        for(int j=0; j<=i - 1; ++j){
-            incognitas[i] -= matriz[i][j] * incognitas[j];
+        auto iter = matriz[i].begin();
+        for(int j=0; j<=i - 1; ++j, ++iter){
+            incognitas[i] -= (*iter) * incognitas[j];
         }
         incognitas[i] /= matriz[i][i];
     }
@@ -38,26 +39,28 @@ void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &i
     const size_t size = matriz.get_shape_x();
     for(int i = size - 1; i>=0; --i){
         incognitas[i] = result[i];
-        for(int j=i+1; j< size; ++j){
-            incognitas[i] -= matriz[i][j] * incognitas[j];
+        for(auto iter = matriz[i].begin()+(i+1);iter<matriz[i].end(); ++iter){
+            incognitas[i] -= (*iter) * incognitas[iter.get_col()];
         }
         incognitas[i] /= matriz[i][i];
     }
 }
 void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados){
     const size_t size = matriz.get_shape_x();
-    for( int i = 0 ; i < size ; ++i) variables[i] = resultados[i];
     for(int i=0; i<size; ++i){
         const double divide_privote = matriz[i][i];
-        for(int j=i; j<size; ++j){
-            matriz[i][j] /= divide_privote;
+        for(auto j=matriz[i].begin()+i; j<matriz[i].rend(); ++j){
+            *j /= divide_privote;
         }
         resultados[i] /= divide_privote;
         for(int j=i+1; j < size; ++j){
-            const double coeficiente_eliminar = matriz[j][i];
-            matriz[j][i] = 0;
-            for(int k=i+1; k < size; ++k){
-                matriz[j][k] -= coeficiente_eliminar * matriz[i][k];
+            auto iter_pivote = matriz[i].begin()+(i+1);
+            auto iter = matriz[j].begin()+i;
+            auto end  = matriz[j].rend();
+            const double coeficiente_eliminar = *iter;
+            *iter = 0;
+            for(++iter; iter < end; ++iter,++iter_pivote){
+                *iter -= coeficiente_eliminar * (*iter_pivote);
             }
             resultados[j] -= coeficiente_eliminar * resultados[i] / matriz[i][i];
         }

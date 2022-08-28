@@ -99,21 +99,31 @@ public:
     size_t get_size() const { return size; };
     virtual T &operator[](const size_t &row) = 0;
     array_like_iterator<T> begin(){
-        return array_like_iterator<T>(get_begin_n(),this);
+        return array_like_iterator<T>(get_begin_n(),allocate_this_cpy());
     }
     array_like_iterator<T> rbegin(){
-        return array_like_iterator<T>(get_rbegin_n(),this);
+        return array_like_iterator<T>(get_rbegin_n(),allocate_this_cpy());
     }
     array_like_iterator<T> end(){
-        return array_like_iterator<T>(get_end_n(),this);
+        return array_like_iterator<T>(get_end_n(),allocate_this_cpy());
     }
     array_like_iterator<T> rend(){
-        return array_like_iterator<T>(get_rend_n(),this);
+        return array_like_iterator<T>(get_rend_n(),allocate_this_cpy());
+    }
+    array_like_vert_iterator<T> vbegin(size_t col){
+        return array_like_vert_iterator<T>(col,get_row(),allocate_this_cpy());
+    }
+    array_like_vert_iterator<T> vend(){
+        return array_like_vert_iterator<T>(0,get_rows(),allocate_this_cpy());
     }
 protected:
     virtual size_t get_row() const {return 0;}; 
     virtual size_t get_rbegin_n() const {return 0;}; 
-    virtual size_t get_rend_n() const {return size;}; 
+    virtual size_t get_rend_n() const {return size;};
+    virtual array_like<T> *allocate_this_cpy() = 0;
+    virtual void set_row(size_t add){};
+    virtual size_t get_rows(){ return 1;};
+    friend class array_like_vert_iterator<T>;
 };
 
 template <class T>
@@ -136,20 +146,30 @@ class vector : public array_like<T>{
     }
     ~vector() { delete[] data; }
     T &operator[](const size_t &row) { return data[row]; }
+    marray<T> *allocate_this_cpy(){
+        return new marray<T>(this->data,1,this->size,0);
+    }
 };
 
 template <class T>
 class marray: public array_like<T>{
     public:
-    size_t &rows,&cols;
+    size_t rows,cols;
     size_t row;
     T *data;
-    marray(T *data, size_t &rows, size_t &cols)
+    marray(T *data, size_t rows, size_t cols)
         : array_like<T>(cols),data(data), rows(rows), cols(cols){};
+    marray(T *data, size_t rows, size_t cols, size_t row)
+        : array_like<T>(cols),data(data), rows(rows), cols(cols), row(row){};
     T &operator[](const size_t &col){
         return data[ row * cols + col];
     }
     size_t get_row() const {return row;}
+    array_like<T> *allocate_this_cpy(){
+        return new marray<T>(data,rows,cols,row);
+    }
+    size_t get_rows(){ return this->rows; }
+    void set_row(size_t row){this->row = row;}
 };
 
 }

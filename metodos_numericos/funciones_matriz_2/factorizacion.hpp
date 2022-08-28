@@ -35,18 +35,21 @@ protected:
         double &operator[](const size_t &col);
         size_t get_rbegin_n() const;
         size_t get_rend_n() const;
+        array_wrapper *allocate_this_cpy();
     };
     class crout_strategy : public array_wrapper{
         using array_wrapper::array_wrapper;
         double &operator[](const size_t &col);
         size_t get_rbegin_n() const;
         size_t get_rend_n() const;
+        array_wrapper *allocate_this_cpy();
     };
     class doolittle_strategy : public array_wrapper{
         using array_wrapper::array_wrapper;
         double &operator[](const size_t &col);
         size_t get_rbegin_n() const;
         size_t get_rend_n() const;
+        array_wrapper *allocate_this_cpy();
     };
     array_wrapper *arr_wrapper;
     public:

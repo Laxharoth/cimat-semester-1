@@ -135,3 +135,7 @@ double &LDU_wrapper::doolittle_strategy::operator[](const size_t &col){
 }
 size_t LDU_wrapper::doolittle_strategy::get_rbegin_n() const { return 0; }
 size_t LDU_wrapper::doolittle_strategy::get_rend_n() const { return row+1; }
+
+LDU_wrapper::array_wrapper *LDU_wrapper::diagonal_strategy::allocate_this_cpy(){ return new diagonal_strategy(data); }
+LDU_wrapper::array_wrapper *LDU_wrapper::crout_strategy::allocate_this_cpy(){ return new crout_strategy(data); }
+LDU_wrapper::array_wrapper *LDU_wrapper::doolittle_strategy::allocate_this_cpy(){ return new doolittle_strategy(data); }

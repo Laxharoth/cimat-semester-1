@@ -25,6 +25,7 @@ public:
     size_t get_row() const;
     size_t get_rbegin_n() const;
     size_t get_rend_n() const;
+    row_wrapper *allocate_this_cpy();
 };
 public:
     row_wrapper &get(const size_t &row);
@@ -43,17 +44,18 @@ class MatrizDiagonal : public matrix_like<double> {
     size_t row;
     public:
         row_wrapper(double *data, size_t size);
+        row_wrapper(double *data, size_t size,size_t row);
         double & operator[](const size_t &col);
         friend class MatrizDiagonal;
         size_t get_row() const;
         size_t get_rbegin_n() const;
         size_t get_rend_n() const;
+        row_wrapper *allocate_this_cpy();
     };
     MatrizDiagonal(size_t size);
     MatrizDiagonal(std::initializer_list<double> init);
     ~MatrizDiagonal();
     row_wrapper & operator[](const size_t &col);
-
 };
 }
 #endif /* MATRIZ_BANDA_HPP */
