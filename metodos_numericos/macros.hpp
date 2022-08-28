@@ -1,6 +1,11 @@
 #include <iostream>
 #include <iomanip> 
 #include <chrono>
+#include <fstream>
+
+#ifndef COMMA
+#define COMMA ,
+#endif
 
 namespace macros{
   std::ostream *out = &(std::cout);
@@ -20,4 +25,24 @@ using namespace std::chrono;
   auto end = high_resolution_clock::now();\
   auto duration = duration_cast<microseconds>(end - start);\
   (*(macros::out)) << "time: " << duration.count() << "micro s" << std::endl;\
+}
+#define out_vector(vector,filename) \
+{\
+  auto file = std::ofstream(filename); \
+  file << vector.get_size() << " " << 1 << std::endl;\
+  for(auto i = vector.begin(); i != vector.end(); ++i)\
+    file << *i << std::endl;\
+  file.close();\
+}
+
+#define out_matrix(matrix,filename) \
+{\
+  auto file = std::ofstream(filename); \
+  file << matrix.get_shape_y() << " " << matrix.get_shape_x() << std::endl;\
+  for(auto j = 0; j < matrix.get_shape_y(); ++j){\
+    for(auto i = matrix[j].begin(); i != matrix[j].end(); ++i)\
+      file << *i << " ";\
+    file << std::endl;\
+  }\
+  file.close();\
 }
