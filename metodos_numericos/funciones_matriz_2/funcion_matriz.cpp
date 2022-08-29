@@ -29,8 +29,8 @@ void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &i
     for(int i=0; i<size; ++i){
         incognitas[i] = result[i];
         auto iter = matriz[i].begin();
-        for(int j=0; j<=i - 1; ++j, ++iter){
-            incognitas[i] -= (*iter) * incognitas[j];
+        for(int j=0; j<=i - 1; ++j){
+            incognitas[i] -= matriz[i][j] * incognitas[j];
         }
         incognitas[i] /= matriz[i][i];
     }
@@ -39,8 +39,8 @@ void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &i
     const size_t size = matriz.get_shape_x();
     for(int i = size - 1; i>=0; --i){
         incognitas[i] = result[i];
-        for(auto iter = matriz[i].begin()+(i+1);iter<matriz[i].end(); ++iter){
-            incognitas[i] -= (*iter) * incognitas[iter.get_col()];
+        for(int j=i+1; j< size; ++j){
+            incognitas[i] -= matriz[i][j] * incognitas[j];
         }
         incognitas[i] /= matriz[i][i];
     }
