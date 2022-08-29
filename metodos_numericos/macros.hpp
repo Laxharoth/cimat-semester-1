@@ -29,7 +29,7 @@ using namespace std::chrono;
 #define out_vector(vector,filename) \
 {\
   auto file = std::ofstream(filename); \
-  file << vector.get_size() << " " << 1 << std::endl;\
+  file << vector.size << " " << 1 << std::endl;\
   for(auto i = vector.begin(); i != vector.end(); ++i)\
     file << *i << std::endl;\
   file.close();\
@@ -38,8 +38,8 @@ using namespace std::chrono;
 #define out_matrix(matrix,filename) \
 {\
   auto file = std::ofstream(filename); \
-  file << matrix.get_shape_y() << " " << matrix.get_shape_x() << std::endl;\
-  for(auto j = 0; j < matrix.get_shape_y(); ++j){\
+  file << matrix.shape_y << " " << matrix.shape_x << std::endl;\
+  for(auto j = 0; j < matrix.shape_y; ++j){\
     for(auto i = matrix[j].begin(); i != matrix[j].end(); ++i)\
       file << *i << " ";\
     file << std::endl;\

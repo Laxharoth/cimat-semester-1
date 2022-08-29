@@ -2,19 +2,25 @@
 #define FUNCION_MATRIZ_HPP
 
 #include "matrix_like/matrix_like.tcc"
+#include "matrix_like/real_matrix.hpp"
 #include "factorizacion.hpp"
 
 #include <cstdlib>
 
-void solucion_diagonal(matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result);
-double determinante_diagonal(matrix_like<double> &matriz_diagonal);
-void inversa_diagonal(matrix_like<double> &matriz_diagonal,array_like<double> &inversa);
-double determinante_triangular(matrix_like<double> &matriz_triangular);
-void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result);
-void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result);
-void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados);
-void solucion_LDU( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result);
-void solucion_crout( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result);
-void solucion_doolittle( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result);
+using mymtx::RealMatrix;
+using mymtx::RealVector;
+
+void solucion_diagonal(RealMatrix &matriz, RealVector &incognitas, RealVector &result);
+double determinante_diagonal(RealMatrix &matriz_diagonal);
+void inversa_diagonal(RealMatrix &matriz_diagonal,RealVector &inversa);
+double determinante_triangular(RealMatrix &matriz_triangular);
+void solucion_triangular_inf( RealMatrix &matriz, RealVector &incognitas, RealVector &result,bool);
+void solucion_triangular_inf( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
+void solucion_triangular_sup( RealMatrix &matriz, RealVector &incognitas, RealVector &result,bool);
+void solucion_triangular_sup( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
+void gauss( RealMatrix &matriz, RealVector &variables, RealVector &resultados);
+void solucion_LDU( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
+void solucion_crout( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
+void solucion_doolittle( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 
 #endif /* FUNCION_MATRIZ_HPP */

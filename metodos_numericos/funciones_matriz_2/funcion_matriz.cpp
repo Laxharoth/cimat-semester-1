@@ -1,42 +1,51 @@
 #include "funcion_matriz.hpp"
 
-void solucion_diagonal(matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
-    const size_t size = matriz.get_shape_x();
+void solucion_diagonal(mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
+    const size_t size = matriz.shape_x;
     for(int i=0; i<size; ++i){
         incognitas[i] = result[i] / matriz[i][i];
     }
 }
-double determinante_diagonal(matrix_like<double> &matriz_diagonal){
-    const size_t size = matriz_diagonal.get_shape_x();
+double determinante_diagonal(mymtx::RealMatrix &matriz_diagonal){
+    const size_t size = matriz_diagonal.shape_x;
     double result{1};
     for(int i=0; i<size; ++i) result*=matriz_diagonal[i][i];
     return result;
 }
-void inversa_diagonal(matrix_like<double> &matriz_diagonal,array_like<double> &inversa){
-    const size_t size = matriz_diagonal.get_shape_x();
+void inversa_diagonal(mymtx::RealMatrix &matriz_diagonal,mymtx::RealVector &inversa){
+    const size_t size = matriz_diagonal.shape_x;
     for(int i=0; i<size; ++i){
         inversa[i] = 1 / matriz_diagonal[i][i];
     }
 }
-double determinante_triangular(matrix_like<double> &matriz_triangular){
-    const size_t size = matriz_triangular.get_shape_x();
+double determinante_triangular(mymtx::RealMatrix &matriz_triangular){
+    const size_t size = matriz_triangular.shape_x;
     double result{1};
     for(int i=0; i<size; ++i) result*=matriz_triangular[i][i];
     return result;
 }
-void solucion_triangular_inf( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
-    const size_t size = matriz.get_shape_x();
+void solucion_triangular_inf( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
+    solucion_triangular_inf(matriz,incognitas,result,true);
+}
+void solucion_triangular_inf( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result,bool compute_diagonale){
+    const size_t size = matriz.shape_x;
     for(int i=0; i<size; ++i){
         incognitas[i] = result[i];
         auto iter = matriz[i].begin();
         for(int j=0; j<=i - 1; ++j){
+            if(!compute_diagonale && i==j){
+                incognitas[i] -= incognitas[j];continue;
+            }
             incognitas[i] -= matriz[i][j] * incognitas[j];
         }
         incognitas[i] /= matriz[i][i];
     }
 }
-void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
-    const size_t size = matriz.get_shape_x();
+void solucion_triangular_sup( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
+    solucion_triangular_sup(matriz,incognitas,result,true);
+}
+void solucion_triangular_sup( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result, bool compute_diagonale){
+    const size_t size = matriz.shape_x;
     for(int i = size - 1; i>=0; --i){
         incognitas[i] = result[i];
         for(int j=i+1; j< size; ++j){
@@ -45,18 +54,18 @@ void solucion_triangular_sup( matrix_like<double> &matriz, array_like<double> &i
         incognitas[i] /= matriz[i][i];
     }
 }
-void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_like<double> &resultados){
-    const size_t size = matriz.get_shape_x();
+void gauss( mymtx::RealMatrix &matriz, mymtx::RealVector &variables, mymtx::RealVector &resultados){
+    const size_t size = matriz.shape_x;
     for(int i=0; i<size; ++i){
         const double divide_privote = matriz[i][i];
-        for(auto j=matriz[i].begin()+i; j<matriz[i].rend(); ++j){
+        for(auto j=matriz[i].begin()+i; j<matriz[i].end(); ++j){
             *j /= divide_privote;
         }
         resultados[i] /= divide_privote;
         for(int j=i+1; j < size; ++j){
             auto iter_pivote = matriz[i].begin()+(i+1);
             auto iter = matriz[j].begin()+i;
-            auto end  = matriz[j].rend();
+            auto end  = matriz[j].end();
             const double coeficiente_eliminar = *iter;
             *iter = 0;
             for(++iter; iter < end; ++iter,++iter_pivote){
@@ -67,24 +76,20 @@ void gauss( matrix_like<double> &matriz, array_like<double> &variables, array_li
     }
     solucion_triangular_sup(matriz, variables, resultados);
 }
-void solucion_LDU( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
-    auto matriz_doolittle = LDU_wrapper::from(&matriz, LDU_wrapper::DOOLITTLE);
-    auto matriz_crout = LDU_wrapper::from(&matriz, LDU_wrapper::CROUT);
-    mymtx::vector<double> aux1(incognitas.get_size());
-    mymtx::vector<double> aux2(incognitas.get_size());
-    solucion_triangular_inf( matriz_doolittle, aux1, result);
+void solucion_LDU( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
+    mymtx::RealVector aux1(incognitas.size);
+    mymtx::RealVector aux2(incognitas.size);
+    solucion_triangular_inf( matriz, aux1, result,false);
     solucion_diagonal( matriz, aux2, aux1);
-    solucion_triangular_sup( matriz_crout, incognitas, aux2);
+    solucion_triangular_sup( matriz, incognitas,aux2, false);
 }
-void solucion_crout( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
-    auto matriz_crout = LDU_wrapper::from(&matriz, LDU_wrapper::CROUT);
-    mymtx::vector<double> aux1(incognitas.get_size());
+void solucion_crout( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
+    mymtx::RealVector aux1(incognitas.size);
     solucion_triangular_inf( matriz, aux1, result);
-    solucion_triangular_sup( matriz_crout, incognitas, aux1);
+    solucion_triangular_sup( matriz, incognitas, aux1, false);
 }
-void solucion_doolittle( matrix_like<double> &matriz, array_like<double> &incognitas, array_like<double> &result){
-    auto matriz_doolittle = LDU_wrapper::from(&matriz, LDU_wrapper::DOOLITTLE);
-    mymtx::vector<double> aux1(incognitas.get_size());
-    solucion_triangular_inf( matriz_doolittle, aux1, result );
+void solucion_doolittle( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
+    mymtx::RealVector aux1(incognitas.size);
+    solucion_triangular_inf( matriz, aux1, result, false );
     solucion_triangular_sup( matriz, incognitas, aux1);
 }

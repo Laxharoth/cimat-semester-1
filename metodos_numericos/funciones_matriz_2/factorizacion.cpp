@@ -1,8 +1,8 @@
 #include "matrix_like/matrix_like.tcc"
 #include "factorizacion.hpp"
 
-void metodo_de_crout(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_superior){
-    const size_t size = matriz.get_shape_y();
+void metodo_de_crout(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior){
+    const size_t size = matriz.shape_y;
     auto calcular_factor_inferior = [&](const int &i, const int &j){
         matriz_inferior[i][j] = matriz[i][j];
         for(int k = 0; k <= j-1; ++k)
@@ -23,8 +23,8 @@ void metodo_de_crout(matrix_like<double> &matriz, matrix_like<double> &matriz_in
         if(matriz_inferior[i][i] == 0) throw cant_factor_exception();
     }
 }
-void metodo_de_doolittle(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_superior){
-    const size_t size = matriz.get_shape_y();
+void metodo_de_doolittle(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior){
+    const size_t size = matriz.shape_y;
     auto calcular_factor_superior = [&](const int &i, const int &j){
         matriz_superior[i][j] = matriz[i][j];
         for(int k = 0; k <=i-1; ++k)
@@ -45,8 +45,8 @@ void metodo_de_doolittle(matrix_like<double> &matriz, matrix_like<double> &matri
         if(matriz_inferior[j][j] == 0) throw cant_factor_exception();
     }
 }
-void factorizacion_LDU(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_diagonal, matrix_like<double> &matriz_superior){
-    const size_t size = matriz.get_shape_y();
+void factorizacion_LDU(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_diagonal, RealMatrix &matriz_superior){
+    const size_t size = matriz.shape_y;
     auto calcular_factor_inferior = [&](const int &i, const int &j){
         matriz_inferior[i][j] = matriz[i][j];
         for(int k = 0; k <= j-1; ++k)

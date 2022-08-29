@@ -1,14 +1,18 @@
 #ifndef FACTORIZACION_HPP
 #define FACTORIZACION_HPP
 
+#include "matrix_like/matrix_like.tcc"
+#include "matrix_like/real_matrix.hpp"
 #include <exception>
 
 using mymtx::matrix_like;
 using mymtx::array_like;
+using mymtx::RealMatrix;
+using mymtx::RealVector;
 
-void metodo_de_crout(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_superior);
-void metodo_de_doolittle(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_superior);
-void factorizacion_LDU(matrix_like<double> &matriz, matrix_like<double> &matriz_inferior, matrix_like<double> &matriz_diagonal, matrix_like<double> &matriz_superior);
+void metodo_de_crout(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior);
+void metodo_de_doolittle(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior);
+void factorizacion_LDU(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_diagonal, RealMatrix &matriz_superior);
 
 class cant_factor_exception : public std::exception{
     using std::exception::exception;

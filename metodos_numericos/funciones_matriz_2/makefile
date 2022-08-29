@@ -13,7 +13,7 @@
 # 	las funcions para factorizar matrices
 # se encuentran en los archivos factorizacion.*
 ############################################
-object_files =funcion_matriz.o matriz_banda.o factorizacion.o matrix_exception.o
+object_files =funcion_matriz.o matriz_banda.o factorizacion.o matrix_exception.o real_matrix.o
 
  matrix_like = matrix_like/matrix_like.tcc matrix_like/matrix_iterator.tcc
 
@@ -43,3 +43,6 @@ matrix_exception.o: matrix_like/matrix_exception.hpp matrix_like/matrix_exceptio
 matriz_banda.o: matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp $(matrix_like)
 	$(MAKE) -C matrix_like matriz_banda.o
 	mv matrix_like/matriz_banda.o .
+real_matrix.o: matrix_like/real_matrix.hpp matrix_like/real_matrix.cpp  matrix_like/matrix_like.tcc
+	$(MAKE) -C matrix_like real_matrix.o
+	mv matrix_like/real_matrix.o .
