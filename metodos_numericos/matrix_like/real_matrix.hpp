@@ -5,10 +5,12 @@
 #include <cstdlib>
 #include <string.h>
 #include <initializer_list>
+
 namespace mymtx{
     class RealMatrix;
     class RealVector;
     class vector_iterator;
+    class const_vector_iterator;
 
     class RealMatrix{
         RealMatrix();
@@ -24,6 +26,13 @@ namespace mymtx{
         const RealVector operator[](const size_t &row) const;
         vector_iterator begin(const size_t row);
         vector_iterator end(const size_t row);
+        const_vector_iterator begin(const size_t row) const;
+        const_vector_iterator end(const size_t row) const;
+        RealVector &operator*=(RealVector &vec) const;
+        RealVector operator*(const RealVector &vec) const;
+        RealMatrix &operator*=(const RealMatrix &other);
+        RealMatrix operator*(const RealMatrix &other) const;
+        RealMatrix &operator=(const RealMatrix &other);
         static RealMatrix traspose(const RealMatrix &m);
     };
     class RealVector{
@@ -42,6 +51,18 @@ namespace mymtx{
         const double &operator[](const size_t col) const;
         vector_iterator begin();
         vector_iterator end();
+        const_vector_iterator begin() const;
+        const_vector_iterator end() const;
+        RealVector operator*(const double coef);
+        RealVector &operator*=(const double coef);
+        RealVector operator/(const double coef);
+        RealVector &operator/=(const double coef);
+        double operator*(const RealVector &other) const;
+        RealVector operator+(const RealVector &other);
+        RealVector &operator+=(const RealVector &other);
+        RealVector operator-(const RealVector &other);
+        RealVector &operator-=(const RealVector &other);
+        RealVector &operator=(const RealVector &other);
     };
     class vector_iterator{
         vector_iterator(){}
@@ -69,6 +90,31 @@ public:
     bool operator<=(const vector_iterator& rhs) const;
     double& operator*();
     };
+class const_vector_iterator{
+        const_vector_iterator(){}
+protected:
+    const double *data;
+    size_t row,col;
+public:
+    const_vector_iterator(const double *data, const size_t row, const size_t col);
+    const_vector_iterator(const const_vector_iterator &other);
+    size_t get_row() const;
+    size_t get_col() const;
+    const_vector_iterator& operator++();
+    const_vector_iterator operator++(int);
+    const_vector_iterator& operator--();
+    const_vector_iterator operator--(int);
+    const_vector_iterator& operator+=(int c);
+    const_vector_iterator operator+(int c) const;
+    const_vector_iterator& operator-=(int c);
+    const_vector_iterator operator-(int c) const ;
+    bool operator==(const const_vector_iterator& rhs) const;
+    bool operator!=(const const_vector_iterator& rhs) const;
+    bool operator>(const const_vector_iterator& rhs)  const;
+    bool operator<(const const_vector_iterator& rhs)  const;
+    bool operator>=(const const_vector_iterator& rhs) const;
+    bool operator<=(const const_vector_iterator& rhs) const;
+    const double& operator*() const;
+    };
 }
-
 #endif /* REAL_MATRIX_HPP */

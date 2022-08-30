@@ -42,57 +42,44 @@ vector_iterator RealMatrix::begin(const size_t row){
 vector_iterator RealMatrix::end(const size_t row){
     return vector_iterator(data + row * shape_x, row, shape_x);
 }
-RealVector::RealVector(const size_t size):size(size),allocated(true){
-    this->data = new double[this->size];
+const_vector_iterator RealMatrix::begin(const size_t row) const{
+    return const_vector_iterator(data + row * shape_x, row, 0);
 }
-RealVector::RealVector(const RealVector &other):size(other.size),allocated(true){
-    this->data = new double[this->size];
-    for(size_t i = 0; i < this->size; ++i){
-        this->data[i] = other[i];
+const_vector_iterator RealMatrix::end(const size_t row) const{
+    return const_vector_iterator(data + row * shape_x, row, shape_x);
+}
+RealVector &RealMatrix::operator*=(RealVector &vec) const{
+    auto cpy = (*this)*vec;
+    vec = cpy;
+    return vec;
+}
+RealVector RealMatrix::operator*(const RealVector &vec) const{
+    RealVector result(vec.size);
+    for(size_t i = 0; i < shape_y; ++i){
+        result[i] = this->operator[](i) * vec;
     }
+    return result;
 }
-RealVector::RealVector(array_like<double> &other):size(other.get_size()),allocated(true){
-    this->data = new double[this->size];
-    for(size_t i = 0; i < this->size; ++i){
-        this->data[i] = other[i];
+RealMatrix &RealMatrix::operator*=(const RealMatrix &other){
+    auto cpy = (*this)*other;
+    (*this) = cpy;
+    return *this;
+}
+RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
+    auto t = traspose(other);
+    auto cpy = RealMatrix(this->shape_y,this->shape_x);
+    for(size_t i = 0; i < this->shape_y; ++i){
+        for(size_t j = 0; j < this->shape_x; ++j){
+            cpy[i][j] = this->operator[](i) * other[j];
+        }
     }
+    return cpy;
 }
-RealVector::RealVector(std::initializer_list<double> initial):size(initial.size()),allocated(true){
-    this->data = new double[this->size];
-    size_t i{0};
-    for(auto j= initial.begin(); j!= initial.end(); ++j,++i)
-        data[i] = *j;
-}
-RealVector::RealVector(double *data, size_t size):size(size),allocated(false),data(data){}
-RealVector::~RealVector(){
-    if(allocated) delete[] data;
-}
-double &RealVector::operator[](const size_t col){return data[col];}
-const double &RealVector::operator[](const size_t col) const {return data[col];}
-vector_iterator RealVector::begin(){
-    return vector_iterator(data,0,0);
-}
-vector_iterator RealVector::end(){
-        return vector_iterator(data,0,size);
+RealMatrix &RealMatrix::operator=(const RealMatrix &other){
+    memcpy(this->data, other.data, this->shape_x * this->shape_y *sizeof(double));
+    return *this;
 }
 
-vector_iterator::vector_iterator(double *data, const size_t row, const size_t col):data(data),row(row),col(col){}
-vector_iterator::vector_iterator(const vector_iterator &other):data(other.data),row(other.row),col(other.col){}
-size_t vector_iterator::get_row() const { return row; }
-size_t vector_iterator::get_col() const { return col; }
-vector_iterator& vector_iterator::operator++()     {++col;return *this;}
-vector_iterator vector_iterator::operator++(int)   {vector_iterator tmp(*this); operator++(); return tmp;}
-vector_iterator& vector_iterator::operator--()     {--col;return *this;}
-vector_iterator vector_iterator::operator--(int)   {vector_iterator tmp(*this); operator--(); return tmp;}
-vector_iterator& vector_iterator::operator+=(int c){col+=c;return *this;}
-vector_iterator vector_iterator::operator+(int c) const {vector_iterator tmp(*this); tmp+=c; return tmp;}
-vector_iterator& vector_iterator::operator-=(int c){col-=c;return *this; }
-vector_iterator vector_iterator::operator-(int c) const {vector_iterator tmp(*this); tmp-=c; return tmp;}
-bool vector_iterator::operator==(const vector_iterator& rhs) const { return col==rhs.col; }
-bool vector_iterator::operator!=(const vector_iterator& rhs) const { return col!=rhs.col; }
-bool vector_iterator::operator>(const vector_iterator& rhs ) const { return col>rhs.col;  }
-bool vector_iterator::operator<(const vector_iterator& rhs ) const { return col<rhs.col;  }
-bool vector_iterator::operator>=(const vector_iterator& rhs) const { return col>=rhs.col; }
-bool vector_iterator::operator<=(const vector_iterator& rhs) const { return col<=rhs.col; }
-double& vector_iterator::operator*() {return data[col];}
 }
+#include "real_vector.cpp"
+#include "real_vector_iterator.cpp"
