@@ -17,7 +17,10 @@ using namespace std::chrono;
 #define print_test( actual, expected ) \
     (*(macros::out)) << "actual: " <<  actual << " :: "; \
     (*(macros::out)) << "expected: " <<  expected << std::endl;
-#define ANNOUNCE_TEST(msg) (*(macros::out)) << "TEST:" << msg << std::endl;
+#define ANNOUNCE_TEST(msg) \
+(*(macros::out)) << "#*********************************#" << std::endl;\
+(*(macros::out)) << "# * TEST:" << msg << std::endl; \
+(*(macros::out)) << "#*********************************#" << std::endl;
 #define measure_time(what) \
 {\
   auto start = high_resolution_clock::now();\
