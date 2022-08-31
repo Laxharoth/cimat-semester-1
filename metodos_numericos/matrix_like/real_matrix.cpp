@@ -34,8 +34,8 @@ RealMatrix RealMatrix::traspose(const RealMatrix &m){
             traposed[j][i] = m[i][j];
     return traposed;
 }
-RealVector RealMatrix::operator[](const size_t &row){ return RealVector(data + row * shape_x, row); }
-const RealVector RealMatrix::operator[](const size_t &row) const { return RealVector(data + row * shape_x, row); }
+RealVector RealMatrix::operator[](const size_t &row){ return RealVector(data + row * shape_x, shape_x); }
+const RealVector RealMatrix::operator[](const size_t &row) const { return RealVector(data + row * shape_x, shape_x); }
 vector_iterator RealMatrix::begin(const size_t row){
     return vector_iterator(data + row * shape_x, row, 0);
 }
@@ -70,7 +70,7 @@ RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
     auto cpy = RealMatrix(this->shape_y,this->shape_x);
     for(size_t i = 0; i < this->shape_y; ++i){
         for(size_t j = 0; j < this->shape_x; ++j){
-            cpy[i][j] = this->operator[](i) * other[j];
+            cpy[i][j] = this->operator[](i) * t[j];
         }
     }
     return cpy;
