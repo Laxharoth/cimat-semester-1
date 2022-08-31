@@ -6,6 +6,7 @@
 #include "factorizacion.hpp"
 
 #include <cstdlib>
+#include <cmath>
 
 using mymtx::RealMatrix;
 using mymtx::RealVector;
@@ -22,5 +23,6 @@ void gauss( RealMatrix &matriz, RealVector &variables, RealVector &resultados);
 void solucion_LDU( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 void solucion_crout( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 void solucion_doolittle( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
+void normalize(RealVector &vec);
 
 #endif /* FUNCION_MATRIZ_HPP */
