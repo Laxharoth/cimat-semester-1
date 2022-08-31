@@ -33,12 +33,10 @@ void solucion_triangular_inf( mymtx::RealMatrix &matriz, mymtx::RealVector &inco
         incognitas[i] = result[i];
         auto iter = matriz[i].begin();
         for(int j=0; j<=i - 1; ++j){
-            if(!compute_diagonale && i==j){
-                incognitas[i] -= incognitas[j];continue;
-            }
             incognitas[i] -= matriz[i][j] * incognitas[j];
         }
-        incognitas[i] /= matriz[i][i];
+        if(compute_diagonale)
+            incognitas[i] /= matriz[i][i];
     }
 }
 void solucion_triangular_sup( mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
@@ -51,7 +49,8 @@ void solucion_triangular_sup( mymtx::RealMatrix &matriz, mymtx::RealVector &inco
         for(int j=i+1; j< size; ++j){
             incognitas[i] -= matriz[i][j] * incognitas[j];
         }
-        incognitas[i] /= matriz[i][i];
+        if(compute_diagonale)
+            incognitas[i] /= matriz[i][i];
     }
 }
 void gauss( mymtx::RealMatrix &matriz, mymtx::RealVector &variables, mymtx::RealVector &resultados){
@@ -92,4 +91,26 @@ void solucion_doolittle( mymtx::RealMatrix &matriz, mymtx::RealVector &incognita
     mymtx::RealVector aux1(incognitas.size);
     solucion_triangular_inf( matriz, aux1, result, false );
     solucion_triangular_sup( matriz, incognitas, aux1);
+}
+void normalize(RealVector &vec){
+    double sum{0};
+    for(auto i = vec.begin(); i != vec.end(); ++i){
+        sum += *i**i;
+    }
+    sum = std::sqrt(sum);
+    for(auto i = vec.begin(); i != vec.end(); ++i){
+        *i/=sum;
+    }
+}
+void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value){
+    double error = 1E20;
+    double old_val{0};
+    while(error > tolerance){
+        V1 = A*V0;
+        value = V0*V1;
+        error = std::abs(old_val-value);
+        old_val = value;
+        normalize(V1);
+        V0 = V1;
+    }
 }
