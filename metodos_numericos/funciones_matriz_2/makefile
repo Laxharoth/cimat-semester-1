@@ -20,20 +20,20 @@ object_files =funcion_matriz.o matriz_banda.o factorizacion.o matrix_exception.o
 programa: programa.run
 	./programa.run
 programa.run: main.o $(object_files)
-	g++ -o programa.run main.o $(object_files)
+	g++ -O2 -o programa.run main.o $(object_files)
 main.o: main.cpp funcion_matriz.hpp factorizacion.hpp matrix_like/matriz_banda.hpp
-	g++ -c main.cpp
+	g++ -O2 -c main.cpp
 funcion_matriz.o: funcion_matriz.hpp funcion_matriz.cpp
-	g++ -c funcion_matriz.cpp
+	g++ -O2 -c funcion_matriz.cpp
 factorizacion.o: factorizacion.hpp factorizacion.cpp
-	g++ -c factorizacion.cpp
+	g++ -O2 -c factorizacion.cpp
 test: test.run
 	clear 
 	./test.run
 test.run: test.o $(object_files)
-	g++ -pthread  -o test.run test.o $(object_files)
+	g++ -O2 -pthread  -o test.run test.o $(object_files)
 test.o: test.cpp funcion_matriz.hpp factorizacion.hpp $(matrix_like) matrix_like/matriz_banda.hpp matrix_like/matriz_banda.cpp macros.hpp function_wrapper/function_wrapper.hpp search_min_max.cpp
-	g++ -c test.cpp 
+	g++ -O2 -c test.cpp 
 clean:
 	rm *.o &
 	rm *.run &
