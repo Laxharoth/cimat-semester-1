@@ -1,6 +1,5 @@
 #ifndef REAL_MATRIX_HPP
 #define REAL_MATRIX_HPP
-#include "matrix_like.tcc"
 
 #include <cstdlib>
 #include <string.h>
@@ -19,7 +18,6 @@ namespace mymtx{
         const size_t shape_x,shape_y;
         RealMatrix(size_t shape_y,size_t shape_x);
         RealMatrix(const RealMatrix &other);
-        RealMatrix(matrix_like<double> &other);
         RealMatrix(std::initializer_list<std::initializer_list<double>> initial);
         ~RealMatrix();
         RealVector operator[](const size_t &row);
@@ -44,7 +42,6 @@ namespace mymtx{
         const size_t size;
         RealVector(const size_t size);
         RealVector(const RealVector &other);
-        RealVector(array_like<double> &other);
         RealVector(std::initializer_list<double> initial);
         RealVector(double *data, size_t size);
         ~RealVector();

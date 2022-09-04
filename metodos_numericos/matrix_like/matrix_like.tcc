@@ -2,6 +2,7 @@
 #define MATRIX_LIKE_HPP
 
 #include "matrix_exception.hpp"
+#include "real_matrix.hpp"
 #include <initializer_list>
 #include <cstdlib>
 #include <string.h>
@@ -47,6 +48,13 @@ public:
         return result;
     };
     matrix_like(size_t shape_y, size_t shape_x):shape_y(shape_y),shape_x(shape_x) {};
+    RealMatrix to_real_matrix(){
+        RealMatrix result(shape_y, shape_x);
+        for(int i = 0; i < result.shape_x; ++i)
+            for(int j = 0; j < result.shape_y; ++j)
+                result[i][j] = (*this)[i][j];
+        return result;
+    }
 };
 
 template <class T>
@@ -134,6 +142,13 @@ public:
         vector<T> result(this->get_size());
         for(auto i = this->begin(), j = result.begin();  i !=this->end(); ++i, ++j){
             *j = *i;
+        }
+        return result;
+    };
+    RealVector to_real_vector(){
+        RealVector result(this->get_size());
+        for(size_t i = 0; i < this->size; ++i){
+            result[i] = (*this)[i];
         }
         return result;
     };

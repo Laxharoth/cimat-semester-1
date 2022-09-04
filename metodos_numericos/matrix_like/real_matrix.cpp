@@ -9,12 +9,6 @@ RealMatrix::RealMatrix(const RealMatrix &other):shape_x(other.shape_x),shape_y(o
     this->data = new double[this->shape_x * this->shape_y];
     memcpy(this->data,other.data,this->shape_x*this->shape_y*sizeof(double));
 }
-RealMatrix::RealMatrix(matrix_like<double> &other):shape_x(other.get_shape_x()),shape_y(other.get_shape_y()){
-    this->data = new double[this->shape_x * this->shape_y];
-    for(int i = 0; i < this->shape_x; ++i)
-        for(int j = 0; j < this->shape_y; ++j)
-            (*this)[i][j] = other[i][j];
-}
 RealMatrix::RealMatrix(std::initializer_list<std::initializer_list<double>> initial):
     shape_y(initial.size()),shape_x((initial.begin())->size()){
     this->data = new double[this->shape_x * this->shape_y];

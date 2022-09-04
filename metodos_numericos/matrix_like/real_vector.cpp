@@ -9,12 +9,6 @@ RealVector::RealVector(const RealVector &other):size(other.size),allocated(true)
         this->data[i] = other[i];
     }
 }
-RealVector::RealVector(array_like<double> &other):size(other.get_size()),allocated(true){
-    this->data = new double[this->size];
-    for(size_t i = 0; i < this->size; ++i){
-        this->data[i] = other[i];
-    }
-}
 RealVector::RealVector(std::initializer_list<double> initial):size(initial.size()),allocated(true){
     this->data = new double[this->size];
     size_t i{0};
