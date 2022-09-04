@@ -28,6 +28,7 @@ namespace mymtx{
         vector_iterator end(const size_t row);
         const_vector_iterator begin(const size_t row) const;
         const_vector_iterator end(const size_t row) const;
+        RealMatrix &operator*=(const double coef);
         RealVector &operator*=(RealVector &vec) const;
         RealVector operator*(const RealVector &vec) const;
         RealMatrix &operator*=(const RealMatrix &other);

@@ -65,6 +65,12 @@ RealMatrix &RealMatrix::operator*=(const RealMatrix &other){
     (*this) = cpy;
     return *this;
 }
+RealMatrix &RealMatrix::operator*=(double coef){
+    for (size_t i = 0; i < this->shape_y; i++){
+        (*this)[i]*=coef;
+    }
+    return *this;
+}
 RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
     auto t = traspose(other);
     auto cpy = RealMatrix(this->shape_y,this->shape_x);
