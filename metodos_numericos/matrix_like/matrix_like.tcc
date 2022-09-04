@@ -97,7 +97,7 @@ protected:
 public:
     array_like(size_t size):size(size){};
     size_t get_size() const { return size; };
-    virtual T &operator[](const size_t &row) = 0;
+    virtual T &operator[](const size_t &col) = 0;
     array_like_iterator<T> begin(){
         return array_like_iterator<T>(get_begin_n(),allocate_this_cpy());
     }
@@ -116,8 +116,29 @@ public:
     array_like_vert_iterator<T> vend(){
         return array_like_vert_iterator<T>(0,get_rows(),allocate_this_cpy());
     }
-protected:
+    vector<T> operator*(T constant){
+        vector<T> result(this->get_size());
+        for(auto i = this->begin(), j = result.begin(); this->end(); ++i, ++j){
+            *j = (*i)*constant;
+        }
+        return result;
+    };
+    vector<T> operator/(T constant){
+        vector<T> result(this->get_size());
+        for(auto i = this->begin(), j = result.begin(); i != this->end(); ++i, ++j){
+            *j = (*i)/constant;
+        }
+        return result;
+    };
+    vector<T> to_vector(){
+        vector<T> result(this->get_size());
+        for(auto i = this->begin(), j = result.begin();  i !=this->end(); ++i, ++j){
+            *j = *i;
+        }
+        return result;
+    };
     virtual size_t get_row() const {return 0;}; 
+protected:
     virtual size_t get_rbegin_n() const {return 0;}; 
     virtual size_t get_rend_n() const {return size;};
     virtual array_like<T> *allocate_this_cpy() = 0;
@@ -138,11 +159,9 @@ class vector : public array_like<T>{
             data[i] = *it++;
         }
     }
-    vector(vector<T> &other):array_like<T>(other.get_size()){
+    vector(const vector<T> &other):array_like<T>(other.get_size()){
         data = new T[this->size];
-        for(size_t i = 0; i < this->size; ++i) {
-            data[i] = other[i];
-        }
+        memcpy(data, other.data, sizeof(T)*(this->size));
     }
     ~vector() { delete[] data; }
     T &operator[](const size_t &row) { return data[row]; }
