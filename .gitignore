@@ -1,5 +1,8 @@
 .vscode/ 
+*.out
 *.o
+*.py
+*.png
 *.run 
 *test*
 *.log
@@ -10,6 +13,8 @@
 *.txt
 *.glade~
 metodos_numericos/graficador/function_wrapper/
+metodos_numericos/busqueda_de_raiz/function_wrapper/
+metodos_numericos/metodos_iterativos/function_wrapper/
 metodos_numericos/graficador/fparser/makefile
 macros.hpp
 !metodos_numericos/macros.hpp
@@ -29,3 +34,16 @@ metodos_numericos/funciones_matriz_2/biseccion.cpp
 metodos_numericos/funciones_matriz_2/function_wrapper/
 matrix_iterator.tcc
 !metodos_numericos/matrix_like/matrix_iterator.tcc
+metodos_numericos/metodos_iterativos/matrix_like/makefile
+programacion/imprimir.c
+funcion_matriz.*
+!metodos_numericos/funciones_matriz_2/funcion_matriz.*
+factorizacion.*
+!metodos_numericos/funciones_matriz_2/factorizacion.*
+real_matrix.*
+!metodos_numericos/matrix_like/real_matrix.*
+real_vector.*
+!metodos_numericos/matrix_like/real_vector.*
+*.o
+real_vector_iterator.cpp
+!metodos_numericos/matrix_like/real_vector_iterator.cpp
