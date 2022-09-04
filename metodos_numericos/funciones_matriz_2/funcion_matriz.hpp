@@ -11,6 +11,11 @@
 using mymtx::RealMatrix;
 using mymtx::RealVector;
 
+struct eigen{
+    RealVector vect;
+    double val;
+};
+
 void solucion_diagonal(RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 double determinante_diagonal(RealMatrix &matriz_diagonal);
 void inversa_diagonal(RealMatrix &matriz_diagonal,RealVector &inversa);
@@ -24,5 +29,6 @@ void solucion_LDU( RealMatrix &matriz, RealVector &incognitas, RealVector &resul
 void solucion_crout( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 void solucion_doolittle( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 void normalize(RealVector &vec);
+void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value);
 
 #endif /* FUNCION_MATRIZ_HPP */

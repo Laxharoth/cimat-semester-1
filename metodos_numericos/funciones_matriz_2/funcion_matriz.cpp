@@ -102,15 +102,30 @@ void normalize(RealVector &vec){
         *i/=sum;
     }
 }
-void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value){
+void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, eigen *holder){
     double error = 1E20;
     double old_val{0};
-    while(error > tolerance){
-        V1 = A*V0;
-        value = V0*V1;
-        error = std::abs(old_val-value);
-        old_val = value;
-        normalize(V1);
-        V0 = V1;
+    size_t found{0};
+    RealVector original = V0;
+    double *component = new double[n_values];
+    for(size_t k=0; k<n_values; ++k){
+        while(error > tolerance){
+            for( size_t i=0; i<found; i++){
+                V0 -= holder[i].vect * component[i];
+                normalize(V0);
+            }
+            V1 = A*V0;
+            value = V0*V1;
+            error = std::abs(old_val-value);
+            old_val = value;
+            normalize(V1);
+            V0 = V1;
+        }
+        if(holder != nullptr){
+            V0 = original;
+            component[found] = V1*V0;
+            holder[found++] = eigen{V1,old_val};
+        }
     }
+    delete[] component;
 }
