@@ -41,7 +41,7 @@ void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triang
 }
 #define ITER 1000
 #define TOLER 1E-10
-void solve_jacobi(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx::RealVector &solutions){
+void solve_jacobi(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx::RealVector &solutions, double *error){
     double sum, numerator, denominator,toler;
     const size_t n = solutions.size;
     size_t i,j;
@@ -62,13 +62,13 @@ for(  unsigned int iter = 0; iter < ITER; ++iter){
         denominator += std::abs(vn[i]);
     }
     toler = numerator / denominator;
-    if(toler < TOLER) return;
+    if(toler < TOLER){ if(error!=nullptr)*error = toler; return;}
     for( size_t i = 0; i < n; ++i ){
         vv[i] = vn[i];
     }
 }
 }
-void solve_gauss_seidel(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx::RealVector &solutions){
+void solve_gauss_seidel(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx::RealVector &solutions, double *error){
     double sum, numerator, denominator,toler;
     const size_t n = solutions.size;
     size_t i,j;
@@ -89,7 +89,7 @@ for(  unsigned int iter = 0; iter < ITER; ++iter){
         denominator += std::abs(vn[i]);
     }
     toler = numerator / denominator;
-    if(toler < TOLER) return;
+    if(toler < TOLER){ if(error!=nullptr)*error = toler; return;}
     for( size_t i = 0; i < n; ++i ){
         vv[i] = vn[i];
     }
