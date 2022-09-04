@@ -13,3 +13,6 @@ test.run: test.o real_matrix.o matrix_exception.o
 	g++ -O2 -o test.run test.o real_matrix.o
 test.o: test.cpp real_matrix.hpp matrix_exception.hpp matrix_like.tcc
 	g++ -O2 -c test.cpp
+clean:
+	rm -rf *.o
+	rm -rf *.run
