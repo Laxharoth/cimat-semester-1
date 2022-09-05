@@ -27,11 +27,13 @@ namespace mymtx{
         const_vector_iterator begin(const size_t row) const;
         const_vector_iterator end(const size_t row) const;
         RealMatrix &operator*=(const double coef);
+        RealMatrix operator*(const double coef) const;
         RealVector &operator*=(RealVector &vec) const;
         RealVector operator*(const RealVector &vec) const;
         RealMatrix &operator*=(const RealMatrix &other);
         RealMatrix operator*(const RealMatrix &other) const;
         RealMatrix &operator=(const RealMatrix &other);
+        RealMatrix &operator-=(const RealMatrix &other);
         static RealMatrix traspose(const RealMatrix &m);
     };
     class RealVector{
@@ -61,6 +63,7 @@ namespace mymtx{
         RealVector operator-(const RealVector &other);
         RealVector &operator-=(const RealVector &other);
         RealVector &operator=(const RealVector &other);
+        RealMatrix cross_product(const RealVector &other) const;
     };
     class vector_iterator{
         vector_iterator(){}

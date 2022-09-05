@@ -59,9 +59,16 @@ RealMatrix &RealMatrix::operator*=(const RealMatrix &other){
     (*this) = cpy;
     return *this;
 }
-RealMatrix &RealMatrix::operator*=(double coef){
+RealMatrix &RealMatrix::operator*=(const double coef){
     for (size_t i = 0; i < this->shape_y; i++){
         (*this)[i]*=coef;
+    }
+    return *this;
+}
+RealMatrix RealMatrix::operator*(const double coef) const{
+    RealMatrix cpy = *this;
+    for (size_t i = 0; i < this->shape_y; i++){
+        cpy[i]*=coef;
     }
     return *this;
 }
@@ -79,7 +86,14 @@ RealMatrix &RealMatrix::operator=(const RealMatrix &other){
     memcpy(this->data, other.data, this->shape_x * this->shape_y *sizeof(double));
     return *this;
 }
-
+RealMatrix &RealMatrix::operator-=(const RealMatrix &other){
+    for(int i = 0; i < this->shape_y; i++){
+        for(int j = 0; j < this->shape_x; j++){
+            (*this)[i][j] -= other[i][j];
+        }
+    }
+    return *this;
+}
 }
 #include "real_vector.cpp"
 #include "real_vector_iterator.cpp"

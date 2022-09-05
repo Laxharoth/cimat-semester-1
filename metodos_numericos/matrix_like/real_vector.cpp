@@ -95,4 +95,13 @@ RealVector &RealVector::operator=(const RealVector &other){
     memcpy(this->data,other.data,sizeof(double)*this->size);
     return *this;
 }
+RealMatrix RealVector::cross_product(const RealVector &other) const {
+    RealMatrix result(other.size,other.size);
+    for (size_t i = 0; i < other.size; i++){
+        for (size_t j = 0; j < other.size; j++){
+            result[i][j] = other[i]*other[j];
+        }
+    }
+    return result;
+}
 }
