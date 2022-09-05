@@ -1,4 +1,5 @@
 #include "funcion_matriz.hpp"
+#include "factorizacion.hpp"
 
 void solucion_diagonal(mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
     const size_t size = matriz.shape_x;
@@ -92,7 +93,7 @@ void solucion_doolittle( mymtx::RealMatrix &matriz, mymtx::RealVector &incognita
     solucion_triangular_inf( matriz, aux1, result, false );
     solucion_triangular_sup( matriz, incognitas, aux1);
 }
-void normalize(RealVector &vec){
+double normalize(RealVector &vec){
     double sum{0};
     for(auto i = vec.begin(); i != vec.end(); ++i){
         sum += *i**i;
@@ -101,31 +102,61 @@ void normalize(RealVector &vec){
     for(auto i = vec.begin(); i != vec.end(); ++i){
         *i/=sum;
     }
+    return sum;
 }
-void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, eigen *holder){
+void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealVector *vec_holder, double *val_holder){
+    double error = 1E20;
+    double old_val{0};
+    size_t found{0};
+    RealVector original = V0;
+    double norm;
+    double *component = new double[n_values];
+    RealMatrix working_m = A;
+    for(size_t k=0; k<n_values; ++k){
+        while(error > tolerance){
+            V1 = working_m*V0;
+            value = V0*V1;
+            error = std::abs(old_val-value);
+            old_val = value;
+            norm = normalize(V1);
+            V0 = V1;
+        }
+        if(vec_holder == nullptr || val_holder == nullptr || k >= n_values){ return; }
+        V0 = original;
+        component[found] = V1*V0;
+        vec_holder[found] = V1 * norm;
+        val_holder[found++] = value;
+        working_m -= V1.cross_product(V1) * (value * norm);
+        error = 1;
+    }
+    delete[] component;
+}
+
+void inverse_power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealVector *vec_holder, double *val_holder){
     double error = 1E20;
     double old_val{0};
     size_t found{0};
     RealVector original = V0;
     double *component = new double[n_values];
+    RealMatrix working_m=A;
+    metodo_de_crout( working_m,working_m,working_m );
     for(size_t k=0; k<n_values; ++k){
         while(error > tolerance){
-            for( size_t i=0; i<found; i++){
-                V0 -= holder[i].vect * component[i];
-                normalize(V0);
-            }
-            V1 = A*V0;
-            value = V0*V1;
+            solucion_crout(working_m,V1,V0);
+            value = 1 / (V0*V1);
             error = std::abs(old_val-value);
             old_val = value;
             normalize(V1);
             V0 = V1;
         }
-        if(holder != nullptr){
-            V0 = original;
-            component[found] = V1*V0;
-            holder[found++] = eigen{V1,old_val};
-        }
+        if(vec_holder == nullptr || val_holder == nullptr || k >= n_values){ return; }
+        V0 = original;
+        component[found] = V1*V0;
+        vec_holder[found] = V1;
+        val_holder[found++] = value;
+        working_m -= V1.cross_product(V1) * value;
+        error = 1;
     }
     delete[] component;
 }
+

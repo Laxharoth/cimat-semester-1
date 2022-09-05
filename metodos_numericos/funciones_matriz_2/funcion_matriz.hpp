@@ -1,9 +1,7 @@
 #ifndef FUNCION_MATRIZ_HPP
 #define FUNCION_MATRIZ_HPP
 
-#include "matrix_like/matrix_like.tcc"
 #include "matrix_like/real_matrix.hpp"
-#include "factorizacion.hpp"
 
 #include <cstdlib>
 #include <cmath>
@@ -28,7 +26,7 @@ void gauss( RealMatrix &matriz, RealVector &variables, RealVector &resultados);
 void solucion_LDU( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 void solucion_crout( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 void solucion_doolittle( RealMatrix &matriz, RealVector &incognitas, RealVector &result);
-void normalize(RealVector &vec);
-void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value);
-
+double normalize(RealVector &vec);
+void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealVector *vec_holder, double *val_holder);
+void inverse_power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealVector *vec_holder, double *val_holder);
 #endif /* FUNCION_MATRIZ_HPP */
