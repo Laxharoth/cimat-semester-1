@@ -42,7 +42,7 @@ int main(int argc, char **argv){
     {
         auto cpy = matriz;
         ANNOUNCE_TEST("Metodo: Factorizacion Crout")
-        measure_time( metodo_de_crout( cpy,cpy,cpy ) );
+        measure_time( crout( cpy,cpy,cpy ) );
         ANNOUNCE_TEST("Metodo: Solucion Crout")
         measure_time( solucion_crout( cpy,variables,vec ) );
         out_vector( variables, "solutions/long_crout.txt")
@@ -50,7 +50,7 @@ int main(int argc, char **argv){
     {
         auto cpy = matriz;
         ANNOUNCE_TEST("Metodo: Factorizacion Doolittle")
-        measure_time( metodo_de_doolittle( cpy,cpy,cpy ) );
+        measure_time( doolittle( cpy,cpy,cpy ) );
         ANNOUNCE_TEST("Metodo: Solucion Doolittle")
         measure_time( solucion_doolittle( cpy, variables, vec ) );
         out_vector( variables, "solutions/long_doolittle.txt")
@@ -58,7 +58,7 @@ int main(int argc, char **argv){
     {
         auto cpy = matriz;
         ANNOUNCE_TEST("Metodo: Factorizacion LDU")
-        measure_time( metodo_de_doolittle( cpy,cpy,cpy ) );
+        measure_time( doolittle( cpy,cpy,cpy ) );
         ANNOUNCE_TEST("Metodo: Solucion LDU")
         measure_time( solucion_LDU( cpy,variables,vec ) );
         out_vector( variables, "solutions/long_ldu.txt")
