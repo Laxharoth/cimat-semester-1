@@ -1,18 +1,18 @@
 #include "matrix_like/matrix_like.tcc"
 #include "factorizacion.hpp"
 
-void metodo_de_crout(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior){
-    const size_t size = matriz.shape_y;
+void crout(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+    const size_t size = A_mtx.shape_y;
     auto calcular_factor_inferior = [&](const int &i, const int &j){
-        matriz_inferior[i][j] = matriz[i][j];
+        L_mtx[i][j] = A_mtx[i][j];
         for(int k = 0; k <= j-1; ++k)
-            matriz_inferior[i][j] -= matriz_inferior[i][k] * matriz_superior[k][j]; 
+            L_mtx[i][j] -= L_mtx[i][k] * U_mtx[k][j]; 
     };
     auto calcular_factor_superior = [&](const int &i, const int &j){
-        matriz_superior[i][j] = matriz[i][j];
+        U_mtx[i][j] = A_mtx[i][j];
         for(int k = 0; k <= i-1; ++k)
-            matriz_superior[i][j] -= matriz_inferior[i][k] * matriz_superior[k][j];         
-        matriz_superior[i][j] /= matriz_inferior[i][i];
+            U_mtx[i][j] -= L_mtx[i][k] * U_mtx[k][j];         
+        U_mtx[i][j] /= L_mtx[i][i];
     };
     for(int i=0; i<size; ++i){
         for(int j=0; j<i; ++j){
@@ -20,21 +20,21 @@ void metodo_de_crout(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix
             calcular_factor_superior(j,i);
         }
         calcular_factor_inferior(i,i);
-        if(matriz_inferior[i][i] == 0) throw cant_factor_exception();
+        if(L_mtx[i][i] == 0) throw cant_factor_exception();
     }
 }
-void metodo_de_doolittle(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior){
-    const size_t size = matriz.shape_y;
+void doolittle(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+    const size_t size = A_mtx.shape_y;
     auto calcular_factor_superior = [&](const int &i, const int &j){
-        matriz_superior[i][j] = matriz[i][j];
+        U_mtx[i][j] = A_mtx[i][j];
         for(int k = 0; k <=i-1; ++k)
-            matriz_superior[i][j] -= matriz_inferior[i][k] * matriz_superior[k][j]; 
+            U_mtx[i][j] -= L_mtx[i][k] * U_mtx[k][j]; 
     };
     auto calcular_factor_inferior = [&](const int &i, const int &j){
-        matriz_inferior[i][j] = matriz[i][j];
+        L_mtx[i][j] = A_mtx[i][j];
         for(int k = 0; k <=j-1; ++k)
-            matriz_inferior[i][j] -= matriz_inferior[i][k] * matriz_superior[k][j]; 
-        matriz_inferior[i][j] /= matriz_superior[j][j];
+            L_mtx[i][j] -= L_mtx[i][k] * U_mtx[k][j]; 
+        L_mtx[i][j] /= U_mtx[j][j];
     };
     for(int j=0; j<size; ++j){
         for(int i=0; i<j; ++i){
@@ -42,27 +42,27 @@ void metodo_de_doolittle(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMa
             calcular_factor_inferior(j,i);
         }
         calcular_factor_superior(j,j);
-        if(matriz_inferior[j][j] == 0) throw cant_factor_exception();
+        if(L_mtx[j][j] == 0) throw cant_factor_exception();
     }
 }
-void factorizacion_LDU(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_diagonal, RealMatrix &matriz_superior){
-    const size_t size = matriz.shape_y;
+void LDU_factor(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &D_mtx, RealMatrix &U_mtx){
+    const size_t size = A_mtx.shape_y;
     auto calcular_factor_inferior = [&](const int &i, const int &j){
-        matriz_inferior[i][j] = matriz[i][j];
+        L_mtx[i][j] = A_mtx[i][j];
         for(int k = 0; k <= j-1; ++k)
-            matriz_inferior[i][j] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][j]; 
-        matriz_inferior[i][j]/= matriz_diagonal[j][j];
+            L_mtx[i][j] -= D_mtx[k][k] * L_mtx[i][k] * U_mtx[k][j]; 
+        L_mtx[i][j]/= D_mtx[j][j];
     };
     auto calcular_factor_superior = [&](const int &i, const int &j){
-        matriz_superior[i][j] = matriz[i][j];
+        U_mtx[i][j] = A_mtx[i][j];
         for(int k = 0; k <= i-1; ++k)
-            matriz_superior[i][j] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][j];
-        matriz_superior[i][j] /= matriz_diagonal[i][i];
+            U_mtx[i][j] -= D_mtx[k][k] * L_mtx[i][k] * U_mtx[k][j];
+        U_mtx[i][j] /= D_mtx[i][i];
     };
     auto calcular_factor_diagonal = [&](const int &i){
-        matriz_diagonal[i][i] = matriz[i][i];
+        D_mtx[i][i] = A_mtx[i][i];
         for(int k = 0; k <= i-1; ++k)
-            matriz_diagonal[i][i] -= matriz_diagonal[k][k] * matriz_inferior[i][k] * matriz_superior[k][i]; 
+            D_mtx[i][i] -= D_mtx[k][k] * L_mtx[i][k] * U_mtx[k][i]; 
     };
     for(int i=0; i<size; ++i){
         for(int j=0; j<i; ++j){
@@ -70,72 +70,76 @@ void factorizacion_LDU(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatr
             calcular_factor_superior(j,i);
         }
         calcular_factor_diagonal(i);
-        if(matriz_inferior[i][i] == 0) throw cant_factor_exception();
+        if(L_mtx[i][i] == 0) throw cant_factor_exception();
     }
 }
 const char* cant_factor_exception::what() const throw(){
     return "zero found in diagonal";
 }
 
-LDU_wrapper::LDU_wrapper(matrix_like *data,char type):matrix_like(data->get_shape_y(), data->get_shape_x()),data(data){
-    switch (type){
-    case LDU_wrapper::DIAGONAL:arr_wrapper = new LDU_wrapper::diagonal_strategy(data);
-        break;
-    case LDU_wrapper::CROUT:arr_wrapper = new LDU_wrapper::crout_strategy(data);
-        break;
-    case LDU_wrapper::DOOLITTLE:arr_wrapper = new LDU_wrapper::doolittle_strategy(data);
-        break;
-    default:
-    //TODO: make this exception
-        throw cant_factor_exception();
-        break;
+void crout_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+    L_mtx[0][0] = A_mtx[0][0];
+    if(L_mtx[0][0] == 0) throw cant_factor_exception();
+    for (size_t i = 1; i < A_mtx.shape_y; i++){
+        L_mtx[i][i-1] = A_mtx[i][i-1];
+        U_mtx[i-1][i] = A_mtx[i-1][i] / L_mtx[i-1][i-1];
+        L_mtx[i][i] = A_mtx[i][i] - L_mtx[i][i-1]*U_mtx[i-1][i];
+        if(L_mtx[i-1][i-1] == 0) throw cant_factor_exception();
     }
 }
-LDU_wrapper LDU_wrapper::from(matrix_like *data,char type){
-    return LDU_wrapper(data, type);
-}
-array_like<double> &LDU_wrapper::operator[](const size_t &row){
-    (*(this->arr_wrapper)).row = row;
-    return *(this->arr_wrapper);
-}
-LDU_wrapper::array_wrapper::array_wrapper(matrix_like *data):array_like<double>(data->get_shape_x()),data(data),row(0){}
-double LDU_wrapper::array_wrapper::default_val = 0;
-double &LDU_wrapper::diagonal_strategy::operator[](const size_t &col){
-    if(row == col){
-        return (*data)[row][col];
+void doolittle_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+    U_mtx[0][0] = A_mtx[0][0];
+    if(U_mtx[0][0] == 0) throw cant_factor_exception();
+    for (size_t i = 1; i < A_mtx.shape_y; i++){
+        U_mtx[i-1][i] = A_mtx[i-1][i];
+        L_mtx[i][i-1] = A_mtx[i][i-1] / L_mtx[i-1][i-1];
+        U_mtx[i][i] = A_mtx[i][i] - L_mtx[i][i-1]*U_mtx[i-1][i];
+        if(U_mtx[i-1][i-1] == 0) throw cant_factor_exception();
     }
-    default_val = 0;
-    return default_val;
 }
-size_t LDU_wrapper::diagonal_strategy::get_rbegin_n() const { return row; }
-size_t LDU_wrapper::diagonal_strategy::get_rend_n() const { return row+1; }
-double &LDU_wrapper::crout_strategy::operator[](const size_t &col){
-    if(row == col){
-        default_val = 1;
-        return default_val;
+void LDU_factor_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &D_mtx, RealMatrix &U_mtx){
+    D_mtx[0][0] = A_mtx[0][0];
+    for (size_t i = 1; i < A_mtx.shape_y; i++){
+        U_mtx[i-1][i] = A_mtx[i-1][i] / D_mtx[i][i];
+        L_mtx[i][i-1] = A_mtx[i][i-1] / D_mtx[i][i];
+        D_mtx[i][i] = A_mtx[i][i] - D_mtx[i][i]*L_mtx[i][i-1]*U_mtx[i-1][i];
+        if(D_mtx[i][i] == 0) throw cant_factor_exception();
     }
-    if(row > col){
-        default_val = 0;
-        return default_val;
-    }
-    return (*data)[row][col];
 }
-size_t LDU_wrapper::crout_strategy::get_rbegin_n() const { return row; }
-size_t LDU_wrapper::crout_strategy::get_rend_n() const { return get_size(); }
-double &LDU_wrapper::doolittle_strategy::operator[](const size_t &col){
-    if(row == col){
-        default_val = 1;
-        return default_val;
-    }
-    if(row < col){
-        default_val = 0;
-        return default_val;
-    }
-    return (*data)[row][col];
-}
-size_t LDU_wrapper::doolittle_strategy::get_rbegin_n() const { return 0; }
-size_t LDU_wrapper::doolittle_strategy::get_rend_n() const { return row+1; }
 
-LDU_wrapper::array_wrapper *LDU_wrapper::diagonal_strategy::allocate_this_cpy(){ return new diagonal_strategy(data); }
-LDU_wrapper::array_wrapper *LDU_wrapper::crout_strategy::allocate_this_cpy(){ return new crout_strategy(data); }
-LDU_wrapper::array_wrapper *LDU_wrapper::doolittle_strategy::allocate_this_cpy(){ return new doolittle_strategy(data); }
+void factor_cholesky(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
+    auto reduce_triangular = [&](const size_t i, const size_t j){
+        double &current = triangular[i][j] = matix[i][j];
+        auto l_ik =triangular[i].begin();
+        auto l_jk =triangular[j].begin();
+        for (size_t k = 0; j != 0 && k < j; ++k, ++l_ik, ++l_jk){
+            current -= (*l_ik) * (*l_jk);
+        }
+        current /= triangular[j][j];
+        triangular[j][i] = current;
+    };
+    auto reduce_diagonal = [&](const size_t i){
+        double &current = triangular[i][i] = matix[i][i];
+        auto l_ik =triangular[i].begin();
+        for (size_t k = 0; i != 0 && k < i; ++k, ++l_ik){
+            current -= (*l_ik) * (*l_ik);
+        }
+        current = sqrt(current);
+    };
+    for(size_t i=0; i<matix.shape_y; ++i){
+        for(size_t j=0;j<i; ++j){
+            reduce_triangular(i,j);
+        }
+        reduce_diagonal(i);
+    }
+}
+void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
+    triangular[0][0] = std::sqrt(matix[0][0]);
+    for(int i=1; i<matix.shape_y; i++){
+        triangular[i][i-1] = matix[i][i-1]/triangular[i-1][i-1];
+        triangular[i-1][i] = triangular[i][i-1];
+        double substract = triangular[i][i-1];
+        double &red =triangular[i][i] = matix[i][i]-substract*substract;
+        red = std::sqrt(red);
+    }
+}
