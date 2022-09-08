@@ -104,4 +104,11 @@ RealMatrix RealVector::cross_product(const RealVector &other) const {
     }
     return result;
 }
+RealVector RealVector::normal(const size_t size){
+    RealVector norm(size);
+    const double val = 1 / std::sqrt(size);
+    for( auto i = norm.begin(); i != norm.end(); ++i )
+        *i = val;
+    return norm;
+}
 }

@@ -2,7 +2,9 @@
 #define REAL_MATRIX_HPP
 
 #include <cstdlib>
+#include <cmath>
 #include <string.h>
+#include <fstream>
 #include <initializer_list>
 
 namespace mymtx{
@@ -35,6 +37,14 @@ namespace mymtx{
         RealMatrix &operator=(const RealMatrix &other);
         RealMatrix &operator-=(const RealMatrix &other);
         static RealMatrix traspose(const RealMatrix &m);
+        static RealMatrix identity(const size_t n);
+        static RealMatrix tridiag(const size_t n, double (*low)(const int i), double (*dig)(const int i), double (*up)(const int i));
+        static RealMatrix tridiag(const size_t n, const double low, const double dig, const double up);
+        RealMatrix &prod_as_band(const double coef, const size_t height, const size_t width);
+        RealVector prod_as_band(RealVector &vec , const size_t height, const size_t width) const;
+        RealMatrix prod_as_band(const RealMatrix &other, const size_t height, const size_t width);
+        static void fwrite( const char* filename, const RealMatrix& matrix);
+        static RealMatrix fread( const char* filename);
     };
     class RealVector{
         RealVector();
@@ -64,6 +74,9 @@ namespace mymtx{
         RealVector &operator-=(const RealVector &other);
         RealVector &operator=(const RealVector &other);
         RealMatrix cross_product(const RealVector &other) const;
+        static RealVector normal(const size_t size);
+        static void fwrite( const char* filename, const RealVector& vector);
+        static RealVector fread( const char* filename);
     };
     class vector_iterator{
         vector_iterator(){}
