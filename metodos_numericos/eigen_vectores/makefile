@@ -1,8 +1,15 @@
+object_files = real_matrix.o funcion_matriz.o factorizacion.o
 
+run: programa.run
+	./programa.run
+programa.run: main.o $(object_files)
+	g++ -O2 -o programa.run main.o $(object_files)
+main.o: main.cpp matrix_like/real_matrix.hpp funcion_matriz.hpp macros.hpp
+	g++ -O2 -c main.cpp
 test: test.run
 	./test.run
-test.run: test.o real_matrix.o funcion_matriz.o
-	g++ -O2 -o test.run test.o real_matrix.o funcion_matriz.o factorizacion.o
+test.run: test.o $(object_files)
+	g++ -O2 -o test.run test.o $(object_files)
 test.o: test.cpp matrix_like/real_matrix.hpp
 	g++ -O2 -c test.cpp
 funcion_matriz.o: funcion_matriz.hpp funcion_matriz.cpp matrix_like/real_matrix.hpp
