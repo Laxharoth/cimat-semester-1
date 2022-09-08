@@ -48,3 +48,4 @@ real_vector.*
 real_vector_iterator.cpp
 !metodos_numericos/matrix_like/real_vector_iterator.cpp
 metodos_numericos/eigen_vectores/matrix_like/makefile
+*.mtx
