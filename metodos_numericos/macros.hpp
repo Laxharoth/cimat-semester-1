@@ -2,6 +2,7 @@
 #include <iomanip> 
 #include <chrono>
 #include <fstream>
+#include "matrix_like/real_matrix.hpp"
 
 #ifndef COMMA
 #define COMMA ,
@@ -48,4 +49,40 @@ using namespace std::chrono;
     file << std::endl;\
   }\
   file.close();\
+}
+template <typename T>
+void print_array(T &array, size_t size)
+{
+	(*(macros::out)) << std::fixed;
+	for (size_t i = 0; i < size; ++i)
+	{
+		(*(macros::out)) << std::setfill(' ') << std::setw(7) << std::setprecision(2) << array[i] << " ";
+	}
+	(*(macros::out)) << std::endl;
+}
+template <typename T>
+void print_matrix(T &matrix, size_t size)
+{
+	for (size_t i = 0; i < size; ++i)
+	{
+		auto a = matrix[i];
+		print_array(a, size);
+	}
+}
+
+void printm(const mymtx::RealMatrix &m){
+    for (size_t i = 0; i < m.shape_y; ++i)
+    {
+        for( auto j = m.begin(i); j < m.end(i); ++j){
+            std::cout << *j << " ";
+        }
+        std::cout << std::endl;
+    }
+    
+}
+void printv(const mymtx::RealVector &m){
+    for( auto j = m.begin(); j < m.end(); ++j){
+            std::cout << *j << " ";
+    }
+    std::cout << std::endl;
 }
