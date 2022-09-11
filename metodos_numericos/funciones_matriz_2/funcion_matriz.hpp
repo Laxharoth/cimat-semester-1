@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <random>
 
 using mymtx::RealMatrix;
 using mymtx::RealVector;
@@ -30,6 +31,7 @@ void solucion_doolittle( RealMatrix &matriz, RealVector &incognitas, RealVector 
 void solve_gauss_seidel(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx::RealVector &solutions, double *error);
 void solve_cholesky(mymtx::RealMatrix &cholesky_factored,mymtx::RealVector &variables, mymtx::RealVector &solutions);
 double normalize(RealVector &vec);
+void randomize(RealVector& vec);
 void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder);
 void inverse_power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder);
 #endif /* FUNCION_MATRIZ_HPP */

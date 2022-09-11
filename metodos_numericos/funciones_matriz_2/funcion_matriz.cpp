@@ -1,5 +1,27 @@
 #include "funcion_matriz.hpp"
 
+class randgen{
+    std::random_device *rd;
+    std::mt19937 *gen;
+    std::uniform_real_distribution<double> *dis;
+    randgen(){
+        rd = new std::random_device();
+        gen= new std::mt19937((*rd)());
+        dis = new std::uniform_real_distribution<double>();
+    }
+    ~randgen(){
+        delete rd;
+        delete gen;
+        delete dis;
+    }
+    public:
+    double generate(){ return (*dis)(*gen); }
+    static randgen &get_randgen(){
+        static randgen rng;
+        return rng;
+    }
+};
+
 void solucion_diagonal(mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
     const size_t size = matriz.shape_x;
     for(int i=0; i<size; ++i){
@@ -134,6 +156,12 @@ double normalize(RealVector &vec){
         *i/=sum;
     }
     return sum;
+}
+void randomize(RealVector& vec){
+    randgen &rng = randgen::get_randgen();
+    for(auto i = vec.begin(); i != vec.end(); ++i){
+        *i= rng.generate();
+    }
 }
 void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder){
     auto &vec_holder = *_vec_holder;
