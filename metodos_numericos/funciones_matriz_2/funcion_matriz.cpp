@@ -169,8 +169,9 @@ void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const 
     double error = 1E20;
     double old_val{0};
     size_t found{0};
-    const RealVector original = V0;
     for(size_t k=0; k<n_values; ++k){
+        randomize(V0);
+        normalize(V0);
         while(error > tolerance){
             for (size_t i = 0; i < found; i++){
                 V0 -= vec_holder[i] * (V0*vec_holder[i]);
@@ -183,7 +184,6 @@ void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const 
             V0 = V1;
         }
         if(_vec_holder == nullptr || _val_holder == nullptr || k >= n_values){ return; }
-        V0 = original;
         vec_holder[found]=V1;
         val_holder[found]=value;
         found++;
@@ -197,12 +197,16 @@ void inverse_power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1
     double error = 1E20;
     double old_val{0};
     size_t found{0};
-    RealVector original = V0;
+    const unsigned max_iter = 2000;
+    unsigned iter = 0;
     RealMatrix working_m=A;
-    RealMatrix H(A.shape_y, A.shape_x);
     crout(working_m,working_m,working_m);
     for(size_t k=0; k<n_values; ++k){
-        while(error > tolerance){
+        iter = 0;
+        while(error > tolerance && iter < max_iter){
+            iter ++;
+            randomize(V0);
+            normalize(V0);
             for (size_t i = 0; i < found; i++){
                 V0 -= vec_holder[i] * (V0*vec_holder[i]);
             }
@@ -213,14 +217,12 @@ void inverse_power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1
             normalize(V1);
             V0 = V1;
         }
-        if(_vec_holder == nullptr || _val_holder == nullptr || k >= n_values){ return; }
-        V0 = original;
+        if(_vec_holder == nullptr || _val_holder == nullptr || 
+            k >= n_values || iter >= max_iter){ return; }
         vec_holder[found]=V1;
         val_holder[found]=value;
         found++;
-        H=V1.cross_product(V1);
         error = 1;
-        if(found%10==0)printf("found:%d\n",found);
     }
 }
 void solve_cholesky(mymtx::RealMatrix &cholesky_factored,mymtx::RealVector &variables, mymtx::RealVector &solutions){
