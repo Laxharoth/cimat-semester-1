@@ -13,6 +13,12 @@ run: programa.run
 	./programa.run
 programa.run: main.o $(object_files)
 	g++ -O2 -o programa.run main.o $(object_files)
+jacobi: jacobi.run
+	./jacobi.run
+jacobi.run: jacobi_main.o $(object_files)
+	g++ -O2 -o jacobi.run jacobi_main.o $(object_files)
+jacobi_main.o: jacobi_main.cpp matrix_like/real_matrix.hpp funcion_matriz.hpp macros.hpp
+	g++ -O2 -c jacobi_main.cpp
 main.o: main.cpp matrix_like/real_matrix.hpp funcion_matriz.hpp macros.hpp
 	g++ -O2 -c main.cpp
 test: test.run
