@@ -111,4 +111,7 @@ RealVector RealVector::normal(const size_t size){
         *i = val;
     return norm;
 }
+void RealVector::sort(RealVector &v){
+    std::sort(v.data, v.data+v.size);
+}
 }

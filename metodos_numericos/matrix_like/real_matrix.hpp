@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <algorithm>
 #include <string.h>
 #include <fstream>
 #include <initializer_list>
@@ -75,6 +76,7 @@ namespace mymtx{
         RealVector &operator=(const RealVector &other);
         RealMatrix cross_product(const RealVector &other) const;
         static RealVector normal(const size_t size);
+        static void sort(RealVector &v);
         static void fwrite( const char* filename, const RealVector& vector);
         static RealVector fread( const char* filename);
     };
@@ -102,6 +104,7 @@ public:
     bool operator<(const vector_iterator& rhs)  const;
     bool operator>=(const vector_iterator& rhs) const;
     bool operator<=(const vector_iterator& rhs) const;
+    double& operator[](int);
     double& operator*();
     };
 class const_vector_iterator{
@@ -128,7 +131,9 @@ public:
     bool operator<(const const_vector_iterator& rhs)  const;
     bool operator>=(const const_vector_iterator& rhs) const;
     bool operator<=(const const_vector_iterator& rhs) const;
+    const double& operator[](int) const;
     const double& operator*() const;
     };
+void abs(RealMatrix &A);
 }
 #endif /* REAL_MATRIX_HPP */

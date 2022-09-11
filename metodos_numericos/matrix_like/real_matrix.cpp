@@ -177,6 +177,18 @@ RealVector RealVector::fread( const char* filename){
     f.close();
     return vector;
 }
+void abs(RealMatrix &A){
+    for(size_t k=0; k<A.shape_y; ++k){
+        for(auto i = A[k].begin(); i<A[k].end(); ++i){
+            *i = std::abs(*i);
+        }
+    }
+}
+void abs(RealVector &V){
+    for(auto i = V.begin(); i<V.end(); ++i){
+        *i = std::abs(*i);
+    }
+}
 }
 #include "real_vector.cpp"
 #include "real_vector_iterator.cpp"
