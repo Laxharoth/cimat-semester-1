@@ -1,3 +1,12 @@
+###################################################
+#
+# Para ejecutar el programa de pruebas 
+# utilizar el comando 'make test'
+#
+# Para ejecutar el programa de para la 
+# matriz de 1000 nodos utilizar el comando 'make'
+#
+###############################
 object_files = real_matrix.o funcion_matriz.o factorizacion.o
 
 run: programa.run
@@ -23,3 +32,5 @@ clean:
 	rm -rf *.o
 	rm -rf *.out
 	rm -rf *.run
+	rm -rf *.vec
+	rm -rf *.mtx
