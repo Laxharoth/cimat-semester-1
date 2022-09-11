@@ -1,4 +1,6 @@
 #include "funcion_matriz.hpp"
+#define PI 3.141592653589793
+#define ZERO_UMBRAL 10e-15
 
 class randgen{
     std::random_device *rd;
@@ -229,4 +231,55 @@ void solve_cholesky(mymtx::RealMatrix &cholesky_factored,mymtx::RealVector &vari
     mymtx::RealVector tmp(solutions.size);
     solucion_triangular_inf(cholesky_factored,tmp,solutions);
     solucion_triangular_sup(cholesky_factored,variables,tmp);
+}
+
+void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix  &U, const unsigned max_iter){
+    size_t col, row;
+    const size_t n = A.shape_y;
+    unsigned iter = 0;
+    auto IndexOfMax = [](const mymtx::RealMatrix &A, size_t &col, size_t &row){
+        double max = row = col= 0;
+        for(size_t k=0; k<A.shape_y; ++k)
+        for(auto i = A.begin(k); i<A.end(k); ++i)
+            if(*i > max){
+                max = *i;
+                col = i.get_col();
+                row = i.get_row();
+            }
+    };
+    auto rotate =[](mymtx::RealMatrix &A_mtx, mymtx::RealMatrix &U_mtx,const size_t row_lmb,const size_t col_lmb){
+        double tan_2,tan_, cos_, sin_, theta;
+        int n = A_mtx.shape_y;
+        if (row_lmb == col_lmb) return;
+        if(A_mtx[row_lmb][row_lmb]!=A_mtx[col_lmb][col_lmb]){
+            tan_2 = (2*A_mtx[row_lmb][col_lmb])/(A_mtx[row_lmb][row_lmb]-A_mtx[col_lmb][col_lmb]);
+            tan_ = tan_2*tan_2/(1+ std::sqrt( 1 + tan_2*tan_2 ) );
+            cos_ = 1/sqrt(tan_*tan_ + 1);
+            sin_ = cos_*tan_;
+        }else{
+            cos_ = std::cos( PI / 4 );
+            sin_ = std::sin( PI / 4 );
+        }
+        auto R = mymtx::RealMatrix::identity(n);
+        R[row_lmb][row_lmb] = R[col_lmb][col_lmb] = cos_; R[row_lmb][col_lmb] = sin_; R[col_lmb][row_lmb] = -sin_;
+        A_mtx = (mymtx::RealMatrix::traspose(R)*A_mtx);
+        A_mtx = (A_mtx * R);
+        U_mtx = (R*U_mtx);
+    };
+    mymtx::RealMatrix M(n,n);
+    U = mymtx::RealMatrix::identity(n);
+    while(iter++ < max_iter){
+        M=A;
+        mymtx::abs(M);
+        for(size_t i=0; i<n; ++i) M[i][i]=0;
+        IndexOfMax(M,row,col);
+        if(row==col){
+            for(size_t i=0; i<n; ++i) e[i]=A[i][i];
+            return;
+        }
+        double Amax = A[row][col];
+        rotate(A, U, row, col);
+        if (Amax < ZERO_UMBRAL) break;
+    }
+    for(size_t i=0; i<n; ++i) e[i]=A[i][i];
 }
