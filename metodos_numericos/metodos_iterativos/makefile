@@ -20,19 +20,19 @@ run: programa.run
 mains: programa.run gauss.run jacob.run
 	@echo e
 programa.run: main.o $(object_files)
-	g++ -O2 -o programa.run main.o $(object_files)
+	g++ -O2 -pthread -o programa.run main.o $(object_files)
 gauss: gauss.run
 	./gauss.run
 gauss.run: maing.o $(object_files)
-	g++ -O2 -o gauss.run maing.o $(object_files)
+	g++ -O2 -pthread -o gauss.run maing.o $(object_files)
 jacob: jacob.run
 	./jacob.run
 jacob.run: mainj.o $(object_files)
-	g++ -O2 -o jacob.run mainj.o $(object_files)
+	g++ -O2 -pthread -o jacob.run mainj.o $(object_files)
 test: test.run
 	./test.run
 test.run: test.o $(object_files)
-	g++ -O2 -o test.run test.o $(object_files)
+	g++ -O2 -pthread -o test.run test.o $(object_files)
 test.o: test.cpp macros.hpp $(matrix_like_dep)
 	g++ -O2 -c test.cpp
 funcion_matriz.o: funcion_matriz.hpp funcion_matriz.cpp
