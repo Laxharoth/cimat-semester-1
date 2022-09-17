@@ -1,5 +1,6 @@
 #include "funcion_matriz.hpp"
 #define PI 3.141592653589793
+#define JACOBI_UMBRAL 10e-4
 #define ZERO_UMBRAL 10e-15
 
 class randgen{
@@ -159,13 +160,40 @@ double normalize(RealVector &vec){
     }
     return sum;
 }
+void normalize(RealMatrix &mtx){
+    double norm1{0},norm2{0};
+    for(size_t i = 0; i < mtx.shape_y; ++i){
+        norm1 += mtx[i][0]*mtx[i][0];
+    }
+    norm1 = std::sqrt(norm1);
+    for(size_t k = 1; k < mtx.shape_x; ++k){
+        for(size_t i = 0; i < mtx.shape_y; ++i){
+            norm2 += mtx[i][k]*mtx[i][k];
+            mtx[i][k-1] /= norm1;
+        }
+        norm1 = std::sqrt(norm2);
+        norm2=0;
+    }
+    for(size_t i = 0; i < mtx.shape_y; ++i){
+        norm1 += mtx[i][mtx.shape_x-1]*mtx[i][mtx.shape_x-1];
+    }
+}
 void randomize(RealVector& vec){
     randgen &rng = randgen::get_randgen();
     for(auto i = vec.begin(); i != vec.end(); ++i){
         *i= rng.generate();
     }
 }
-void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder){
+void randomize(RealMatrix& mtx){
+    randgen &rng = randgen::get_randgen();
+    for(size_t i = 0; i < mtx.shape_y; ++i){
+        for( auto j = mtx.begin(i); j < mtx.end(i); ++j){
+            *j =rng.generate();
+        }
+    }
+}
+void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder){
+    RealVector V0(V1.size);
     auto &vec_holder = *_vec_holder;
     auto &val_holder = *_val_holder;
     double error = 1E20;
@@ -192,8 +220,8 @@ void power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const 
         error = 1;
     }
 }
-
-void inverse_power_iteration(const RealMatrix &A, RealVector &V0, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix*_vec_holder, RealVector *_val_holder){
+void inverse_power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix*_vec_holder, RealVector *_val_holder){
+    RealVector V0(V1.size);
     auto &vec_holder = *_vec_holder;
     auto &val_holder = *_val_holder;
     double error = 1E20;
@@ -232,54 +260,50 @@ void solve_cholesky(mymtx::RealMatrix &cholesky_factored,mymtx::RealVector &vari
     solucion_triangular_inf(cholesky_factored,tmp,solutions);
     solucion_triangular_sup(cholesky_factored,variables,tmp);
 }
-
 void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix  &U, const unsigned max_iter){
     size_t col, row;
     const size_t n = A.shape_y;
     unsigned iter = 0;
-    auto IndexOfMax = [](const mymtx::RealMatrix &A, size_t &col, size_t &row){
-        double max = row = col= 0;
-        for(size_t k=0; k<A.shape_y; ++k)
-        for(auto i = A.begin(k); i<A.end(k); ++i)
-            if(*i > max){
+    mymtx::RealMatrix B = A;
+    auto IndexOfMax = [](const mymtx::RealMatrix &inA, size_t &incol, size_t &inrow){
+        double max = inrow = incol= 0;
+        for(size_t k=0; k<inA.shape_y; ++k)
+        for(auto i = inA.begin(k); i<inA.end(k); ++i){
+            if( i.get_col() == i.get_row() )continue;
+            if(std::abs(*i) > std::abs(max)){
                 max = *i;
-                col = i.get_col();
-                row = i.get_row();
+                incol = i.get_col();
+                inrow = i.get_row();
             }
+        }
     };
-    auto rotate =[](mymtx::RealMatrix &A_mtx, mymtx::RealMatrix &U_mtx,const size_t row_lmb,const size_t col_lmb){
+    auto rotate =[&A,&B](mymtx::RealMatrix &U_mtx,const size_t row_lmb,const size_t col_lmb){
         double tan_2,tan_, cos_, sin_, theta;
-        int n = A_mtx.shape_y;
+        const size_t n = B.shape_y;
         if (row_lmb == col_lmb) return;
-        if(A_mtx[row_lmb][row_lmb]!=A_mtx[col_lmb][col_lmb]){
-            tan_2 = (2*A_mtx[row_lmb][col_lmb])/(A_mtx[row_lmb][row_lmb]-A_mtx[col_lmb][col_lmb]);
+        if(B[row_lmb][row_lmb]!=B[col_lmb][col_lmb]){
+            tan_2 = (2*B[row_lmb][col_lmb])/(B[row_lmb][row_lmb]-B[col_lmb][col_lmb]);
             tan_ = tan_2*tan_2/(1+ std::sqrt( 1 + tan_2*tan_2 ) );
-            cos_ = 1/sqrt(tan_*tan_ + 1);
+            cos_ = 1/std::sqrt(tan_*tan_ + 1);
             sin_ = cos_*tan_;
         }else{
             cos_ = std::cos( PI / 4 );
             sin_ = std::sin( PI / 4 );
         }
         auto R = mymtx::RealMatrix::identity(n);
-        R[row_lmb][row_lmb] = R[col_lmb][col_lmb] = cos_; R[row_lmb][col_lmb] = sin_; R[col_lmb][row_lmb] = -sin_;
-        A_mtx = (mymtx::RealMatrix::traspose(R)*A_mtx);
-        A_mtx = (A_mtx * R);
-        U_mtx = (R*U_mtx);
+        R[row_lmb][row_lmb] = R[col_lmb][col_lmb] = cos_; 
+        R[row_lmb][col_lmb] = sin_; R[col_lmb][row_lmb] = -sin_;
+        U_mtx *= R;
+        B = mymtx::MatrixTraspose(U_mtx)*A.prod_as_band(U_mtx,1,1);
     };
-    mymtx::RealMatrix M(n,n);
     U = mymtx::RealMatrix::identity(n);
-    while(iter++ < max_iter){
-        M=A;
-        mymtx::abs(M);
-        for(size_t i=0; i<n; ++i) M[i][i]=0;
-        IndexOfMax(M,row,col);
-        if(row==col){
-            for(size_t i=0; i<n; ++i) e[i]=A[i][i];
-            return;
-        }
-        double Amax = A[row][col];
-        rotate(A, U, row, col);
-        if (Amax < ZERO_UMBRAL) break;
+    while(iter++<max_iter){
+        IndexOfMax(B,row,col);
+        if (std::abs(B[row][col]) < JACOBI_UMBRAL){ break;}
+        rotate(U, row, col);
+    }
+    for(size_t i=0; i<n; ++i) e[i]=B[i][i];
+}
     }
     for(size_t i=0; i<n; ++i) e[i]=A[i][i];
 }
