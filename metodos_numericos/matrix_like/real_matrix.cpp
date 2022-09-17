@@ -1,6 +1,45 @@
 #include "real_matrix.hpp"
+#include <future>
+#include <vector>
 
+struct mrow_data{
+    size_t begin;size_t end; const size_t row;const mymtx::RealMatrix* mtx; const mymtx::RealMatrix *other; mymtx::RealMatrix *cpy;
+};
+struct mrowMT_data{
+    size_t begin;size_t end; const size_t row;const mymtx::RealMatrix* mtx; const mymtx::MatrixTraspose *other; mymtx::RealMatrix *cpy;
+};
+struct mrowMV_data{
+    const mymtx::RealVector *vec;
+    mymtx::RealVector *result;
+    const mymtx::RealMatrix *mtx;
+    const size_t row;
+};
+void mult_row(mrow_data d){
+    for( size_t k = d.begin; k < d.end; ++k){
+        for(size_t j = 0; j < d.other->shape_x; ++j){
+            (*d.cpy)[d.row][j] += (*d.mtx)(d.row,k) * (*d.other)(k,j);
+        }
+    }
+};
+void mult_matrix_MT_row(mrowMT_data d){
+    for( size_t k = d.begin; k < d.end; ++k){
+        for(size_t j = 0; j < d.other->shape_x; ++j){
+            (*d.cpy)[d.row][j] += (*d.mtx)(d.row,k) * (*d.other)(k,j);
+        }
+    }
+};
+void mult_matrix_TM_row(mrowMT_data d){
+    for( size_t k = d.begin; k < d.end; ++k){
+        for(size_t j = 0; j < d.mtx->shape_x; ++j){
+            (*d.cpy)[d.row][j] += (*d.other)(d.row,k) * (*d.mtx)(k,j);
+        }
+    }
+};
+void mult_mtx_vec_Row(mrowMV_data d){
+    (*d.result)[d.row] = d.mtx->operator[](d.row) * (*(d.vec));
+}
 namespace mymtx{
+
 
 RealMatrix::RealMatrix(size_t shape_y,size_t shape_x):shape_x(shape_x),shape_y(shape_y){
     this->data = new double[this->shape_x * this->shape_y]{0};
@@ -36,8 +75,8 @@ RealMatrix RealMatrix::identity(const size_t n){
 RealMatrix RealMatrix::tridiag(const size_t n, double (*low)(const int i), double (*dig)(const int i), double (*up)(const int i)){
     RealMatrix trid(n,n);
     for( size_t i = 0; i < n; ++i ){
-        trid[i][i] = dig(i);
         if(i>0)trid[i][i-1] = low(i);
+        trid[i][i] = dig(i);
         if(i<n-1)trid[i][i+1] = up(i);
     }
     return trid;
@@ -45,13 +84,15 @@ RealMatrix RealMatrix::tridiag(const size_t n, double (*low)(const int i), doubl
 RealMatrix RealMatrix::tridiag(const size_t n, const double low,const double dig, const double up){
     RealMatrix trid(n,n);
     for( size_t i = 0; i < n; ++i ){
-        trid[i][i] = dig;
         if(i>0)trid[i][i-1] = low;
+        trid[i][i] = dig;
         if(i<n-1)trid[i][i+1] = up;
     }
     return trid;
 }
 RealVector RealMatrix::operator[](const size_t &row){ return RealVector(data + row * shape_x, shape_x); }
+double &RealMatrix::operator()(const size_t row, const size_t col){ return (*this)[row][col]; }
+const double &RealMatrix::operator()(const size_t row, const size_t col) const { return (*this)[row][col]; }
 const RealVector RealMatrix::operator[](const size_t &row) const { return RealVector(data + row * shape_x, shape_x); }
 vector_iterator RealMatrix::begin(const size_t row){
     return vector_iterator(data + row * shape_x, row, 0);
@@ -72,8 +113,17 @@ RealVector &RealMatrix::operator*=(RealVector &vec) const{
 }
 RealVector RealMatrix::operator*(const RealVector &vec) const{
     RealVector result(vec.size);
+    #ifndef NO_ASYNC
+    std::vector<std::future<void>> futures;
+    #endif
     for(size_t i = 0; i < shape_y; ++i){
+        #ifndef NO_ASYNC
+        futures.push_back(
+            std::async(std::launch::async, mult_mtx_vec_Row, mrowMV_data{ &vec, &result, this,i })
+        );
+        #else
         result[i] = this->operator[](i) * vec;
+        #endif
     }
     return result;
 }
@@ -88,20 +138,54 @@ RealMatrix &RealMatrix::operator*=(const double coef){
     }
     return *this;
 }
-RealMatrix RealMatrix::operator*(const double coef) const{
-    RealMatrix cpy = *this;
-    for (size_t i = 0; i < this->shape_y; i++){
-        cpy[i]*=coef;
-    }
-    return *this;
-}
+// RealMatrix RealMatrix::operator*(const double coef) const{
+//     RealMatrix cpy = *this;
+//     for (size_t i = 0; i < this->shape_y; i++){
+//         cpy[i]*=coef;
+//     }
+//     return *this;
+// }
 RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
-    auto t = traspose(other);
-    auto cpy = RealMatrix(this->shape_y,this->shape_x);
+    auto cpy = RealMatrix(this->shape_y,other.shape_x);
+    std::vector<std::future<void>> futures;
     for(size_t i = 0; i < this->shape_y; ++i){
-        for(size_t j = 0; j < this->shape_x; ++j){
-            cpy[i][j] = this->operator[](i) * t[j];
+        #ifndef NO_ASYNC
+        futures.push_back(
+        std::async(std::launch::async, mult_row, mrow_data{0, other.shape_y, i, this, &other, &cpy})
+        );
+        #else
+        for( size_t k = 0; k < other.shape_y; ++k){
+            for(size_t j = 0; j < other.shape_x; ++j){
+                cpy[i][j] += (*this)(i,k) * other(k,j);
+            }
         }
+        #endif
+    
+    }
+    return cpy;
+}
+RealMatrix RealMatrix::prod_as_band(const RealMatrix &other, const size_t height, const size_t width){
+    auto cpy = RealMatrix(this->shape_y,other.shape_x);
+    size_t begin,end;
+    #ifndef NO_ASYNC
+    std::vector<std::future<void>> futures;
+    #endif
+    for(size_t i = 0; i < this->shape_y; ++i){
+        begin = i - height;
+        end = 1 + i + width;
+        if( i < height ) begin = 0;
+        if( i > this->shape_y - height ) end = this->shape_x;
+        #ifndef NO_ASYNC
+        futures.push_back(
+        std::async(std::launch::async, mult_row, mrow_data{begin, end, i, this, &other, &cpy})
+        );
+        #else
+        for( size_t k = begin; k < end; ++k){
+            for(size_t j = 0; j < other.shape_x; ++j){
+                cpy[i][j] += (*this)(i,k) * other(k,j);
+            }
+        }
+        #endif
     }
     return cpy;
 }
@@ -116,6 +200,11 @@ RealMatrix &RealMatrix::operator-=(const RealMatrix &other){
         }
     }
     return *this;
+}
+RealMatrix RealMatrix::operator-(const RealMatrix &other) const{
+    auto cpy = *this;
+    cpy-=other;
+    return cpy;
 }
 RealMatrix &RealMatrix::prod_as_band(const double coef, const size_t height, const size_t width){
     size_t begin,end;
@@ -189,6 +278,61 @@ void abs(RealVector &V){
         *i = std::abs(*i);
     }
 }
+
+const double &MatrixTraspose::operator()(size_t row, size_t col) const{
+    return t[col][row];
+}
+MatrixTraspose::MatrixTraspose(const RealMatrix &m):t(m),shape_y(m.shape_x),shape_x(m.shape_y)  { }
+MatrixTraspose::MatrixTraspose(const MatrixTraspose &other):t(other.t),shape_y(other.shape_y),shape_x(other.shape_x) { }
+
+}
+mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const double c){
+    mymtx::RealMatrix cpy = mtx;
+    cpy*=c;
+    return cpy;
+}
+mymtx::RealMatrix operator*(const double c, const mymtx::RealMatrix &mtx){
+    return mtx*c;
+}
+mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const mymtx::MatrixTraspose &mtxt){
+    mymtx::RealMatrix res(mtx.shape_y,mtxt.shape_x);
+    #ifndef NO_ASYNC
+    std::vector<std::future<void>> futures;
+    #endif
+    for(size_t i = 0; i < res.shape_y; ++i){
+        #ifndef NO_ASYNC
+        futures.push_back(
+            std::async(std::launch::async, mult_matrix_MT_row, mrowMT_data{0, mtxt.shape_x, i, &mtx, &mtxt, &res})
+        );
+        #else
+        for( size_t k = 0; k < mtxt.shape_x; ++k){
+            for(size_t j = 0; j < res.shape_x; ++j){
+                res[i][j] += mtx[i][k] * mtxt(k,j);
+            }
+        }
+        #endif
+    }
+    return res;
+}
+mymtx::RealMatrix operator*(const mymtx::MatrixTraspose &mtxt, const mymtx::RealMatrix &mtx){
+    mymtx::RealMatrix res(mtx.shape_y,mtxt.shape_x);
+    #ifndef NO_ASYNC
+    std::vector<std::future<void>> futures;
+    #endif
+    for(size_t i = 0; i < res.shape_y; ++i){
+        #ifndef NO_ASYNC
+        futures.push_back(
+            std::async(std::launch::async, mult_matrix_TM_row, mrowMT_data{0, mtxt.shape_x, i, &mtx, &mtxt, &res})
+        );
+        #else
+        for( size_t k = 0; k < mtx.shape_x; ++k){
+            for(size_t j = 0; j < res.shape_x; ++j){
+                res[i][j] += mtxt(i,k) * mtx(k,j);
+            }
+        }
+        #endif
+    }
+    return res;
 }
 #include "real_vector.cpp"
 #include "real_vector_iterator.cpp"

@@ -10,8 +10,8 @@ real_matrix.o: real_matrix.hpp real_matrix.cpp real_vector.cpp real_vector_itera
 test: test.run
 	./test.run
 test.run: test.o real_matrix.o matrix_exception.o
-	g++ -O2 -o test.run test.o real_matrix.o
-test.o: test.cpp real_matrix.hpp matrix_exception.hpp matrix_like.tcc
+	g++ -O2 -pthread -o test.run test.o real_matrix.o
+test.o: test.cpp real_matrix.hpp matrix_exception.hpp matrix_like.tcc ../macros.hpp
 	g++ -O2 -c test.cpp
 clean:
 	rm -rf *.o

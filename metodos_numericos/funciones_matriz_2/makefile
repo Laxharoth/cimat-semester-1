@@ -20,7 +20,7 @@ object_files =funcion_matriz.o matriz_banda.o factorizacion.o matrix_exception.o
 programa: programa.run
 	./programa.run
 programa.run: main.o $(object_files)
-	g++ -O2 -o programa.run main.o $(object_files)
+	g++ -O2 -pthread -o programa.run main.o $(object_files)
 main.o: main.cpp funcion_matriz.hpp factorizacion.hpp matrix_like/matriz_banda.hpp
 	g++ -O2 -c main.cpp
 funcion_matriz.o: funcion_matriz.hpp funcion_matriz.cpp
