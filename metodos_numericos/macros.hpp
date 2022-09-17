@@ -1,3 +1,5 @@
+#ifndef MACROS_HPP
+#define MACROS_HPP
 #include <iostream>
 #include <iomanip> 
 #include <chrono>
@@ -70,19 +72,4 @@ void print_matrix(T &matrix, size_t size)
 	}
 }
 
-void printm(const mymtx::RealMatrix &m){
-    for (size_t i = 0; i < m.shape_y; ++i)
-    {
-        for( auto j = m.begin(i); j < m.end(i); ++j){
-            std::cout << *j << " ";
-        }
-        std::cout << std::endl;
-    }
-    
-}
-void printv(const mymtx::RealVector &m){
-    for( auto j = m.begin(); j < m.end(); ++j){
-            std::cout << *j << " ";
-    }
-    std::cout << std::endl;
-}
+#endif /* MACROS_HPP */
