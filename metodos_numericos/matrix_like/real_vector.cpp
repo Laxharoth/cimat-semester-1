@@ -114,4 +114,23 @@ RealVector RealVector::normal(const size_t size){
 void RealVector::sort(RealVector &v){
     std::sort(v.data, v.data+v.size);
 }
+double RealVector::distance() const{
+    double sum = 0;
+    for(auto i=this->begin(); i!=this->end(); ++i) sum += (*i) * (*i);
+    return std::sqrt(sum);
 }
+RealMatrix RealVector::as_matrix() const {
+    RealMatrix m(this->size,1);
+    memcmp(m.data, this->data, sizeof(double)*this->size);
+    return m;
+}
+}
+mymtx::RealVector operator*(const mymtx::RealVector &v, const double c){
+    mymtx::RealVector cpy = v;
+    cpy*=c;
+    return cpy;
+}
+mymtx::RealVector operator*(const double c, const mymtx::RealVector &v){
+    return v*c;
+}
+
