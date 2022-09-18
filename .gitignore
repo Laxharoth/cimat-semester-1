@@ -53,3 +53,5 @@ metodos_numericos/eigen_vectores/matrix_like/makefile
 programacion/Tarea4/quicksort.c
 *.pgm
 programacion/Tarea4/pgm1.c
+programacion/Tarea5/quicksort.c
+programacion/Tarea5/pgm1.c
