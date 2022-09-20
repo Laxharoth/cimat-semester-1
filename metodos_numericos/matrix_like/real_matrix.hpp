@@ -49,6 +49,23 @@ namespace mymtx{
         RealMatrix prod_as_band(const RealMatrix &other, const size_t height, const size_t width);
         static void fwrite( const char* filename, const RealMatrix& matrix);
         static RealMatrix fread( const char* filename);
+        class Column{
+        Column();
+        double *data;
+        public:
+        const size_t size;
+        const size_t increment;
+        Column(const RealMatrix::Column &other);
+        Column(double *data, size_t size,const size_t increment);
+        double &operator[](const size_t row);
+        const double &operator[](const size_t row) const;
+        double operator*(const Column&other) const;
+        double distance() const;
+        RealMatrix as_matrix() const;
+        Column &operator=(const RealVector &other);
+        };
+        Column column(const size_t col);
+        const Column column(const size_t col) const;
         friend class RealVector;
     };
     class RealVector{
@@ -59,6 +76,7 @@ namespace mymtx{
         const size_t size;
         RealVector(const size_t size);
         RealVector(const RealVector &other);
+        RealVector(const RealMatrix::Column &other);
         RealVector(std::initializer_list<double> initial);
         RealVector(double *data, size_t size);
         ~RealVector();
@@ -68,7 +86,6 @@ namespace mymtx{
         vector_iterator end();
         const_vector_iterator begin() const;
         const_vector_iterator end() const;
-        RealVector operator*(const double coef);
         RealVector &operator*=(const double coef);
         RealVector operator/(const double coef);
         RealVector &operator/=(const double coef);
@@ -159,4 +176,12 @@ mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const mymtx::MatrixTra
 mymtx::RealMatrix operator*(const mymtx::MatrixTraspose &mtxt, const mymtx::RealMatrix &mtx);
 mymtx::RealVector operator*(const mymtx::RealVector &v, const double c);
 mymtx::RealVector operator*(const double c, const mymtx::RealVector &v);
+double operator*(const mymtx::RealMatrix::Column &c, const mymtx::RealVector &v);
+double operator*(const mymtx::RealVector &v, const mymtx::RealMatrix::Column &c);
+mymtx::RealVector operator*(const mymtx::RealMatrix::Column &c, double &coef);
+mymtx::RealVector operator*(double &coef, const mymtx::RealMatrix::Column &c);
+mymtx::RealVector operator+(const mymtx::RealMatrix::Column &c, const mymtx::RealVector &v);
+mymtx::RealVector operator+(const mymtx::RealVector &v, const mymtx::RealMatrix::Column &c);
+mymtx::RealVector operator-(const mymtx::RealMatrix::Column &c, const mymtx::RealVector &v);
+mymtx::RealVector operator-(const mymtx::RealVector &v, const mymtx::RealMatrix::Column &c);
 #endif /* REAL_MATRIX_HPP */

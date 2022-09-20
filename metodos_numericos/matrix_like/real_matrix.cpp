@@ -284,7 +284,12 @@ const double &MatrixTraspose::operator()(size_t row, size_t col) const{
 }
 MatrixTraspose::MatrixTraspose(const RealMatrix &m):t(m),shape_y(m.shape_x),shape_x(m.shape_y)  { }
 MatrixTraspose::MatrixTraspose(const MatrixTraspose &other):t(other.t),shape_y(other.shape_y),shape_x(other.shape_x) { }
-
+RealMatrix::Column RealMatrix::column(const size_t col){
+    return RealMatrix::Column(data+col, shape_y, shape_x);
+}
+const RealMatrix::Column RealMatrix::column(const size_t col) const{
+    return RealMatrix::Column(data+col, shape_y, shape_x);
+}
 }
 mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const double c){
     mymtx::RealMatrix cpy = mtx;

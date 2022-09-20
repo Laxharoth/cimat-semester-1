@@ -5,9 +5,11 @@ RealVector::RealVector(const size_t size):size(size),allocated(true){
 }
 RealVector::RealVector(const RealVector &other):size(other.size),allocated(true){
     this->data = new double[this->size];
-    for(size_t i = 0; i < this->size; ++i){
-        this->data[i] = other[i];
-    }
+    memcpy(this->data,other.data,this->size*sizeof(double));
+}
+RealVector::RealVector(const RealMatrix::Column &other):size(other.size),allocated(true){
+    this->data = new double[this->size];
+    for(int i=0;i<this->size;i++) (*this)[i] = other[i];
 }
 RealVector::RealVector(std::initializer_list<double> initial):size(initial.size()),allocated(true){
     this->data = new double[this->size];
@@ -32,11 +34,6 @@ const_vector_iterator RealVector::begin() const{
 }
 const_vector_iterator RealVector::end() const{
         return const_vector_iterator(data,0,size);
-}
-RealVector RealVector::operator*(const double coef){
-    RealVector cpy = *this;
-    cpy*=coef;
-    return cpy;
 }
 RealVector &RealVector::operator*=(const double coef){
     for( auto i = this->begin(); i != this->end(); ++i )
@@ -124,6 +121,40 @@ RealMatrix RealVector::as_matrix() const {
     memcmp(m.data, this->data, sizeof(double)*this->size);
     return m;
 }
+RealMatrix::Column::Column(const RealMatrix::Column &other):size(other.size),increment(other.increment),data(other.data){}
+RealMatrix::Column::Column(double *data, size_t size,const size_t increment):
+    data(data),size(size),increment(increment){}
+double &RealMatrix::Column::operator[](const size_t row){
+    return *(data+row*increment);
+}
+const double &RealMatrix::Column::operator[](const size_t row) const{
+    return *(data+row*increment);
+}
+double RealMatrix::Column::distance() const{
+    double v;
+    for (size_t i = 0; i < size; i++)
+        v = (*this)[i] * (*this)[i];
+    return v;
+}
+RealMatrix RealMatrix::Column::as_matrix() const{
+    RealMatrix result(size,1);
+    for (size_t i = 0; i < size; i++)
+        result[i][0] = (*this)[i];
+    return result;
+}
+double RealMatrix::Column::operator*(const RealMatrix::Column&other) const{
+    double r=0;
+    for (size_t i = 0; i < size; i++){
+        r+= (*this)[i]*other[i];
+    }
+    return r;
+}
+RealMatrix::Column &RealMatrix::Column::operator=(const RealVector &other){
+    for (size_t i = 0; i < size; i++){
+        (*this)[i] = other[i];
+    }
+    return *this;
+}
 }
 mymtx::RealVector operator*(const mymtx::RealVector &v, const double c){
     mymtx::RealVector cpy = v;
@@ -133,4 +164,43 @@ mymtx::RealVector operator*(const mymtx::RealVector &v, const double c){
 mymtx::RealVector operator*(const double c, const mymtx::RealVector &v){
     return v*c;
 }
-
+double operator*(const mymtx::RealMatrix::Column &c, const mymtx::RealVector &v){
+    double r=0;
+    for( auto i = 0; i < v.size; ++i )
+        r += c[i] * v[i];
+    return r;
+}
+double operator*(const mymtx::RealVector &v, const mymtx::RealMatrix::Column &c){
+    return c * v;
+}
+mymtx::RealVector operator*(const mymtx::RealMatrix::Column &c, double &coef){
+    mymtx::RealVector v(c.size);
+    for (size_t i = 0; i < c.size; i++){
+        v[i] = c[i] * coef;
+    }
+    return v;
+}
+mymtx::RealVector operator*(double &coef, const mymtx::RealMatrix::Column &c){
+    return c * coef;
+}
+mymtx::RealVector operator+(const mymtx::RealMatrix::Column &c, const mymtx::RealVector &v){
+    mymtx::RealVector vr(c.size);
+    for (size_t i = 0; i < c.size; i++)
+        vr[i] = c[i] + v[i];
+    return vr;
+}
+mymtx::RealVector operator+(const mymtx::RealVector &v, const mymtx::RealMatrix::Column &c){
+    return c+v;
+}
+mymtx::RealVector operator-(const mymtx::RealMatrix::Column &c, const mymtx::RealVector &v){
+    mymtx::RealVector vr(c.size);
+    for (size_t i = 0; i < c.size; i++)
+        vr[i] = c[i] - v[i];
+    return vr;
+}
+mymtx::RealVector operator-(const mymtx::RealVector &v, const mymtx::RealMatrix::Column &c){
+    mymtx::RealVector vr(c.size);
+    for (size_t i = 0; i < c.size; i++)
+        vr[i] = v[i] + c[i];
+    return vr;
+}
