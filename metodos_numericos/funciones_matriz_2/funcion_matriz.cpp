@@ -305,6 +305,77 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
     }
     for(size_t i=0; i<n; ++i) e[i]=B[i][i];
 }
+
+void rayleigh_method(mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val){
+    auto identity = mymtx::RealMatrix::identity(V1.size);
+    RealVector V0(V1.size);
+    double norm;
+    mymtx::RealMatrix B=(A - identity*val);
+    while((B*V1).distance()>ZERO_UMBRAL){
+        val = V0*(A*V0);
+        gauss(B, V1, V0);
+        B = (A - identity*val);
+        norm=normalize(V1);
+        V0 = V1;
+    }
+}
+
+void qr_decomposition(mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R){
+    mymtx::RealVector col0 = A.column(0);
+    R[0][0]=normalize(col0);
+    Q.column(0) = col0;
+    RealVector a_ux(A.shape_y);
+    for (size_t j = 1; j < A.shape_x; j++){
+        //calc R_ij
+        for (size_t i = 0; i < j; i++){
+            R[i][j] = Q.column(i) * A.column(j);
+        }
+        //calc a*
+        a_ux = R[0][j]*Q.column(0);
+        for (size_t i = 1; i < j; i++)
+            a_ux += R[i][j]*Q.column(i);
+        a_ux = A.column(j) - a_ux;
+        //calc R_jj
+        R[j][j] = normalize(a_ux);
+        //assing q_j
+        Q.column(j)=a_ux;
+    }
+}
+void conjugate_gradient(mymtx::RealMatrix &A, mymtx::RealVector &x, mymtx::RealVector &b){
+    double alpha,betha,rsnew;
+    x = mymtx::RealVector(x.size);
+    auto r = b;
+    auto p = r;
+    mymtx::RealVector w(p.size);
+    unsigned i{0};
+    while( i++< x.size * 8){
+        w = A*p;
+        alpha = (p*r)/(p*w);
+        x   = x + alpha*p;
+        r   = r - alpha*w;
+        if(std::sqrt(r*r)< ZERO_UMBRAL) break;
+        betha =(p*r)/(p*p);
+        p = r + (betha)*p;
+    }
+}
+void conjugate_gradient_jacobi(mymtx::RealMatrix &A, mymtx::RealVector &x, mymtx::RealVector &b){
+    double alpha,betha,rsnew;
+    x = mymtx::RealVector(x.size);
+    auto r = b;
+    auto z = mymtx::RealVector(x.size);
+    solucion_diagonal(A,z,r);
+    auto p = z;
+    mymtx::RealVector w(p.size);
+    unsigned i{0};
+    while( i++< x.size * 8){
+        w = A*p;
+        alpha = (z*r)/(p*w);
+        x   = x + alpha*p;
+        r   = r - alpha*w;
+        if(std::sqrt(r*r)< ZERO_UMBRAL) break;
+        solucion_diagonal(A,z,r);
+        betha =(p*z)/(p*p);
+        p = r + (betha)*p;
     }
     for(size_t i=0; i<n; ++i) e[i]=A[i][i];
 }
