@@ -37,10 +37,10 @@ double determinante_diagonal(mymtx::RealMatrix &matriz_diagonal){
     for(int i=0; i<size; ++i) result*=matriz_diagonal[i][i];
     return result;
 }
-void inversa_diagonal(mymtx::RealMatrix &matriz_diagonal,mymtx::RealVector &inversa){
+void inversa_diagonal(mymtx::RealMatrix &matriz_diagonal,mymtx::RealMatrix &inversa){
     const size_t size = matriz_diagonal.shape_x;
     for(int i=0; i<size; ++i){
-        inversa[i] = 1 / matriz_diagonal[i][i];
+        inversa[i][i] = 1 / matriz_diagonal[i][i];
     }
 }
 double determinante_triangular(mymtx::RealMatrix &matriz_triangular){
@@ -109,6 +109,7 @@ void gauss( mymtx::RealMatrix &matriz, mymtx::RealVector &variables, mymtx::Real
     const size_t size = matriz.shape_x;
     for(int i=0; i<size; ++i){
         const double divide_privote = matriz[i][i];
+        if(std::abs(divide_privote)<ZERO_UMBRAL) throw std::runtime_error("zero division");
         for(auto j=matriz[i].begin()+i; j<matriz[i].end(); ++j){
             *j /= divide_privote;
         }
