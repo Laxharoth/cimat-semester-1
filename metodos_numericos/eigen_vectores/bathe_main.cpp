@@ -17,12 +17,12 @@ int main(int argc, char const *argv[]){
     // auto f = std::ofstream("bathe_out.txt");
     // macros::out = &f;
     auto mtx = mymtx::RealMatrix::tridiag(SIZE,-1,2,-1);
-{
+    ANNOUNCE_TEST("bathe eigen"){
     // mtx*=(1/(h*h));
     const unsigned amt = 2;
     mymtx::RealMatrix eigvec(SIZE,SIZE);
     mymtx::RealVector eigval(SIZE);
-    ANNOUNCE_TEST("bathe eigen")
+    
     mymtx::RealMatrix I(mtx.shape_y, amt);
     mymtx::RealVector eig(amt);
     measure_time(
@@ -32,17 +32,61 @@ int main(int argc, char const *argv[]){
     printm( mymtx::RealMatrix::traspose(I) );
     strm_out("values");
     printv(eig);
-}
-
-//     ANNOUNCE_TEST("Ralergh")
-// {
-//     mymtx::RealVector V0{0, 0, -0.49, 0.62, -0.60};
-//     double val = 1.5;
-//     printm(mtx);
-//     ralergh_method(mtx, V0, val);
-//     strm_out("val" << std::endl << val);
-//     strm_out("vec");
-//     printv(V0);
-// }
+    }
+    /*
+    ANNOUNCE_TEST("Rayleigh"){
+    mymtx::RealVector V0{1, 0, -1, 0.0, 1};
+    double val = 2.1;
+    printm(mtx);
+    rayleigh_method(mtx, V0, val);
+    strm_out("val" << std::endl << val);
+    strm_out("vec");
+    printv(V0);
+    strm_out("mtx");
+    printm(mtx);
+    }
+    ANNOUNCE_TEST("QR"){
+        auto mtx = mymtx::RealMatrix::tridiag(5,-1,2,-1);
+        mymtx::RealMatrix Q(mtx.shape_y, mtx.shape_x);
+        mymtx::RealMatrix R(mtx.shape_y, mtx.shape_x);
+        qr_decomposition(mtx,Q,R);
+        strm_out("Q");
+        printm(Q);
+        strm_out("R");
+        printm(R);
+        strm_out("QR");
+        printm(Q*R);
+    }
+    ANNOUNCE_TEST("Gradient"){
+        mymtx::RealMatrix mtx{
+		{4,1,0},
+		{1,3,1},
+		{1,3,4}
+        };
+        mymtx::RealVector result{5.0,8.0,20.0};
+        mymtx::RealVector expected{1.0, 1.0,4.0};
+        mymtx::RealVector actual(result.size);
+        conjugate_gradient(mtx,actual,result);
+        strm_out("expected");
+        printv(expected,*macros::out);
+        strm_out("actual");
+        printv(actual,*macros::out);
+    }
+    ANNOUNCE_TEST("Gradient Jacobi"){
+        mymtx::RealMatrix mtx{
+		{4,1,0},
+		{1,3,1},
+		{1,3,4}
+        };
+        mymtx::RealVector result{5.0,8.0,20.0};
+        mymtx::RealVector expected{1.0, 1.0,4.0};
+        mymtx::RealVector actual(result.size);
+        conjugate_gradient_jacobi(mtx,actual,result);
+        strm_out("expected");
+        printv(expected,*macros::out);
+        strm_out("actual");
+        printv(actual,*macros::out);
+    }
     return 0;
+    //*/
 }
