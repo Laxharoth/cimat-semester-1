@@ -22,21 +22,23 @@ int main(int argc, char const *argv[]){
 }
 
 void cipher( char *img, int max_size){
-    int *iimg = img;
+    int *iimg = (int *)img;
     int i=0,j=0;
     unsigned int *maps = malloc(3*sizeof(int));
     unsigned int *tmp_maps = malloc(3*sizeof(int));
     unsigned int *swap;
     unsigned int c=16, m=8, e=65535;
-    maps[0] = maps[1] = maps[2] = e;
-    for (i = 0; i < max_size/4; i++){
+    maps[0] = 0xF00F00;maps[1] = 0x00F0F0;maps[2] = 0xF0000F;
+    
+    for (i = 0; i < max_size/4; ){
+        int H = e&(maps[0]^maps[1]^maps[2]);
         for(j=0; j < 3 && i < max_size/4;j++, i++){
             iimg[i] = iimg[i] ^ maps[j];
-            tmp_maps[j] = (c * maps[j] + maps[j]>>m) + e&(maps[0]|maps[1]|maps[2]);
+            tmp_maps[j] = ((c * maps[j]) + (maps[j]>>m)) + H;
         }
         swap = maps;
         maps = tmp_maps;
-        maps = swap;
+        tmp_maps = swap;
     }
     free(maps);
     free(tmp_maps);
