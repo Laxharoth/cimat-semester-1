@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#ifdef _WIN32
+#if defined(_WIN32) || defined(WIN32)
 #define CLEAR system("cls");
 #else
 #define CLEAR system("clear");
