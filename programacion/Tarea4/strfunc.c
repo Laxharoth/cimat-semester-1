@@ -28,7 +28,7 @@ int * strfind(const string str, const string sub_str, int *frec){
     *frec = 0;
     int index = 0;
     while(str[index] != '\0'){
-        if( ! start_with(str+index,sub_str) ) continue;
+        if( ! start_with(str+index,sub_str) ){index++; continue;}
         ++(*frec);
         if( res == NULL ) res = malloc( sizeof(int) );
         else res = realloc(res, sizeof(int) * (*frec) );
