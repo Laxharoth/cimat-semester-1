@@ -199,11 +199,13 @@ void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance
     auto &val_holder = *_val_holder;
     double error = 1E20;
     double old_val{0};
-    size_t found{0};
+    size_t found{0},iter{0};
     for(size_t k=0; k<n_values; ++k){
+        iter = 0;
         randomize(V0);
         normalize(V0);
-        while(error > tolerance){
+        while(error > tolerance && iter < max_iter){
+            iter++;
             for (size_t i = 0; i < found; i++){
                 V0 -= vec_holder[i] * (V0*vec_holder[i]);
             }
@@ -215,7 +217,7 @@ void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance
             V0 = V1;
         }
         if(_vec_holder == nullptr || _val_holder == nullptr || 
-            k >= n_values){ return; }
+            k >= n_values || iter >= max_iter){ return; }
         vec_holder[found]=V1;
         val_holder[found]=value;
         found++;
