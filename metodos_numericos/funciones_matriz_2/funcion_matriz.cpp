@@ -266,6 +266,8 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
     const size_t n = A.shape_y;
     unsigned iter = 0;
     mymtx::RealMatrix B = A;
+    const mymtx::RealMatrix I = mymtx::RealMatrix::identity(n);
+    mymtx::RealMatrix R(n,n);
     auto IndexOfMax = [](const mymtx::RealMatrix &inA, size_t &incol, size_t &inrow){
         double max = inrow = incol= 0;
         for(size_t k=0; k<inA.shape_y; ++k)
@@ -278,7 +280,7 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
             }
         }
     };
-    auto rotate =[&A,&B](mymtx::RealMatrix &U_mtx,const size_t row_lmb,const size_t col_lmb){
+    auto rotate =[&A,&B,&I,&R](mymtx::RealMatrix &U_mtx,const size_t row_lmb,const size_t col_lmb){
         double tan_2,tan_, cos_, sin_, theta;
         const size_t n = B.shape_y;
         if (row_lmb == col_lmb) return;
@@ -291,7 +293,7 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
             cos_ = std::cos( PI / 4 );
             sin_ = std::sin( PI / 4 );
         }
-        auto R = mymtx::RealMatrix::identity(n);
+        R = I;
         R[row_lmb][row_lmb] = R[col_lmb][col_lmb] = cos_; 
         R[row_lmb][col_lmb] = sin_; R[col_lmb][row_lmb] = -sin_;
         U_mtx *= R;
