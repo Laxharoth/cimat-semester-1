@@ -305,13 +305,21 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
     }
     for(size_t i=0; i<n; ++i) e[i]=B[i][i];
 }
+void bathe_subspace(const mymtx::RealMatrix &A,mymtx::RealMatrix &I,mymtx::RealVector &eig){
 
 void rayleigh_method(mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val){
     auto identity = mymtx::RealMatrix::identity(V1.size);
-    RealVector V0(V1.size);
-    double norm;
+    if(((A - identity*val)*V1).distance()< ZERO_UMBRAL)return;
+    normalize(V1);
+    RealVector V0=V1;
+    val = V0*(A*V0);
     mymtx::RealMatrix B=(A - identity*val);
     while((B*V1).distance()>ZERO_UMBRAL){
+        // gauss(B, V1, V0);
+        crout_tridiagonal(B,B,B);
+        solucion_crout(B,V1,V0);
+        normalize(V1);
+        V0 = V1;
         val = V0*(A*V0);
         gauss(B, V1, V0);
         B = (A - identity*val);
