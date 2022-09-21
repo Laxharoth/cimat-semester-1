@@ -14,6 +14,18 @@ struct mrowMV_data{
     const mymtx::RealMatrix *mtx;
     const size_t row;
 };
+struct mrowMC_data{
+    const mymtx::RealMatrix::Column *vec;
+    mymtx::RealVector *result;
+    const mymtx::RealMatrix *mtx;
+    const size_t row;
+};
+struct mrowMTV_data{
+    const mymtx::RealVector *vec;
+    mymtx::RealVector *result;
+    const mymtx::MatrixTraspose *mtx;
+    const size_t row;
+};
 void mult_row(mrow_data d){
     for( size_t k = d.begin; k < d.end; ++k){
         for(size_t j = 0; j < d.other->shape_x; ++j){
@@ -37,6 +49,15 @@ void mult_matrix_TM_row(mrowMT_data d){
 };
 void mult_mtx_vec_Row(mrowMV_data d){
     (*d.result)[d.row] = d.mtx->operator[](d.row) * (*(d.vec));
+}
+void mult_mtx_col_Row(mrowMC_data d){
+    (*d.result)[d.row] = d.mtx->operator[](d.row) * (*(d.vec));
+}
+void mult_mtxt_vec_Row(mrowMTV_data d){
+    (*d.result)[d.row] = 0;
+    for (size_t i = 0; i < d.vec->size; i++){
+        (*d.result)[d.row] += d.mtx->operator()(d.row,i) * d.vec->operator[](i);
+    }
 }
 namespace mymtx{
 
@@ -120,6 +141,38 @@ RealVector RealMatrix::operator*(const RealVector &vec) const{
         #ifndef NO_ASYNC
         futures.push_back(
             std::async(std::launch::async, mult_mtx_vec_Row, mrowMV_data{ &vec, &result, this,i })
+        );
+        #else
+        result[i] = this->operator[](i) * vec;
+        #endif
+    }
+    return result;
+}
+RealVector RealMatrix::operator*(const RealMatrix::Column &vec) const{
+    RealVector result(vec.size);
+    #ifndef NO_ASYNC
+    std::vector<std::future<void>> futures;
+    #endif
+    for(size_t i = 0; i < shape_y; ++i){
+        #ifndef NO_ASYNC
+        futures.push_back(
+            std::async(std::launch::async, mult_mtx_col_Row, mrowMC_data{ &vec, &result, this,i })
+        );
+        #else
+        result[i] = this->operator[](i) * vec;
+        #endif
+    }
+    return result;
+}
+RealVector MatrixTraspose::operator*(const RealVector &vec) const{
+    RealVector result(vec.size);
+    #ifndef NO_ASYNC
+    std::vector<std::future<void>> futures;
+    #endif
+    for(size_t i = 0; i < shape_y; ++i){
+        #ifndef NO_ASYNC
+        futures.push_back(
+            std::async(std::launch::async, mult_mtxt_vec_Row, mrowMTV_data{ &vec, &result, this,i })
         );
         #else
         result[i] = this->operator[](i) * vec;

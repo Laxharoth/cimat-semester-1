@@ -32,7 +32,6 @@ namespace mymtx{
         const_vector_iterator begin(const size_t row) const;
         const_vector_iterator end(const size_t row) const;
         RealMatrix &operator*=(const double coef);
-        // RealMatrix operator*(const double coef) const;
         RealVector &operator*=(RealVector &vec) const;
         RealVector operator*(const RealVector &vec) const;
         RealMatrix &operator*=(const RealMatrix &other);
@@ -62,10 +61,14 @@ namespace mymtx{
         double operator*(const Column&other) const;
         double distance() const;
         RealMatrix as_matrix() const;
+        RealVector as_vector() const;
         Column &operator=(const RealVector &other);
+        RealVector operator-(const Column &other)const;
+        RealMatrix::Column &operator-=(const RealVector &other);
         };
         Column column(const size_t col);
         const Column column(const size_t col) const;
+        RealVector operator*(const Column &other) const;
         friend class RealVector;
     };
     class RealVector{
@@ -76,7 +79,6 @@ namespace mymtx{
         const size_t size;
         RealVector(const size_t size);
         RealVector(const RealVector &other);
-        RealVector(const RealMatrix::Column &other);
         RealVector(std::initializer_list<double> initial);
         RealVector(double *data, size_t size);
         ~RealVector();
@@ -164,6 +166,7 @@ public:
         const size_t shape_x;
         const size_t shape_y;
         const double &operator()(size_t row, size_t col) const;
+        RealVector operator*(const RealVector &vec) const;
         MatrixTraspose(const RealMatrix &m);
         MatrixTraspose(const MatrixTraspose &other);
     };
