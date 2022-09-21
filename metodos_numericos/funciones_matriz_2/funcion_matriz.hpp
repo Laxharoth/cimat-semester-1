@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <cmath>
 #include <random>
+#include <vector>
+#include <future>
 
 using mymtx::RealMatrix;
 using mymtx::RealVector;
@@ -33,8 +35,9 @@ void solve_cholesky(mymtx::RealMatrix &cholesky_factored,mymtx::RealVector &vari
 double normalize(RealVector &vec);
 void randomize(RealVector& vec);
 void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder);
-void inverse_power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder);
+void inverse_power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder, const size_t);
 void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix  &U, const unsigned max_iter);
+void bathe_subspace(const mymtx::RealMatrix &A,mymtx::RealMatrix &I,mymtx::RealVector &eig);
 void rayleigh_method(mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val);
 void qr_decomposition(mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R);
 void conjugate_gradient(mymtx::RealMatrix &A, mymtx::RealVector &var, mymtx::RealVector &result);
