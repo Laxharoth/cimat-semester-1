@@ -107,7 +107,7 @@ void LDU_factor_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &D_
     }
 }
 
-void factor_cholesky(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
+void factor_cholesky(const mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
     auto reduce_triangular = [&](const size_t i, const size_t j){
         double &current = triangular[i][j] = matix[i][j];
         auto l_ik =triangular[i].begin();

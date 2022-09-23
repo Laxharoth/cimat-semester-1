@@ -17,7 +17,7 @@ void doolittle(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matr
 void doolittle_tridiagonal(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior);
 void LDU_factor(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_diagonal, RealMatrix &matriz_superior);
 void LDU_factor_tridiagonal(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_diagonal, RealMatrix &matriz_superior);
-void factor_cholesky(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular);
+void factor_cholesky(const mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular);
 void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular);
 
 class cant_factor_exception : public std::exception{
