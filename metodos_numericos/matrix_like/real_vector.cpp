@@ -2,6 +2,7 @@
 namespace mymtx{
 RealVector::RealVector(const size_t size):size(size),allocated(true){
     this->data = new double[this->size];
+    memset(this->data, 0, this->size * sizeof(double));
 }
 RealVector::RealVector(const RealVector &other):size(other.size),allocated(true){
     this->data = new double[this->size];
