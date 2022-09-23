@@ -1,7 +1,7 @@
 #include "funcion_matriz.hpp"
 #define PI 3.141592653589793
 #define JACOBI_UMBRAL 10e-4
-#define ZERO_UMBRAL 10e-15
+#define ZERO_UMBRAL 10e-5
 
 class randgen{
     std::random_device *rd;
@@ -25,7 +25,7 @@ class randgen{
     }
 };
 
-void solucion_diagonal(mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
+void solucion_diagonal(const mymtx::RealMatrix &matriz, mymtx::RealVector &incognitas, mymtx::RealVector &result){
     const size_t size = matriz.shape_x;
     for(int i=0; i<size; ++i){
         incognitas[i] = result[i] / matriz[i][i];
@@ -193,7 +193,9 @@ void randomize(RealMatrix& mtx){
         }
     }
 }
-void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder,const size_t max_iter){
+void power_iteration(const RealMatrix &A, RealVector &V1, 
+        const double tolerance, double &value, size_t n_values, 
+        RealMatrix *_vec_holder, RealVector *_val_holder,const size_t max_iter){
     RealVector V0(V1.size);
     auto &vec_holder = *_vec_holder;
     auto &val_holder = *_val_holder;
@@ -273,7 +275,8 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
     mymtx::RealVector new_row_i(n);
     mymtx::RealVector new_row_j(n);
     auto IndexOfMax = [](const mymtx::RealMatrix &inA, size_t &incol, size_t &inrow){
-        double max = inrow = incol= 0;
+        double max = inrow = 0;
+        incol = 1;
         for(size_t k=0; k<inA.shape_y; ++k)
         for(auto i = inA.begin(k); i<inA.end(k); ++i){
             if( i.get_col() == i.get_row() )continue;
@@ -313,28 +316,85 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
     for(size_t i=0; i<n; ++i) e[i]=B[i][i];
 }
 void bathe_subspace(const mymtx::RealMatrix &A,mymtx::RealMatrix &I_t,mymtx::RealVector &eig){
-    
+    size_t m = eig.size;
+    mymtx::MatrixTraspose I(I_t);
+    mymtx::RealMatrix B(m,m);
+    mymtx::RealMatrix ro(m,m);
+    mymtx::RealVector d(m);
+    double val1;
+    randomize(I_t);
+    for (size_t i = 0; i < I_t.shape_y; i++){
+        I_t[i]/=I_t[i].distance();
+    }
+    size_t iter,row,col;
+    double error = 1;
+    auto eig_old = eig;
+    auto IndexOfMax = [](const mymtx::RealMatrix &inA){
+        double max = 0;
+        for(size_t k=0; k<inA.shape_y; ++k)
+        for(auto i = inA.begin(k); i<inA.end(k); ++i){
+            if( i.get_col() == i.get_row() )continue;
+            if(std::abs(*i) > std::abs(max)){
+                max = *i;
+            }
+        }
+        return max;
+    };
+    while (1){
+        iter = 0;
+        for(size_t k=0; k<m; ++k){
+        iter = 0;
+        mymtx::RealVector V0 = I_t[k];
+        while(iter < 40){
+            iter++;
+            for (size_t i = 0; i < k; i++){
+                V0 -= I_t[i] * (I_t[i]*V0);
+            }
+            V0 = A * V0;
+            normalize(V0);
+            }
+            I_t[k] = V0;
+        }
+        B = I_t * A * I;
+        eig_old = eig;
+        jacobi_eigen(B,eig,ro,100000);
+        if((eig-eig_old).distance()<ZERO_UMBRAL)break;
+        I_t = mymtx::MatrixTraspose(ro) * I_t;
+        for (size_t i = 0; i < I_t.shape_y; i++){
+            I_t[i]/=I_t[i].distance();
+        }
+    }
+    for (size_t i = 0; i < I_t.shape_y; i++){
+        I_t[i]/=I_t[i].distance();
+    }
 }
 
-void rayleigh_method(mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val){
-    auto identity = mymtx::RealMatrix::identity(V1.size);
+void rayleigh_method(const mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val){
+    const auto identity = mymtx::RealMatrix::identity(V1.size);
     if(((A - identity*val)*V1).distance()< ZERO_UMBRAL)return;
     normalize(V1);
     RealVector V0=V1;
-    val = V0*(A*V0);
+    val = V0*(A * V0);
     mymtx::RealMatrix B=(A - identity*val);
-    while((B*V1).distance()>ZERO_UMBRAL){
-        // gauss(B, V1, V0);
-        crout(B,B,B);
-        solucion_crout(B,V1,V0);
+    mymtx::RealMatrix Q(B.shape_y,B.shape_x),R(B.shape_y,B.shape_x);
+    double old_val = val+1;
+    while((B*V1).distance()>ZERO_UMBRAL && std::abs(old_val-val)>ZERO_UMBRAL){
+        try{
+            // crout(B,B,B);
+            // solucion_crout(B,V1,V0);
+            gauss(B,V1,V0);
+            // qr_decomposition(B,Q,R);
+            // solve_qr(Q,R,V1,V0);
+        }catch(...){return;}
         normalize(V1);
         V0 = V1;
+        old_val = val;
         val = V0*(A*V0);
         B = (A - identity*val);
     }
 }
 
-void qr_decomposition(mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R){
+void qr_decomposition(const mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R){
     mymtx::RealVector col0 = A.column(0).as_vector();
     R[0][0]=normalize(col0);
     Q.column(0) = col0;
@@ -355,40 +415,45 @@ void qr_decomposition(mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatr
         Q.column(j)=a_ux;
     }
 }
-void conjugate_gradient(mymtx::RealMatrix &A, mymtx::RealVector &x, mymtx::RealVector &b){
-    double alpha,betha,rsnew;
-    x = mymtx::RealVector(x.size);
-    auto r = b;
-    auto p = r;
-    mymtx::RealVector w(p.size);
-    unsigned i{0};
-    while( i++< x.size * 8){
+void solve_qr(const mymtx::RealMatrix &Q, mymtx::RealMatrix &R, mymtx::RealVector &var, const mymtx::RealVector &res){
+    mymtx::RealVector Qres = mymtx::MatrixTraspose(Q) * res;
+    solucion_triangular_sup(R,var,Qres);
+}
+void conjugate_gradient(const mymtx::RealMatrix &A, mymtx::RealVector &x, mymtx::RealVector &b){
+    auto r=b;
+    auto p=r;
+    unsigned k{0};
+    mymtx::RealVector w(x.size);
+    double alpha,betha;
+    while (k < r.size * 2){
         w = A*p;
         alpha = (p*r)/(p*w);
-        x   = x + alpha*p;
-        r   = r - alpha*w;
+        x = x + alpha*p;
+        r = r - alpha*w;
         if(std::sqrt(r*r)< ZERO_UMBRAL) break;
-        betha =(p*r)/(p*p);
-        p = r + (betha)*p;
+        betha = (p*r)/(p*p);
+        p = r + betha*p;
     }
+    
 }
-void conjugate_gradient_jacobi(mymtx::RealMatrix &A, mymtx::RealVector &x, mymtx::RealVector &b){
-    double alpha,betha,rsnew;
-    x = mymtx::RealVector(x.size);
+void conjugate_gradient_jacobi(const mymtx::RealMatrix &A, mymtx::RealVector &x, mymtx::RealVector &b){
+    double alpha,betha;
     auto r = b;
-    auto z = mymtx::RealVector(x.size);
+    mymtx::RealVector z(x.size);
+    mymtx::RealVector w(x.size);
     solucion_diagonal(A,z,r);
     auto p = z;
-    mymtx::RealVector w(p.size);
     unsigned i{0};
-    while( i++< x.size * 8){
+    double rzold;
+    while( i++< x.size * 3 ){
+        rzold = r*z;
         w = A*p;
-        alpha = (z*r)/(p*w);
+        alpha = (rzold)/(p*w);
         x   = x + alpha*p;
         r   = r - alpha*w;
         if(std::sqrt(r*r)< ZERO_UMBRAL) break;
         solucion_diagonal(A,z,r);
-        betha =(p*z)/(p*p);
+        betha =(r*z)/(rzold);
         p = r + (betha)*p;
     }
 }
