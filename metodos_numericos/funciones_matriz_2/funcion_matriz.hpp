@@ -18,7 +18,7 @@ struct eigen{
     double val;
 };
 
-void solucion_diagonal(RealMatrix &matriz, RealVector &incognitas, RealVector &result);
+void solucion_diagonal(const RealMatrix &matriz, RealVector &incognitas, RealVector &result);
 double determinante_diagonal(RealMatrix &matriz_diagonal);
 void inversa_diagonal(RealMatrix &matriz_diagonal,RealVector &inversa);
 double determinante_triangular(RealMatrix &matriz_triangular);
@@ -38,8 +38,9 @@ void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance
 void inverse_power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder, const size_t);
 void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix  &U, const unsigned max_iter);
 void bathe_subspace(const mymtx::RealMatrix &A,mymtx::RealMatrix &I,mymtx::RealVector &eig);
-void rayleigh_method(mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val);
-void qr_decomposition(mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R);
-void conjugate_gradient(mymtx::RealMatrix &A, mymtx::RealVector &var, mymtx::RealVector &result);
-void conjugate_gradient_jacobi(mymtx::RealMatrix &A, mymtx::RealVector &var, mymtx::RealVector &result);
+void rayleigh_method(const mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val);
+void qr_decomposition(const mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R);
+void solve_qr(const mymtx::RealMatrix &Q, mymtx::RealMatrix &R, mymtx::RealVector &var, const mymtx::RealVector &res);
+void conjugate_gradient(const mymtx::RealMatrix &A, mymtx::RealVector &var, mymtx::RealVector &result);
+void conjugate_gradient_jacobi(const mymtx::RealMatrix &A, mymtx::RealVector &var, mymtx::RealVector &result);
 #endif /* FUNCION_MATRIZ_HPP */
