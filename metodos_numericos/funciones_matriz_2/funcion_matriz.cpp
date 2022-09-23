@@ -315,7 +315,7 @@ void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix 
     }
     for(size_t i=0; i<n; ++i) e[i]=B[i][i];
 }
-void bathe_subspace(const mymtx::RealMatrix &A,mymtx::RealMatrix &I_t,mymtx::RealVector &eig){
+void subspace_pow(const mymtx::RealMatrix &A,mymtx::RealMatrix &I_t,mymtx::RealVector &eig){
     size_t m = eig.size;
     mymtx::MatrixTraspose I(I_t);
     mymtx::RealMatrix B(m,m);
@@ -368,6 +368,64 @@ void bathe_subspace(const mymtx::RealMatrix &A,mymtx::RealMatrix &I_t,mymtx::Rea
         I_t[i]/=I_t[i].distance();
     }
 }
+void subspace_ipow(const mymtx::RealMatrix &A,mymtx::RealMatrix &I_t,mymtx::RealVector &eig){
+    size_t m = eig.size;
+    mymtx::MatrixTraspose I(I_t);
+    mymtx::RealMatrix B(m,m);
+    mymtx::RealMatrix Chol(A.shape_y,A.shape_x);
+    mymtx::RealMatrix ro(m,m);
+    mymtx::RealVector d(m);
+    double val1;
+    randomize(I_t);
+    for (size_t i = 0; i < I_t.shape_y; i++){
+        I_t[i]/=I_t[i].distance();
+    }
+    size_t iter,row,col;
+    double error = 1;
+    auto eig_old = eig;
+    auto IndexOfMax = [](const mymtx::RealMatrix &inA){
+        double max = 0;
+        for(size_t k=0; k<inA.shape_y; ++k)
+        for(auto i = inA.begin(k); i<inA.end(k); ++i){
+            if( i.get_col() == i.get_row() )continue;
+            if(std::abs(*i) > std::abs(max)){
+                max = *i;
+            }
+        }
+        return max;
+    };
+    factor_cholesky(A,Chol);
+    while (1){
+        iter = 0;
+        for(size_t k=0; k<m; ++k){
+        iter = 0;
+        mymtx::RealVector V0 = I_t[k];
+        mymtx::RealVector V1(V0.size);
+        while(iter < 40){
+            iter++;
+            for (size_t i = 0; i < k; i++){
+                V0 -= I_t[i] * (I_t[i]*V0);
+            }
+            solve_cholesky(Chol,V1,V0);
+            V0 = V1;
+            normalize(V0);
+            }
+            I_t[k] = V0;
+        }
+        B = I_t * A * I;
+        eig_old = eig;
+        jacobi_eigen(B,eig,ro,100000);
+        if((eig-eig_old).distance()<ZERO_UMBRAL)break;
+        I_t = mymtx::MatrixTraspose(ro) * I_t;
+        for (size_t i = 0; i < I_t.shape_y; i++){
+            I_t[i]/=I_t[i].distance();
+        }
+    }
+    for (size_t i = 0; i < I_t.shape_y; i++){
+        I_t[i]/=I_t[i].distance();
+    }
+}
+
 
 void rayleigh_method(const mymtx::RealMatrix &A,mymtx::RealVector &V1, double &val){
     const auto identity = mymtx::RealMatrix::identity(V1.size);
