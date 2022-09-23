@@ -1,7 +1,9 @@
 #include "real_matrix.hpp"
 #include <future>
 #include <vector>
-
+#ifndef MIN_OPER_FOR_THREAD
+#define MIN_OPER_FOR_THREAD 500
+#endif
 struct mrow_data{
     size_t begin;size_t end; const size_t row;const mymtx::RealMatrix* mtx; const mymtx::RealMatrix *other; mymtx::RealMatrix *cpy;
 };
@@ -12,7 +14,7 @@ struct mrowMV_data{
     const mymtx::RealVector *vec;
     mymtx::RealVector *result;
     const mymtx::RealMatrix *mtx;
-    const size_t row;
+    const size_t row,begin,end;
 };
 struct mrowMC_data{
     const mymtx::RealMatrix::Column *vec;
@@ -48,7 +50,9 @@ void mult_matrix_TM_row(mrowMT_data d){
     }
 };
 void mult_mtx_vec_Row(mrowMV_data d){
-    (*d.result)[d.row] = d.mtx->operator[](d.row) * (*(d.vec));
+    for (size_t j = d.begin; j < d.end; j++){
+        (*d.result)[d.row] += (*d.mtx)[d.row][j] * (*d.vec)[j];
+    }
 }
 void mult_mtx_col_Row(mrowMC_data d){
     (*d.result)[d.row] = d.mtx->operator[](d.row) * (*(d.vec));
@@ -63,7 +67,8 @@ namespace mymtx{
 
 
 RealMatrix::RealMatrix(size_t shape_y,size_t shape_x):shape_x(shape_x),shape_y(shape_y){
-    this->data = new double[this->shape_x * this->shape_y]{0};
+    this->data = new double[this->shape_x * this->shape_y];
+    memset(this->data,0,this->shape_x * this->shape_y * sizeof(double));
 }
 RealMatrix::RealMatrix(const RealMatrix &other):shape_x(other.shape_x),shape_y(other.shape_y){
     this->data = new double[this->shape_x * this->shape_y];
@@ -139,12 +144,15 @@ RealVector RealMatrix::operator*(const RealVector &vec) const{
     #endif
     for(size_t i = 0; i < shape_y; ++i){
         #ifndef NO_ASYNC
+        if( shape_y > MIN_OPER_FOR_THREAD)
         futures.push_back(
-            std::async(std::launch::async, mult_mtx_vec_Row, mrowMV_data{ &vec, &result, this,i })
+            std::async(std::launch::async, mult_mtx_vec_Row, mrowMV_data{ &vec, &result, this,i,0,shape_x })
         );
-        #else
-        result[i] = this->operator[](i) * vec;
+        else
         #endif
+        for (size_t j = 0; j < shape_x; j++){
+            result[i] += (*this)[i][j] * vec[j];
+        }
     }
     return result;
 }
@@ -155,12 +163,15 @@ RealVector RealMatrix::operator*(const RealMatrix::Column &vec) const{
     #endif
     for(size_t i = 0; i < shape_y; ++i){
         #ifndef NO_ASYNC
+        if(shape_y > MIN_OPER_FOR_THREAD)
         futures.push_back(
             std::async(std::launch::async, mult_mtx_col_Row, mrowMC_data{ &vec, &result, this,i })
         );
-        #else
-        result[i] = this->operator[](i) * vec;
+        else
         #endif
+        for (size_t j = 0; j < vec.size; j++){
+            result[i] += (*this)(i,j) * vec[j];
+        }
     }
     return result;
 }
@@ -171,12 +182,15 @@ RealVector MatrixTraspose::operator*(const RealVector &vec) const{
     #endif
     for(size_t i = 0; i < shape_y; ++i){
         #ifndef NO_ASYNC
+        if( shape_y > MIN_OPER_FOR_THREAD)
         futures.push_back(
             std::async(std::launch::async, mult_mtxt_vec_Row, mrowMTV_data{ &vec, &result, this,i })
         );
-        #else
-        result[i] = this->operator[](i) * vec;
+        else
         #endif
+        for (size_t j = 0; j < vec.size; j++){
+            result[i] += (*this)(i,j) * vec[j];
+        }
     }
     return result;
 }
@@ -203,16 +217,17 @@ RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
     std::vector<std::future<void>> futures;
     for(size_t i = 0; i < this->shape_y; ++i){
         #ifndef NO_ASYNC
+        if( shape_y > MIN_OPER_FOR_THREAD)
         futures.push_back(
         std::async(std::launch::async, mult_row, mrow_data{0, other.shape_y, i, this, &other, &cpy})
         );
-        #else
+        else
+        #endif
         for( size_t k = 0; k < other.shape_y; ++k){
             for(size_t j = 0; j < other.shape_x; ++j){
                 cpy[i][j] += (*this)(i,k) * other(k,j);
             }
         }
-        #endif
     
     }
     return cpy;
@@ -229,16 +244,17 @@ RealMatrix RealMatrix::prod_as_band(const RealMatrix &other, const size_t height
         if( i < height ) begin = 0;
         if( i > this->shape_y - height ) end = this->shape_x;
         #ifndef NO_ASYNC
+        if(end - begin > 500)
         futures.push_back(
         std::async(std::launch::async, mult_row, mrow_data{begin, end, i, this, &other, &cpy})
         );
-        #else
+        else
+        #endif
         for( size_t k = begin; k < end; ++k){
             for(size_t j = 0; j < other.shape_x; ++j){
                 cpy[i][j] += (*this)(i,k) * other(k,j);
             }
         }
-        #endif
     }
     return cpy;
 }
@@ -275,12 +291,22 @@ RealMatrix &RealMatrix::prod_as_band(const double coef, const size_t height, con
 RealVector RealMatrix::prod_as_band(RealVector &vec , const size_t height, const size_t width) const{
     RealVector result(vec.size);
     size_t begin,end;
+    #ifndef NO_ASYNC
+    std::vector<std::future<void>> futures;
+    #endif
     for (size_t i = 0; i < this->shape_y; i++){
         begin = i - height;
         end = 1 + i + width;
         if( i < height ) begin = 0;
         if( i > this->shape_y - height ) end = this->shape_x;
         result[i] = 0;
+        #ifndef NO_ASYNC
+        if( shape_y > MIN_OPER_FOR_THREAD)
+        futures.push_back(
+            std::async(std::launch::async, mult_mtx_vec_Row, mrowMV_data{ &vec, &result, this,i, begin,end })
+        );
+        else
+        #endif
         for (size_t j = begin; j < end; j++){
             result[i] += (*this)[i][j] * vec[j];
         }
@@ -359,36 +385,38 @@ mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const mymtx::MatrixTra
     #endif
     for(size_t i = 0; i < res.shape_y; ++i){
         #ifndef NO_ASYNC
+        if( res.shape_y > MIN_OPER_FOR_THREAD)
         futures.push_back(
             std::async(std::launch::async, mult_matrix_MT_row, mrowMT_data{0, mtxt.shape_x, i, &mtx, &mtxt, &res})
         );
-        #else
-        for( size_t k = 0; k < mtxt.shape_x; ++k){
+        else
+        #endif
+        for( size_t k = 0; k < mtxt.shape_y; ++k){
             for(size_t j = 0; j < res.shape_x; ++j){
                 res[i][j] += mtx[i][k] * mtxt(k,j);
             }
         }
-        #endif
     }
     return res;
 }
 mymtx::RealMatrix operator*(const mymtx::MatrixTraspose &mtxt, const mymtx::RealMatrix &mtx){
-    mymtx::RealMatrix res(mtx.shape_y,mtxt.shape_x);
+    mymtx::RealMatrix res(mtxt.shape_y,mtx.shape_x);
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
     #endif
     for(size_t i = 0; i < res.shape_y; ++i){
         #ifndef NO_ASYNC
+        if( res.shape_y > MIN_OPER_FOR_THREAD)
         futures.push_back(
             std::async(std::launch::async, mult_matrix_TM_row, mrowMT_data{0, mtxt.shape_x, i, &mtx, &mtxt, &res})
         );
-        #else
-        for( size_t k = 0; k < mtx.shape_x; ++k){
+        else
+        #endif
+        for( size_t k = 0; k < mtx.shape_y; ++k){
             for(size_t j = 0; j < res.shape_x; ++j){
                 res[i][j] += mtxt(i,k) * mtx(k,j);
             }
         }
-        #endif
     }
     return res;
 }
