@@ -34,7 +34,7 @@ void solve_gauss_seidel(mymtx::RealMatrix &matix, mymtx::RealVector &variables, 
 void solve_cholesky(mymtx::RealMatrix &cholesky_factored,mymtx::RealVector &variables, mymtx::RealVector &solutions);
 double normalize(RealVector &vec);
 void randomize(RealVector& vec);
-void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder);
+void power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder,const size_t max_iter);
 void inverse_power_iteration(const RealMatrix &A, RealVector &V1, const double tolerance, double &value, size_t n_values, RealMatrix *_vec_holder, RealVector *_val_holder, const size_t);
 void jacobi_eigen(mymtx::RealMatrix &A, mymtx::RealVector &e, mymtx::RealMatrix  &U, const unsigned max_iter);
 void subspace_pow(const mymtx::RealMatrix &A,mymtx::RealMatrix &I,mymtx::RealVector &eig);
