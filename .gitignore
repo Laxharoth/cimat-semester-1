@@ -60,3 +60,4 @@ programacion/codigo_de_huffman.c
 metodos_numericos/matrix_like/print.cpp
 metodos_numericos/interpolacion/matrix_like/print.cpp
 metodos_numericos/interpolacion/matrix_like/makefile
+metodos_numericos/interpolacion/function_wrapper
