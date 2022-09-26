@@ -19,8 +19,8 @@ mymtx::RealVector readVectxt(const std::string filename);
 
 
 int main(int argc, char const *argv[]){
-    auto f = std::ofstream("bathe_out.txt");
-    macros::out = &f;
+    // auto f = std::ofstream("subspace_out.txt");
+    // macros::out = &f;
     ANNOUNCE_TEST("Subespace Power Iter 3x3"){
     mymtx::RealMatrix mtx = readMtxtxt("vector_in/Eigen_3x3.txt");
     const unsigned amt = 2;
@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]){
         subspace_pow(mtx, I_t ,eig);
     )
     strm_out("vectors");
-    printm( I_t );
+    printm( I_t, *macros::out );
     strm_out("values");
     printv(eig, *macros::out);
     mymtx::RealMatrix::fwrite("vector.out/actual.pow.Eigen_3x3.mtx.txt",I_t);
@@ -63,6 +63,8 @@ int main(int argc, char const *argv[]){
     mymtx::RealVector valv(1);
     valv[0] = val;
     printv(V0,*macros::out);
+    mymtx::RealVector::fwrite("vector.out/actual.ray.Eigen_vec_3x3.vec.txt",V0);
+    mymtx::RealVector::fwrite("vector.out/actual.ray.Eigen_val_3x3.vec.txt",valv);
     }
     ANNOUNCE_TEST("QR 3x3"){
         mymtx::RealMatrix mtx = readMtxtxt("vector_in/M_sys_3x3.txt");
@@ -109,7 +111,7 @@ int main(int argc, char const *argv[]){
         subspace_pow(mtx, I_t ,eig);
     )
     strm_out("vectors");
-    printm( I_t );
+    printm( I_t, *macros::out );
     strm_out("values");
     printv(eig, *macros::out);
     mymtx::RealMatrix::fwrite("vector.out/actual.pow.Eigen_50x50.mtx.txt",I_t);
@@ -142,8 +144,8 @@ int main(int argc, char const *argv[]){
     mymtx::RealVector valv(1);
     valv[0] = val;
     printv(V0,*macros::out);
-    mymtx::RealVector::fwrite("vector.out/actual.ipow.Eigen_vec_50x1.vec.txt",V0);
-    mymtx::RealVector::fwrite("vector.out/actual.ipow.Eigen_val_1x1.vec.txt",valv);
+    mymtx::RealVector::fwrite("vector.out/actual.ray.Eigen_vec_50x50.vec.txt",V0);
+    mymtx::RealVector::fwrite("vector.out/actual.ray.Eigen_val_50x50.vec.txt",valv);
     }
     ANNOUNCE_TEST("QR 125x125"){
         mymtx::RealMatrix mtx = readMtxtxt("vector_in/M_sys_125x125.txt");
@@ -181,6 +183,7 @@ int main(int argc, char const *argv[]){
         printv(V1,*macros::out);
         mymtx::RealVector::fwrite("vector.out/actual.GradJ.V_sol_125x1.vec.txt",V1);
     }
+    // f.close();
     return 0;
 }
 mymtx::RealMatrix readMtxtxt(const std::string filename){
