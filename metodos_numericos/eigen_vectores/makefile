@@ -1,16 +1,27 @@
 ###################################################
 #
-# Para ejecutar el programa con el metodo de jacobi
-#  se ejecuta el comando 'make jacobi'
-#  Es recomendable modificar el valor asignado al macro SIZE
-#   en el archivo jacobi_main.cpp, 
-#   el cual corresponde al tamaño de la matriz
+# Para ejecutar las pruebas de los metodos
+# utilizar el comando make subspace
 #
-# El método de jacobi se encuentra en el archivo
-#  funcion_matriz.cpp en la linea 263
+# La salida en texto se guarda en el archivo subspace_out.txt
 #
-# La comparación entre valores y vectores propios 
-#  se realiza en el notebook npeig.ipynb y requiere numpy
+# Para obtener los valores esperados se utilizo numpy en el notebook subspace.ipynb
+# Para comparar los valores esperados con los obtenidos se utilizo numpy en el notebook subspace_cmp.ipynb
+#
+# Las funciones implementadas se encuentran el el archivo funcion_matrix.cpp a partir de la linea 318
+#
+# Los vectores y matrices se guardan en el directorio vector.out
+#
+# Los vectores se guandan en archivos binario,
+# 	Los primeros 8 bytes corresponden a un entero sin signo el cual es el tamaño del vector
+#	El resto del archivo representa los valores del vector y estan guardados en paquetes
+#		de 8 bytes como flotantes de doble precision
+#
+# Las matrices seguardan en archivos binarios,
+#	Los primeros 8 bytes son un entero sin signo que corresponde al numero de filas
+#	Los siguentes 8 bytes son un entero sin signo que corresponde al numero de columnas
+#	El resto del archivo representa los valores de la matriz y estan guardados por filas
+#		en paquetes de 8 bytes flotantes de doble precision
 #
 ###############################
 object_files = real_matrix.o funcion_matriz.o factorizacion.o
@@ -25,12 +36,12 @@ jacobi.run: jacobi_main.o $(object_files)
 	g++ -O2 -pthread -o jacobi.run jacobi_main.o $(object_files)
 jacobi_main.o: jacobi_main.cpp matrix_like/real_matrix.hpp funcion_matriz.hpp macros.hpp
 	g++ -O2 -c jacobi_main.cpp
-bathe: bathe.run
-	./bathe.run
-bathe.run: bathe_main.o $(object_files)
-	g++ -O2 -pthread -o bathe.run bathe_main.o $(object_files)
-bathe_main.o: bathe_main.cpp matrix_like/real_matrix.hpp funcion_matriz.hpp macros.hpp
-	g++ -O2 -c bathe_main.cpp
+subspace: subspace.run
+	./subspace.run
+subspace.run: subspace_main.o $(object_files)
+	g++ -O2 -pthread -o subspace.run subspace_main.o $(object_files)
+subspace_main.o: subspace_main.cpp matrix_like/real_matrix.hpp funcion_matriz.hpp macros.hpp
+	g++ -O2 -c subspace_main.cpp
 main.o: main.cpp matrix_like/real_matrix.hpp funcion_matriz.hpp macros.hpp
 	g++ -O2 -c main.cpp
 test: test.run
@@ -48,5 +59,4 @@ factorizacion.o: factorizacion.hpp factorizacion.cpp
 	g++ -O2 -c factorizacion.cpp
 clean:
 	rm -rf *.o
-	rm -rf *.out
 	rm -rf *.run
