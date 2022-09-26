@@ -117,8 +117,8 @@ RealMatrix RealMatrix::tridiag(const size_t n, const double low,const double dig
     return trid;
 }
 RealVector RealMatrix::operator[](const size_t &row){ return RealVector(data + row * shape_x, shape_x); }
-double &RealMatrix::operator()(const size_t row, const size_t col){ return (*this)[row][col]; }
-const double &RealMatrix::operator()(const size_t row, const size_t col) const { return (*this)[row][col]; }
+double &RealMatrix::operator()(const size_t row, const size_t col){ return this->data[row*shape_x+col]; }
+const double &RealMatrix::operator()(const size_t row, const size_t col) const { return this->data[row*shape_x+col]; }
 const RealVector RealMatrix::operator[](const size_t &row) const { return RealVector(data + row * shape_x, shape_x); }
 vector_iterator RealMatrix::begin(const size_t row){
     return vector_iterator(data + row * shape_x, row, 0);
@@ -317,7 +317,7 @@ void RealMatrix::fwrite( const char* filename, const RealMatrix& matrix){
     std::ofstream f(filename, std::ofstream::out | std::ofstream::binary);
     f.write( (char*)(&(matrix.shape_y)), sizeof(size_t) );
     f.write( (char*)(&(matrix.shape_x)), sizeof(size_t) );
-    f.write( (char*)(matrix.data), sizeof(double)*matrix.shape_y*matrix.shape_y );
+    f.write( (char*)(matrix.data), sizeof(double)*matrix.shape_y*matrix.shape_x );
     f.close();
 }
 void RealVector::fwrite( const char* filename, const RealVector& vector){
