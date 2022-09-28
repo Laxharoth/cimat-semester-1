@@ -170,16 +170,16 @@ RealVector RealMatrix::Column::operator-(const RealMatrix::Column &other)const{
     }
     return v;
 }
-RealVector map(const RealVector v,double (*callback)(const double)){
+RealVector map(const RealVector &v,double (*callback)(const double)){
     RealVector v_new(v.size);
     auto i = v.begin();
     for(auto j =v_new.begin(); j !=v_new.end();++i,++j)
         *j = callback(*i);
 }
-double reduce(const RealVector v,double (*callback)(double acc, const double cur),const double start){
+double reduce(const RealVector &v,double (*callback)(double acc, const double cur),const double start){
     double acc = start;
     for(auto i=v.begin();i!=v.end();++i)
-        acc += callback(acc,*i);
+        acc = callback(acc,*i);
 }
 }
 mymtx::RealVector operator*(const mymtx::RealVector &v, const double c){

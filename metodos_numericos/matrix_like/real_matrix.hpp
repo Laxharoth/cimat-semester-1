@@ -172,8 +172,8 @@ public:
     };
     
     void abs(RealMatrix &A);
-    RealVector map(const RealVector v,double (*callback)(const double));
-    double reduce(const RealVector v,double (*callback)(double acc, const double cur, const double start),const double start);
+    RealVector map(const RealVector &v,double (*callback)(const double));
+    double reduce(const RealVector &v,double (*callback)(double acc, const double cur),const double start);
 }
 mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const double c);
 mymtx::RealMatrix operator*(const double c, const mymtx::RealMatrix &mtx);
