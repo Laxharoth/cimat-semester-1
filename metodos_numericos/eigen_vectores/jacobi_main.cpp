@@ -16,13 +16,7 @@ struct eigen_index{
 int main(int argc, char const *argv[]){
     // auto f = std::ofstream("jacobi_out.txt");
     // macros::out = &f;
-
-    // auto mtx = mymtx::RealMatrix::tridiag(SIZE,1,-2,1);
-    mymtx::RealMatrix mtx{
-        {1,2,3},
-        {2,4,5},
-        {3,5,6},
-    };
+    auto mtx = mymtx::RealMatrix::tridiag(SIZE,1,-2,1);
     mtx*=-1;
     mymtx::RealMatrix eigvec(mtx.shape_x,mtx.shape_x);
     mymtx::RealVector eigval(mtx.shape_x);
