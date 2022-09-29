@@ -1,4 +1,4 @@
-#define get_address(start, position, size) (start + position*size)
+
 int cmpint(void *a, void *b){
     return (*((int*)a))-(*((int*)b));
 }
@@ -21,7 +21,10 @@ void quicksort( void *data, int start, int end, unsigned int data_size, int (*cm
         swap(data +  left * data_size,data +  right * data_size);
         if( right == mid) mid = left;
         if( left == mid) mid = right;
+        left++;
+        if( left >= right)break;
     }
+    if(left >= end) return;
     quicksort(data, start, left,data_size,cmp,swap);
     quicksort(data, left, end,data_size,cmp,swap);
 }
