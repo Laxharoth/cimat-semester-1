@@ -74,6 +74,10 @@ RealMatrix::RealMatrix(const RealMatrix &other):shape_x(other.shape_x),shape_y(o
     this->data = new double[this->shape_x * this->shape_y];
     memcpy(this->data,other.data,this->shape_x*this->shape_y*sizeof(double));
 }
+RealMatrix::RealMatrix(RealMatrix &&other):shape_x(other.shape_x),shape_y(other.shape_y){
+    this->data = other.data;
+    other.data = nullptr;
+}
 RealMatrix::RealMatrix(std::initializer_list<std::initializer_list<double>> initial):
     shape_y(initial.size()),shape_x((initial.begin())->size()){
     this->data = new double[this->shape_x * this->shape_y];
@@ -84,7 +88,8 @@ RealMatrix::RealMatrix(std::initializer_list<std::initializer_list<double>> init
     }
 }
 RealMatrix::~RealMatrix(){
-    delete[] data;
+    if(data!=nullptr)
+        delete[] data;
 }
 RealMatrix RealMatrix::traspose(const RealMatrix &m){
     RealMatrix traposed( m.shape_x, m.shape_y );

@@ -22,6 +22,7 @@ namespace mymtx{
         RealMatrix(size_t shape_y,size_t shape_x);
         RealMatrix(const RealMatrix &other);
         RealMatrix(std::initializer_list<std::initializer_list<double>> initial);
+        RealMatrix(RealMatrix &&other);
         ~RealMatrix();
         RealVector operator[](const size_t &row);
         double &operator()(const size_t row, const size_t col);
@@ -79,6 +80,7 @@ namespace mymtx{
         const size_t size;
         RealVector(const size_t size);
         RealVector(const RealVector &other);
+        RealVector(RealVector &&other);
         RealVector(std::initializer_list<double> initial);
         RealVector(double *data, size_t size);
         ~RealVector();

@@ -8,6 +8,10 @@ RealVector::RealVector(const RealVector &other):size(other.size),allocated(true)
     this->data = new double[this->size];
     memcpy(this->data,other.data,this->size*sizeof(double));
 }
+RealVector::RealVector(RealVector &&other):size(other.size),allocated(other.allocated){
+    this->data = other.data;
+    other.data = nullptr;
+}
 RealVector::RealVector(std::initializer_list<double> initial):size(initial.size()),allocated(true){
     this->data = new double[this->size];
     size_t i{0};
@@ -16,7 +20,7 @@ RealVector::RealVector(std::initializer_list<double> initial):size(initial.size(
 }
 RealVector::RealVector(double *data, size_t size):size(size),allocated(false),data(data){}
 RealVector::~RealVector(){
-    if(allocated) delete[] data;
+    if(allocated && data!=nullptr) delete[] data;
 }
 double &RealVector::operator[](const size_t col){return data[col];}
 const double &RealVector::operator[](const size_t col) const {return data[col];}
@@ -175,11 +179,13 @@ RealVector map(const RealVector &v,double (*callback)(const double)){
     auto i = v.begin();
     for(auto j =v_new.begin(); j !=v_new.end();++i,++j)
         *j = callback(*i);
+    return v_new;
 }
 double reduce(const RealVector &v,double (*callback)(double acc, const double cur),const double start){
     double acc = start;
     for(auto i=v.begin();i!=v.end();++i)
         acc = callback(acc,*i);
+    return acc;
 }
 }
 mymtx::RealVector operator*(const mymtx::RealVector &v, const double c){
