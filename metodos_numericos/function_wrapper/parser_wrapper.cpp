@@ -3,3 +3,4 @@
 
 FunctionParserAdapter_to_FWrapper::FunctionParserAdapter_to_FWrapper(FunctionParser *parser):parser(parser) {}
 double FunctionParserAdapter_to_FWrapper::eval(const double &x){ return parser->Eval(&x); }
+double FunctionParserAdapter_to_FWrapper::eval(const double &x) const { return parser->Eval(&x); }
