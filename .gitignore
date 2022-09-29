@@ -67,3 +67,4 @@ programacion/Tarea7/tree.h
 programacion/Tarea7/queue.c
 programacion/Tarea7/queue.h
 *.pyc
+*.compresed
