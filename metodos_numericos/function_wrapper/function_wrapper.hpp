@@ -8,6 +8,7 @@
 class FunctionWrapper{
     public:
     virtual double eval(const double &x) = 0;
+    virtual double eval(const double &x) const = 0;
 };
 
 class Derivative : public FunctionWrapper{
