@@ -2,10 +2,11 @@
 *.out
 *.o
 *.py
-*.png
 *.run 
 *test*
 *.log
+*.png
+!Analisis_datos/**/*.png
 *.exe
 *.inc
 *.hh
@@ -61,3 +62,7 @@ metodos_numericos/matrix_like/print.cpp
 metodos_numericos/interpolacion/matrix_like/print.cpp
 metodos_numericos/interpolacion/matrix_like/makefile
 metodos_numericos/interpolacion/function_wrapper
+programacion/Tarea7/tree.c
+programacion/Tarea7/tree.h
+programacion/Tarea7/queue.c
+programacion/Tarea7/queue.h
