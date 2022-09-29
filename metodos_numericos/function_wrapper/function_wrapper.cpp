@@ -5,6 +5,9 @@
 Derivative::Derivative(FunctionWrapper* original):original_function(original){}
 
 double Derivative::eval(const double &x){
+    return const_cast<Derivative *>(this)->eval(x);
+}
+double Derivative::eval(const double &x) const {
     return ( original_function->eval( x + DELTA_X ) - original_function->eval(x)  ) / DELTA_X;
 }
 
