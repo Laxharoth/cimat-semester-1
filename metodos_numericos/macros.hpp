@@ -24,6 +24,9 @@ using namespace std::chrono;
 (*(macros::out)) << "#*********************************#" << std::endl;\
 (*(macros::out)) << "# * TEST:" << msg << std::endl; \
 (*(macros::out)) << "#*********************************#" << std::endl;
+#define start_timer(start) start = high_resolution_clock::now()
+#define end_timer(end) end = high_resolution_clock::now()
+#define print_timer(start,end) (*(macros::out)) << "time: " << duration_cast<microseconds>(end - start).count() << "micro s" << std::endl
 #define measure_time(what) \
 {\
   auto start = high_resolution_clock::now();\
