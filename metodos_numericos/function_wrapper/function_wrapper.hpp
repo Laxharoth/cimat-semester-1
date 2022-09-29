@@ -16,6 +16,16 @@ class Derivative : public FunctionWrapper{
     public:
     Derivative(FunctionWrapper *original);
     double eval(const double &x);
+
+class Count : public FunctionWrapper{
+    double current,step;
+    public:
+    Count();
+    Count(double start);
+    Count(double start,double step);
+    Count(double start, double end,unsigned int steps);
+    double eval(const double &x);
+    double eval(const double &x) const;
 };
 
 #endif /* FUNCTION_WRAPPER_HPP */
