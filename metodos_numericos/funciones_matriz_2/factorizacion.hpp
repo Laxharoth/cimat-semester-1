@@ -1,13 +1,10 @@
 #ifndef FACTORIZACION_HPP
 #define FACTORIZACION_HPP
 
-#include "matrix_like/matrix_like.tcc"
 #include "matrix_like/real_matrix.hpp"
 #include <exception>
 #include <cmath>
 
-using mymtx::matrix_like;
-using mymtx::array_like;
 using mymtx::RealMatrix;
 using mymtx::RealVector;
 
