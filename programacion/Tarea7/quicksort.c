@@ -9,14 +9,15 @@ void swapint(void *a, void *b){
     *aa = *bb;
     *bb = c;
 }
+#include "stdio.h"
 void quicksort( void *data, int start, int end, unsigned int data_size, int (*cmp)(void *a, void *b), void (*swap)(void *a, void *b)){
     if(end - start <= 1) return;
     int left = start;
     int right = end-1;
     int mid = right;
     while(1){
-        while( cmp( data +  left * data_size , data + mid * data_size) < 0) left++;
-        while( right > 0 && cmp( data +  right * data_size , data + mid * data_size) > 0 ) right--;
+        while( left < right && cmp( data +  left * data_size , data + mid * data_size) < 0){left++;}
+        while( left < right &&right > 0 && cmp( data +  right * data_size , data + mid * data_size) > 0 ){right--;}
         if( left >= right)break;
         swap(data +  left * data_size,data +  right * data_size);
         if( right == mid) mid = left;
