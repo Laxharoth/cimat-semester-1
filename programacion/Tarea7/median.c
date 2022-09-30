@@ -9,7 +9,7 @@ typedef char (*filter)( char *mtx, //img
              );
 
 int cmpchr(void *a, void *b){ return (*((char*)(a)))>(*((char*)(b)))?1:-1; }
-void swapchr(void *a, void *b){ char c = (*((char*)(a))); (*((char*)(a))) = (*((char*)(b))); (*((char*)(b)))-c; }
+void swapchr(void *a, void *b){ char* aa = (char*)a; char* bb = (char*)b; char c = *aa; *aa = *bb; *bb = c; }
 char median( char *mtx, //img
              int y, int x, //position to find median
              int window_size, //window size

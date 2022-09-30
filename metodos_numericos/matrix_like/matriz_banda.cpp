@@ -69,7 +69,7 @@ MatrizDiagonal::~MatrizDiagonal(){
 }
 MatrizDiagonal::row_wrapper::row_wrapper(double *data, size_t size, size_t row):array_like<double>(size),data(data),row(row){}
 double &MatrizDiagonal::row_wrapper::operator[](const size_t &col){
-    if( row == row ) return this->data[row];
+    if( row == col ) return this->data[row];
     default_value = 0;
     return default_value;
 }

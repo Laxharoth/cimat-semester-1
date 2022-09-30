@@ -45,7 +45,7 @@ void solve_jacobi(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx:
     double sum, numerator, denominator,toler;
     const size_t n = solutions.size;
     size_t i,j;
-    mymtx::vector<double> vv(n);
+    mymtx::RealVector vv(n);
     mymtx::RealVector &vn=variables;
     for( size_t i = 0; i < n; ++i ){
         vv[i] = solutions[i] / matix[i][i];
@@ -72,7 +72,7 @@ void solve_gauss_seidel(mymtx::RealMatrix &matix, mymtx::RealVector &variables, 
     double sum, numerator, denominator,toler;
     const size_t n = solutions.size;
     size_t i,j;
-    mymtx::vector<double> vv(n);
+    mymtx::RealVector vv(n);
     mymtx::RealVector &vn=variables;
     for( size_t i = 0; i < n; ++i ){
         vv[i] = vn[i] = solutions[i] / matix[i][i];

@@ -36,7 +36,7 @@ int main(int argc, char const *argv[]){
 
 
 int cmpchr(void *a, void *b){ return (*((char*)(a)))>(*((char*)(b)))?1:-1; }
-void swapchr(void *a, void *b){ char c = (*((char*)(a))); (*((char*)(a))) = (*((char*)(b))); (*((char*)(b)))-c; }
+void swapchr(void *a, void *b){ char* aa = (char*)a; char* bb = (char*)b; char c = *aa; *aa = *bb; *bb = c; }
 char median( char *mtx,int y, int x, int dim_y, int dim_x ){
     if( (x==0 && y==0) ||
         (x==0 && y==dim_y-1)|| 
@@ -103,11 +103,11 @@ char gradient( char *mtx,int y, int x, int dim_y, int dim_x ){
     ) return mtx[y*dim_x+x];
     if( x == 0 || x == dim_x-1){
         double gy = mtx[(y+1)*dim_x+x]-mtx[y*dim_x+x];
-        return (char)(abs(gy));
+        return (char)(fabs(gy));
     }
     if( y == 0 || y == dim_y-1){
         double gx = mtx[y*dim_x+x+1]-mtx[y*dim_x+x];
-        return (char)(abs(gx));
+        return (char)(fabs(gx));
     }
     double gy = mtx[(y+1)*dim_x+x]-mtx[y*dim_x+x];
     double gx = mtx[y*dim_x+x+1]-mtx[y*dim_x+x];

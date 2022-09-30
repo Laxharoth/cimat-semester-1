@@ -14,7 +14,7 @@ double Derivative::eval(const double &x) const {
 Count::Count():current(-1),step(1){}
 Count::Count(double start):current(start-1),step(1){}
 Count::Count(double start,double step):current(start-step),step(step){}
-Count::Count(double start, double end,unsigned int steps):step((end-start)/steps),current(start-step){}
+Count::Count(double start, double end,unsigned int steps):step((end-start)/steps),current(0){ current = start-step;}
 double Count::eval(const double &x){ return current+=step; }
 double Count::eval(const double &x) const { return current; }
 #endif /* FUNCTION_WRAPPER_CPP */

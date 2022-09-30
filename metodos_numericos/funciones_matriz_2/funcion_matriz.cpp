@@ -331,13 +331,13 @@ void subspace_pow(const mymtx::RealMatrix &A,mymtx::RealMatrix &I_t,mymtx::RealV
     auto eig_old = eig;
     auto IndexOfMax = [](const mymtx::RealMatrix &inA){
         double max = 0;
-        for(size_t k=0; k<inA.shape_y; ++k)
+        for(size_t k=0; k<inA.shape_y; ++k){
         for(auto i = inA.begin(k); i<inA.end(k); ++i){
             if( i.get_col() == i.get_row() )continue;
             if(std::abs(*i) > std::abs(max)){
                 max = *i;
             }
-        }
+        }}
         return max;
     };
     while (1){
@@ -385,13 +385,13 @@ void subspace_ipow(const mymtx::RealMatrix &A,mymtx::RealMatrix &I_t,mymtx::Real
     auto eig_old = eig;
     auto IndexOfMax = [](const mymtx::RealMatrix &inA){
         double max = 0;
-        for(size_t k=0; k<inA.shape_y; ++k)
+        for(size_t k=0; k<inA.shape_y; ++k){
         for(auto i = inA.begin(k); i<inA.end(k); ++i){
             if( i.get_col() == i.get_row() )continue;
             if(std::abs(*i) > std::abs(max)){
                 max = *i;
             }
-        }
+        }}
         return max;
     };
     factor_cholesky(A,Chol);

@@ -128,6 +128,7 @@ int decompress(const byte* file_buffer, const char *output_file){
     fwrite(original_file,size,1,f);
     fclose(f);
     free(original_file);
+    return 0;
 }
 unsigned int *handle_my_file( const byte* buffer, unsigned long size){
     unsigned int *abcedary = calloc(BITS_COMB, sizeof(unsigned int));

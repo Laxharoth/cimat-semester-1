@@ -119,7 +119,7 @@ double RealVector::distance() const{
 }
 RealMatrix RealVector::as_matrix() const {
     RealMatrix m(this->size,1);
-    memcmp(m.data, this->data, sizeof(double)*this->size);
+    memcpy(m.data, this->data, sizeof(double)*this->size);
     return m;
 }
 RealMatrix::Column::Column(const RealMatrix::Column &other):size(other.size),increment(other.increment),data(other.data){}

@@ -6,7 +6,6 @@
 #include <cmath>
 
 using mymtx::RealMatrix;
-using mymtx::RealVector;
 
 void crout(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior);
 void crout_tridiagonal(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_superior);

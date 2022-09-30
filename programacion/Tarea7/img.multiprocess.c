@@ -29,10 +29,10 @@
 void fork_replace(char *mtx,int dim_y, int dim_x, filter fnc, int window_size, size_t forks);
 int main(int argc, char const *argv[]){
     int cols, rows;
-    char *img = pgmRead("fractal_tree.ascii.pgm",&rows, &cols);
+    char *img = (char *)pgmRead("fractal_tree.ascii.pgm",&rows, &cols);
     // replace( img, rows,cols,median, 9 );
     fork_replace( img, rows,cols,median, 9, 2);
-    pgmWrite("fractal_tree.2.ascii.pgm",rows,cols,img,"");
+    pgmWrite("fractal_tree.2.ascii.pgm",rows,cols,(unsigned char*)img,"");
     free(img);
     return 0;
 }
@@ -69,7 +69,7 @@ void fork_replace(char *mtx,int dim_y, int dim_x, filter fnc, int window_size, s
             exit(ERROR_FORK);
         }
         //prevent child of forking
-        if(pid == 0){ sleep(0.1);break; }
+        if(pid == 0){ usleep(100);break; }
         internal_forks_id[i] = pid;
     }
     //child process

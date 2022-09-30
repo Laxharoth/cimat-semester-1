@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     ANNOUNCE_TEST("1 valor");
     strm_out("power iteration")
     measure_time(
-        power_iteration( mtx, V0, V1, 1E-20, val, 2, nullptr, nullptr );
+        power_iteration( mtx, V1, 1E-20, val, 2, nullptr, nullptr,10000 );
     );
 
     auto biggest_l = 3.9546266935713628;
@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
     V0=V0rig;
     strm_out("inverse power iteration")
     measure_time(
-        inverse_power_iteration( mtx, V0, V1, 1E-20, val, 1, nullptr, nullptr );
+        inverse_power_iteration( mtx, V1, 1E-20, val, 1, nullptr, nullptr, 10000 );
     );
 
     auto smallest = 0.1742732695496015;
@@ -59,7 +59,5 @@ int main(int argc, char const *argv[])
         contrl+=std::abs(*j);
     }
     strm_out( error/contrl );
-
-
     return 0;
 }
