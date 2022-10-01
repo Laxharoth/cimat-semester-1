@@ -230,7 +230,7 @@ RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
         #endif
         for( size_t k = 0; k < other.shape_y; ++k){
             for(size_t j = 0; j < other.shape_x; ++j){
-                cpy[i][j] += (*this)(i,k) * other(k,j);
+                cpy(i,j) += (*this)(i,k) * other(k,j);
             }
         }
     
