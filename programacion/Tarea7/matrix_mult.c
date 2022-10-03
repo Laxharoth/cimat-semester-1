@@ -22,6 +22,8 @@
 #define ERROR_WAIT         -22
 #define ERROR_NOT_IN_ARR   -23
 
+#define REPETITIONS 20
+
 struct _shape{
     unsigned shape_x;unsigned shape_y;
 }; typedef struct _shape shape;
@@ -34,18 +36,25 @@ int main(){
     double *B=malloc(sizeof(double)*1000*1000);
     shape shape_B={1000,1000};
     double *C; shape shape_C;
-    long time;
     // omp multiplication
-    time = GetTimeStamp(
-        C = omp_mutl(A,B,shape_A,shape_B,&shape_C);
-    );
-    printf("Open MP time: %ld microseconds\n",time);
+    long time=0;
+    for (size_t i = 0; i < REPETITIONS; i++)
+    {
+        time += GetTimeStamp(
+            C = omp_mutl(A,B,shape_A,shape_B,&shape_C);
+        );
+    }
+    printf("Open MP time: %ld microseconds\n",time/REPETITIONS);
     free(C);
-    // fork multiplication
-    time = GetTimeStamp(
-        C = fork_mutl(A,B,shape_A,shape_B,&shape_C);
-    );
-    printf("fork time: %ld microseconds\n",time);
+    time=0;
+    for (size_t i = 0; i < REPETITIONS; i++)
+    {
+        time += GetTimeStamp(
+            C = fork_mutl(A,B,shape_A,shape_B,&shape_C);
+        );
+    }
+    printf("Open MP time: %ld microseconds\n",time/REPETITIONS);
+    
     free(C);
 }
 
