@@ -9,7 +9,7 @@ real_matrix.o: real_matrix.hpp real_matrix.cpp real_vector.cpp real_vector_itera
 
 test: test.run
 	./test.run
-test.run: test.cpp real_matrix.cpp
+test.run: test.cpp real_matrix.cpp real_vector.cpp real_vector_iterator.cpp
 	g++ -g -pthread -o test.run test.cpp real_matrix.cpp
 clean:
 	rm -rf *.o
