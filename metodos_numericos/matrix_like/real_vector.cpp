@@ -1,4 +1,7 @@
 #include "real_matrix.hpp"
+#include <cmath>
+#include <cstddef>
+#include <future>
 namespace mymtx{
 RealVector::RealVector(const size_t size):size(size),allocated(true){
     this->data = new double[this->size];
@@ -36,9 +39,28 @@ const_vector_iterator RealVector::begin() const{
 const_vector_iterator RealVector::end() const{
         return const_vector_iterator(data,0,size);
 }
+struct vector_coef_data{size_t begin; size_t end; RealVector *v;double coef;};
 RealVector &RealVector::operator*=(const double coef){
+    #ifndef NO_ASYNC
+    if(size > MIN_OPER_FOR_THREAD){
+    std::vector<std::future<void>> futures;
+    for(size_t i= 0; i<3; ++i){
+        size_t begin = (size *i) / 3;
+        size_t end = (size *(i+1)) / 3;
+        futures.push_back(std::async(std::launch::async,[](vector_coef_data d){
+            for (size_t i = d.begin; i < d.end; i++){
+                (*d.v)[i] *= d.coef;
+            }
+        }, vector_coef_data{begin,end,this,coef}));
+    }
+    futures.clear();
+    }else
+    #endif
+    {
     for( auto i = this->begin(); i != this->end(); ++i )
         (*i)*=coef;
+    }
+
     return *this;
 }
 RealVector RealVector::operator/(const double coef){
@@ -47,26 +69,64 @@ RealVector RealVector::operator/(const double coef){
     return cpy;
 }
 RealVector &RealVector::operator/=(const double coef){
-    for( auto i = this->begin(); i != this->end(); ++i )
-        (*i)/=coef;
+    (*this) *= 1/coef;
     return *this;
 }
+struct vector_vector_data{size_t begin; size_t end; const RealVector* const v1; const RealVector* const v2; double * const sum;};
 double RealVector::operator*(const RealVector &other) const {
     double sum{0};
+    #ifndef NO_ASYNC
+    double sums[3];
+    if(size > MIN_OPER_FOR_THREAD){
+    std::vector<std::future<void>> futures;
+    for(size_t i= 0; i<3; ++i){
+        size_t begin = (size*i) / 3;
+        size_t end = (size *(i+1)) / 3;
+        futures.push_back(std::async(std::launch::async,[](vector_vector_data d){
+            (*d.sum) = 0;
+            for (size_t i = d.begin; i < d.end; i++){
+                (*d.sum) += (*d.v1)[i] * (*d.v2)[i];
+            }
+        }, vector_vector_data{begin,end,this,&other,sums+i}));
+    }
+    futures.clear();
+    sum = sums[0]+sums[1]+sums[2];
+    }
+    else
+    #endif
+    {
     auto it = other.begin();
     auto ti = this->begin();
     while(it != other.end()){
         sum += (*it)*(*ti);
         ++it;++ti;
     }
+    }
     return sum;
 }
+struct vector_sum_vector_data{size_t begin; size_t end; RealVector* const v1; const RealVector* const v2;};
 RealVector &RealVector::operator+=(const RealVector &other){
+    #ifndef NO_ASYNC
+    if(size > MIN_OPER_FOR_THREAD){
+    std::vector<std::future<void>> futures;
+    for(size_t i= 0; i<3; ++i){
+        size_t begin = (size*i) / 3;
+        size_t end = (size *(i+1)) / 3;
+        futures.push_back(std::async(std::launch::async,[](vector_sum_vector_data d){
+            for (size_t i = d.begin; i < d.end; i++){
+                (*d.v1)[i] += (*d.v2)[i];
+            }
+        }, vector_sum_vector_data{begin,end,this,&other}));
+    }}
+    else
+    #endif 
+    {
     auto it = other.begin();
     auto ti = this->begin();
     while(it != other.end()){
         (*ti) += (*it);
         ++it;++ti;
+    }
     }
     return *this;
 }
@@ -76,11 +136,27 @@ RealVector RealVector::operator+(const RealVector &other){
     return cpy;
 }
 RealVector &RealVector::operator-=(const RealVector &other){
+    #ifndef NO_ASYNC
+    if(size > MIN_OPER_FOR_THREAD){
+    std::vector<std::future<void>> futures;
+    for(size_t i= 0; i<3; ++i){
+        size_t begin = (size*i) / 3;
+        size_t end = (size *(i+1)) / 3;
+        futures.push_back(std::async(std::launch::async,[](vector_sum_vector_data d){
+            for (size_t i = d.begin; i < d.end; i++){
+                (*d.v1)[i] -= (*d.v2)[i];
+            }
+        }, vector_sum_vector_data{begin,end,this,&other}));
+    }}
+    else
+    #endif 
+    {
     auto it = other.begin();
     auto ti = this->begin();
     while(it != other.end()){
         (*ti) -= (*it);
         ++it;++ti;
+    }
     }
     return *this;
 }
@@ -93,13 +169,31 @@ RealVector &RealVector::operator=(const RealVector &other){
     memcpy(this->data,other.data,sizeof(double)*this->size);
     return *this;
 }
+struct vector_cross_vector_data{size_t begin; size_t end; const RealVector* const v1; const RealVector* const v2; RealMatrix *res;};
 RealMatrix RealVector::cross_product(const RealVector &other) const {
     RealMatrix result(other.size,other.size);
+    #ifndef NO_ASYNC
+    if(size > MIN_OPER_FOR_THREAD){
+    std::vector<std::future<void>> futures;
+    for(size_t i= 0; i<3; ++i){
+        size_t begin = (size*i) / 3;
+        size_t end = (size *(i+1)) / 3;
+        futures.push_back(std::async(std::launch::async,[](vector_cross_vector_data d){
+            for (size_t i = d.begin; i < d.end; i++){
+                for (size_t j = 0; j < (*d.v2).size; j++){
+                    (*d.res)(i,j) = (*d.v1)[i]*(*d.v2)[j];
+                }
+            }
+        }, vector_cross_vector_data{begin,end,this,&other,&result}));
+    }}
+    else
+    #endif 
+    {
     for (size_t i = 0; i < other.size; i++){
         for (size_t j = 0; j < other.size; j++){
             result[i][j] = other[i]*other[j];
         }
-    }
+    }}
     return result;
 }
 RealVector RealVector::normal(const size_t size){
@@ -113,8 +207,7 @@ void RealVector::sort(RealVector &v){
     std::sort(v.data, v.data+v.size);
 }
 double RealVector::distance() const{
-    double sum = 0;
-    for(auto i=this->begin(); i!=this->end(); ++i) sum += (*i) * (*i);
+    double sum = (*this)*(*this);
     return std::sqrt(sum);
 }
 RealMatrix RealVector::as_matrix() const {
@@ -132,10 +225,10 @@ const double &RealMatrix::Column::operator[](const size_t row) const{
     return *(data+row*increment);
 }
 double RealMatrix::Column::distance() const{
-    double v;
+    double v=0;
     for (size_t i = 0; i < size; i++)
-        v = (*this)[i] * (*this)[i];
-    return v;
+        v += (*this)[i] * (*this)[i];
+    return std::sqrt(v);
 }
 RealMatrix RealMatrix::Column::as_matrix() const{
     RealMatrix result(size,1);
@@ -161,9 +254,26 @@ RealMatrix::Column &RealMatrix::Column::operator=(const RealVector &other){
     }
     return *this;
 }
+struct column_sum_vector_data{size_t begin; size_t end; RealMatrix::Column* const v1; const RealVector* const v2;};
 RealMatrix::Column &RealMatrix::Column::operator-=(const RealVector &other){
+    #ifndef NO_ASYNC
+    if(size > MIN_OPER_FOR_THREAD){
+    std::vector<std::future<void>> futures;
+    for(size_t i= 0; i<3; ++i){
+        size_t begin = (size*i) / 3;
+        size_t end = (size *(i+1)) / 3;
+        futures.push_back(std::async(std::launch::async,[](column_sum_vector_data d){
+            for (size_t i = d.begin; i < d.end; i++){
+                (*d.v1)[i] -= (*d.v2)[i];
+            }
+        }, column_sum_vector_data{begin,end,this,&other}));
+    }}
+    else
+    #endif 
+    {
     for (size_t i = 0; i < size; i++){
         (*this)[i] -= other[i];
+    }
     }
     return *this;
 }
