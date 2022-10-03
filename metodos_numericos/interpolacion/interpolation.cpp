@@ -1,4 +1,5 @@
 #include "interpolation.hpp"
+#include "funcion_matriz.hpp"
 #include "matrix_like/real_matrix.hpp"
 PolyFunction interpolate_line(const mymtx::RealVector &X, const mymtx::RealVector &Y){
     return interpolate_poly(X,Y,1);
@@ -31,9 +32,9 @@ PolyFunction interpolate_poly(const mymtx::RealVector &X, const mymtx::RealVecto
             A(current,j) = xpow;
         }
     }
-    gauss(A,ab,yx);
-    // factor_cholesky(A,A);
-    // solve_cholesky(A,ab,yx);
+    // gauss(A,ab,yx);
+    crout(A,A,A);
+    solucion_crout(A, ab,yx);
     return PolyFunction(ab);
 }
 MultiFunctionWrapper interpolate_funcs(const mymtx::RealVector &X, const mymtx::RealVector &Y, std::vector<FunctionWrapper *>fns){
@@ -51,7 +52,8 @@ MultiFunctionWrapper interpolate_funcs(const mymtx::RealVector &X, const mymtx::
             }
         }    
     }
-    gauss(A,cs,ys);
+    crout(A,A,A);
+    solucion_crout(A, cs,ys);
     return MultiFunctionWrapper(fns,cs);
 }
 PolyFunction interpolate_poly_2(const mymtx::RealVector &X, const mymtx::RealVector &Y){
@@ -63,7 +65,10 @@ PolyFunction interpolate_poly_2(const mymtx::RealVector &X, const mymtx::RealVec
             A(i,j) = std::pow(X[i],j);
         }
     }
-    gauss(A,as,ys);
+    RealMatrix Q(A.shape_y,A.shape_x);
+    RealMatrix R = Q;
+    qr_decomposition(A,Q,R);
+    solve_qr(Q,R, as,ys);
     return PolyFunction(as);
 }
 LagramFunction interpolate_lagram(const mymtx::RealVector &X, const mymtx::RealVector &Y){
