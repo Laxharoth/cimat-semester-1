@@ -3,28 +3,32 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// #define INPUT "Don-Quijote-Ingles.txt"
+// #define INPUT "len_out.pgm"
+#define INPUT "fractal_tree.ascii.pgm"
+
 long fileSize(const char *file_name);
 int main(int argc, char const *argv[]){
     {
         /*  compress */{
-            const char *filename = "fractal_tree.ascii.pgm";
+            const char *filename = INPUT;
             long file_size = fileSize(filename);
             byte *buffer = malloc(file_size);
             FILE *f = fopen(filename,"rb");
             fread(buffer,1,file_size,f);
             fclose(f);
-            compress(buffer,file_size,"fractal_tree.ascii.pgm" ".compresed");
+            compress(buffer,file_size,INPUT ".compresed");
             free(buffer);
         }
         /*  compress */
         {
-            const char *filename = "fractal_tree.ascii.pgm" ".compresed";
+            const char *filename = INPUT ".compresed";
             long file_size = fileSize(filename);
             byte *buffer = malloc(file_size);
             FILE *f = fopen(filename,"rb");
             fread(buffer,1,file_size,f);
             fclose(f);
-            decompress(buffer,"decompresed." "fractal_tree.ascii.pgm");
+            decompress(buffer,"decompresed." INPUT);
             free(buffer);
         }
     }
