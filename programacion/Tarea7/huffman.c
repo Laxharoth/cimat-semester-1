@@ -1,4 +1,6 @@
 #include "huffman.h"
+#include <stdio.h>
+#include <string.h>
 
 byte_position *get_sorted_positions(unsigned int *abcedary);
 Tree *gen_tree(byte_position *positions, unsigned int *leafs);
@@ -56,7 +58,6 @@ int compress(const byte* file_buffer, unsigned long size,const char *output_file
     //Write compresed file
     fwrite(output_buffer,write_bytes,1,f);
     //write table
-    // printf("%x",ftell(f)); // where the table starts
     for(unsigned int i=0;i<leafs;++i){
         pushing_bits_size = strlen(table[i].code);
         //write size of code
@@ -66,6 +67,16 @@ int compress(const byte* file_buffer, unsigned long size,const char *output_file
         //write correspondent byte
         fwrite(&(table[i].value),1,1,f);
     }
+    #ifdef PRINT_TABLE
+    printf("byte,codigo,frecuencia,tamano esperado\n");
+    for (unsigned int i = 0; i < 255; i++){
+        if(abcedary[i] == 0) continue;
+        index = search_in_table_by_value(table, i);
+        printf("%d,\"%s\",%d,%ld\n", i, table[index].code , abcedary[i], 
+               strlen(table[index].code)*abcedary[i] );
+    }
+    #endif // PRINT_TABLE
+
     // cleanup
     fclose(f);
     free(output_buffer);
