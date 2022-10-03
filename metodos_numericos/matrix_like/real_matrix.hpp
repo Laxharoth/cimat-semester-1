@@ -6,7 +6,13 @@
 #include <algorithm>
 #include <string.h>
 #include <fstream>
+#include <future>
+#include <vector>
 #include <initializer_list>
+
+#ifndef MIN_OPER_FOR_THREAD
+#define MIN_OPER_FOR_THREAD 500
+#endif
 
 namespace mymtx{
     class RealMatrix;

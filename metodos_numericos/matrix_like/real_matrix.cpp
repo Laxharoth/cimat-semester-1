@@ -1,9 +1,5 @@
 #include "real_matrix.hpp"
-#include <future>
-#include <vector>
-#ifndef MIN_OPER_FOR_THREAD
-#define MIN_OPER_FOR_THREAD 500
-#endif
+
 struct mrow_data{
     size_t begin;size_t end; const size_t row;const mymtx::RealMatrix* mtx; const mymtx::RealMatrix *other; mymtx::RealMatrix *cpy;
 };
