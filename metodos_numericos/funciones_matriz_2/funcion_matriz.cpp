@@ -10,7 +10,7 @@ class randgen{
     randgen(){
         rd = new std::random_device();
         gen= new std::mt19937((*rd)());
-        dis = new std::uniform_real_distribution<double>();
+        dis = new std::uniform_real_distribution<double>(-1,1);
     }
     ~randgen(){
         delete rd;
