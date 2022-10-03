@@ -69,3 +69,4 @@ programacion/Tarea7/queue.h
 *.pyc
 *.compresed
 programacion/Tarea7/pgm1.c
+*.csv
