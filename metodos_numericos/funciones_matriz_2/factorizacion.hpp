@@ -17,8 +17,8 @@ void LDU_factor(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &mat
 void LDU_factor_tridiagonal(RealMatrix &matriz, RealMatrix &matriz_inferior, RealMatrix &matriz_diagonal, RealMatrix &matriz_superior);
 void factor_cholesky(const mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular);
 void factor_cholesky_as_band(const mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular, int heigh);
-
 void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular);
+void qr_decomposition(const mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R);
 
 class cant_factor_exception : public std::exception{
     using std::exception::exception;
