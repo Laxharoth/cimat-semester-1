@@ -1,4 +1,4 @@
-#include "factorizacion.hpp"
+#include "funcion_matriz.hpp"
 
 void crout(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
     const size_t size = A_mtx.shape_y;
@@ -222,5 +222,26 @@ void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triang
         double substract = triangular[i][i-1];
         double &red =triangular(i,i) = matix(i,i)-substract*substract;
         red = std::sqrt(red);
+    }
+}
+void qr_decomposition(const mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R){
+    mymtx::RealVector col0 = A.column(0).as_vector();
+    R(0,0)=normalize(col0);
+    Q.column(0) = col0;
+    RealMatrix E(A.shape_y,A.shape_x);
+    RealVector u(A.shape_y);
+    for (size_t j = 1; j < A.shape_x; j++){
+        u = 0;
+        //calc R_ij
+        for (size_t i = 0; i < j; i++){
+            R(i,j) = Q.column(i) * A.column(j);
+            u += R(i,j)*Q.column(i);
+        }
+        //calc a*
+        u = A.column(j) - u;
+        //calc R_jj
+        R(j,j) = normalize(u);
+        //assing q_j
+        Q.column(j)=u;
     }
 }
