@@ -169,6 +169,10 @@ RealVector &RealVector::operator=(const RealVector &other){
     memcpy(this->data,other.data,sizeof(double)*this->size);
     return *this;
 }
+RealVector &RealVector::operator=(const double coef){
+    memset(this->data,coef,sizeof(double)*this->size);
+    return *this;
+}
 struct vector_cross_vector_data{size_t begin; size_t end; const RealVector* const v1; const RealVector* const v2; RealMatrix *res;};
 RealMatrix RealVector::cross_product(const RealVector &other) const {
     RealMatrix result(other.size,other.size);

@@ -105,6 +105,7 @@ namespace mymtx{
         RealVector operator-(const RealVector &other);
         RealVector &operator-=(const RealVector &other);
         RealVector &operator=(const RealVector &other);
+        RealVector &operator=(const double coef);
         RealMatrix cross_product(const RealVector &other) const;
         double distance() const;
         RealMatrix as_matrix() const;
