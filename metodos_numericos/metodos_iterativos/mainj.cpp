@@ -1,25 +1,25 @@
 #include <iostream>
 #include <fstream>
 
-#include "matrix_like/real_matrix.hpp"
-#include "funcion_matriz.hpp"
+#include "matrix_like/matrix.hpp"
+#include "matrix_like/funcion_matriz.hpp"
 #include "functions.hpp"
 #include "macros.hpp"
 
-void fill_matrix(mymtx::RealMatrix &matrix);
-void fill_vector(mymtx::RealVector &vector,double Q, double q0, double qn);
-void fill_x(mymtx::RealVector &vector, double min, double max);
-void print_points(std::string filename,mymtx::RealVector &x,mymtx::RealVector &y);
+void fill_matrix(mymtx::matrix &matrix);
+void fill_vector(mymtx::vector &vector,double Q, double q0, double qn);
+void fill_x(mymtx::vector &vector, double min, double max);
+void print_points(std::string filename,mymtx::vector &x,mymtx::vector &y);
 
 int main(int argc, char const *argv[]){
     double error;
     auto f = std::ofstream("out_jacob.txt");
     macros::out = &f;
 
-    mymtx::RealMatrix m10(10,10);
-    mymtx::RealVector v10(10);
-    mymtx::RealVector s10(10);
-    mymtx::RealVector x10(10);
+    mymtx::matrix m10(10,10);
+    mymtx::vector v10(10);
+    mymtx::vector s10(10);
+    mymtx::vector x10(10);
     fill_matrix(m10);
     fill_vector(s10, 2, 0, 2);
     fill_x(x10, 0,1);
@@ -29,10 +29,10 @@ int main(int argc, char const *argv[]){
     out_vector(v10, "solutionsi10.txt");
     print_points("10",x10,v10);
 
-    mymtx::RealMatrix m50(50,50);
-    mymtx::RealVector v50(50);
-    mymtx::RealVector s50(50);
-    mymtx::RealVector x50(50);
+    mymtx::matrix m50(50,50);
+    mymtx::vector v50(50);
+    mymtx::vector s50(50);
+    mymtx::vector x50(50);
     fill_matrix(m50);
     fill_vector(s50, 2, 0, 2);
     fill_x(x50, 0,1);
@@ -43,10 +43,10 @@ int main(int argc, char const *argv[]){
     out_vector(v50, "solutionsi50.txt");
     print_points("50",x50,v50);
 
-    mymtx::RealMatrix m100(200,200);
-    mymtx::RealVector v100(200);
-    mymtx::RealVector s100(200);
-    mymtx::RealVector x100(200);
+    mymtx::matrix m100(200,200);
+    mymtx::vector v100(200);
+    mymtx::vector s100(200);
+    mymtx::vector x100(200);
     fill_matrix(m100);
     fill_vector(s100, 2, 0, 2);
     fill_x(x100, 0,1);
@@ -57,10 +57,10 @@ int main(int argc, char const *argv[]){
     out_vector(v100, "solutionsi100.txt");
     print_points("100",x100,v100);
 
-    mymtx::RealMatrix m1000(1000,1000);
-    mymtx::RealVector v1000(1000);
-    mymtx::RealVector s1000(1000);
-    mymtx::RealVector x1000(1000);
+    mymtx::matrix m1000(1000,1000);
+    mymtx::vector v1000(1000);
+    mymtx::vector s1000(1000);
+    mymtx::vector x1000(1000);
     fill_matrix(m1000);
     fill_vector(s1000, 2, 0, 2);
     fill_x(x1000, 0,1);
@@ -71,10 +71,10 @@ int main(int argc, char const *argv[]){
     out_vector(v1000, "solutionsi1000.txt");
     print_points("1000",x1000,v1000);
 
-    mymtx::RealMatrix m10000(10000,10000);
-    mymtx::RealVector v10000(10000);
-    mymtx::RealVector s10000(10000);
-    mymtx::RealVector x10000(10000);
+    mymtx::matrix m10000(10000,10000);
+    mymtx::vector v10000(10000);
+    mymtx::vector s10000(10000);
+    mymtx::vector x10000(10000);
     fill_matrix(m10000);
     fill_vector(s10000, 2, 0, 2);
     fill_x(x10000, 0,1);
@@ -88,7 +88,7 @@ int main(int argc, char const *argv[]){
     return 0;
 }
 
-void fill_matrix(mymtx::RealMatrix &matrix){
+void fill_matrix(mymtx::matrix &matrix){
     double h = 1.0 / (matrix.shape_y+1);
     for (size_t i = 0; i < matrix.shape_y; i++){
         matrix[i][i] = 2;
@@ -97,7 +97,7 @@ void fill_matrix(mymtx::RealMatrix &matrix){
     }
     matrix*=(1.0/(h));
 }
-void fill_vector(mymtx::RealVector &vector,double Q, double q0, double qn){
+void fill_vector(mymtx::vector &vector,double Q, double q0, double qn){
     double h = 1.0 / (vector.size+1);
     vector[0] = -2*h;
     vector[vector.size-1] = -2*h + 2/h;
@@ -106,14 +106,14 @@ void fill_vector(mymtx::RealVector &vector,double Q, double q0, double qn){
     }   
 }
 
-void fill_x(mymtx::RealVector &vector, double min, double max){
+void fill_x(mymtx::vector &vector, double min, double max){
     double increment = (max-min)/(vector.size-1);
     for (size_t i = 0; i < vector.size; i++){
         vector[i] = min + i * increment;
     }   
 }
 
-void print_points(std::string filename,mymtx::RealVector &x,mymtx::RealVector &y){
+void print_points(std::string filename,mymtx::vector &x,mymtx::vector &y){
     auto filey = std::ofstream(("p"+filename+"yj.py").c_str());
     auto filex = std::ofstream(("p"+filename+"x.py").c_str());
     

@@ -23,11 +23,14 @@ class tow : public FunctionWrapper{
     double eval(const double &x) const{ return std::pow(x,x);}
     double eval(const double &x) { return std::pow(x,x);}
 };
-class ex : public FunctionWrapper{
+class id : public FunctionWrapper{
     double eval(const double &x) const{ return std::exp(x);}
     double eval(const double &x) { return std::exp(x);}
 };
-
+class ex : public FunctionWrapper{
+    double eval(const double &x) const{ return (x);}
+    double eval(const double &x) { return (x);}
+};
 class func_1 : public FunctionWrapper{
     double eval(const double &x) const override{ return 1.0 / (1+ 25*x*x); }
     double eval(const double &x) override{ return const_cast<const func_1 *>(this)->eval(x); }
@@ -65,7 +68,7 @@ int main(int argc, const char** argv) {
         mymtx::RealVector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_5 ".vec",Y_graph);
     }{
         std::vector<FunctionWrapper *> fns;
-        cosine fn1;sine fn2; ln fn3; tow fn4; ex fn5;
+        cosine fn1;sine fn2; ln fn3; tow fn4; id fn5;
         fns.push_back(&fn1);fns.push_back(&fn2);
         //fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
@@ -107,7 +110,7 @@ int main(int argc, const char** argv) {
         mymtx::RealVector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_100 ".vec",Y_graph);
     }{
         std::vector<FunctionWrapper *> fns;
-        cosine fn1;sine fn2; ln fn3; tow fn4; ex fn5;
+        cosine fn1;sine fn2; ln fn3; tow fn4; id fn5;
         fns.push_back(&fn1);fns.push_back(&fn2);
         //fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
@@ -149,7 +152,7 @@ int main(int argc, const char** argv) {
         mymtx::RealVector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_1000 ".vec",Y_graph);
     }{
         std::vector<FunctionWrapper *> fns;
-        cosine fn1;sine fn2; ln fn3; tow fn4; ex fn5;
+        cosine fn1;sine fn2; ln fn3; tow fn4; id fn5;
         fns.push_back(&fn1);fns.push_back(&fn2);
         //fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
@@ -191,7 +194,7 @@ int main(int argc, const char** argv) {
         mymtx::RealVector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_5 ".vec",Y_graph);
     }{
         std::vector<FunctionWrapper *> fns;
-        cosine fn1;sine fn2; ln fn3; tow fn4; ex fn5;
+        cosine fn1;sine fn2; ln fn3; tow fn4; id fn5;
         fns.push_back(&fn1);fns.push_back(&fn2);
         //fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
@@ -233,7 +236,7 @@ int main(int argc, const char** argv) {
         mymtx::RealVector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_100 ".vec",Y_graph);
     }{
         std::vector<FunctionWrapper *> fns;
-        cosine fn1;sine fn2; ln fn3; tow fn4; ex fn5;
+        cosine fn1;sine fn2; ln fn3; tow fn4; id fn5;
         fns.push_back(&fn1);fns.push_back(&fn2);
         //fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
@@ -275,7 +278,7 @@ int main(int argc, const char** argv) {
         mymtx::RealVector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_1000 ".vec",Y_graph);
     }{
         std::vector<FunctionWrapper *> fns;
-        cosine fn1;sine fn2; ln fn3; tow fn4; ex fn5;
+        cosine fn1;sine fn2; ln fn3; tow fn4; id fn5;
         fns.push_back(&fn1);fns.push_back(&fn2);
         //fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);

@@ -50,8 +50,9 @@ test.run: test.o $(object_files)
 	g++ -O2 -pthread -o test.run test.o $(object_files)
 test.o: test.cpp matrix_like/real_matrix.hpp
 	g++ -O2 -c test.cpp
-funcion_matriz.o: funcion_matriz.hpp funcion_matriz.cpp factorizacion.cpp matrix_like/real_matrix.hpp
-	g++ -O2 -c funcion_matriz.cpp
+funcion_matriz.o: matrix_like/funcion_matriz.hpp matrix_like/funcion_matriz.cpp matrix_like/factorizacion.cpp matrix_like/real_matrix.hpp
+	$(MAKE) -C matrix_like funcion_matriz.o
+	mv matrix_like/funcion_matriz.o .
 real_matrix.o: matrix_like/real_matrix.hpp matrix_like/real_matrix.cpp matrix_like/real_vector.cpp matrix_like/real_vector_iterator.cpp
 	$(MAKE) -C matrix_like real_matrix.o
 	mv matrix_like/real_matrix.o .

@@ -1,26 +1,26 @@
-#include "real_matrix.hpp"
+#include "matrix.hpp"
 
 struct mrow_data{
-    size_t begin;size_t end; const size_t row;const mymtx::RealMatrix* mtx; const mymtx::RealMatrix *other; mymtx::RealMatrix *cpy;
+    size_t begin;size_t end; const size_t row;const mymtx::matrix* mtx; const mymtx::matrix *other; mymtx::matrix *cpy;
 };
 struct mrowMT_data{
-    size_t begin;size_t end; const size_t row;const mymtx::RealMatrix* mtx; const mymtx::MatrixTraspose *other; mymtx::RealMatrix *cpy;
+    size_t begin;size_t end; const size_t row;const mymtx::matrix* mtx; const mymtx::MatrixTraspose *other; mymtx::matrix *cpy;
 };
 struct mrowMV_data{
-    const mymtx::RealVector *vec;
-    mymtx::RealVector *result;
-    const mymtx::RealMatrix *mtx;
+    const mymtx::vector *vec;
+    mymtx::vector *result;
+    const mymtx::matrix *mtx;
     const size_t row,begin,end;
 };
 struct mrowMC_data{
-    const mymtx::RealMatrix::Column *vec;
-    mymtx::RealVector *result;
-    const mymtx::RealMatrix *mtx;
+    const mymtx::matrix::Column *vec;
+    mymtx::vector *result;
+    const mymtx::matrix *mtx;
     const size_t row;
 };
 struct mrowMTV_data{
-    const mymtx::RealVector *vec;
-    mymtx::RealVector *result;
+    const mymtx::vector *vec;
+    mymtx::vector *result;
     const mymtx::MatrixTraspose *mtx;
     const size_t row;
 };
@@ -62,19 +62,19 @@ void mult_mtxt_vec_Row(mrowMTV_data d){
 namespace mymtx{
 
 
-RealMatrix::RealMatrix(size_t shape_y,size_t shape_x):shape_x(shape_x),shape_y(shape_y){
+matrix::matrix(size_t shape_y,size_t shape_x):shape_x(shape_x),shape_y(shape_y){
     this->data = new double[this->shape_x * this->shape_y];
     memset(this->data,0,this->shape_x * this->shape_y * sizeof(double));
 }
-RealMatrix::RealMatrix(const RealMatrix &other):shape_x(other.shape_x),shape_y(other.shape_y){
+matrix::matrix(const matrix &other):shape_x(other.shape_x),shape_y(other.shape_y){
     this->data = new double[this->shape_x * this->shape_y];
     memcpy(this->data,other.data,this->shape_x*this->shape_y*sizeof(double));
 }
-RealMatrix::RealMatrix(RealMatrix &&other):shape_x(other.shape_x),shape_y(other.shape_y){
+matrix::matrix(matrix &&other):shape_x(other.shape_x),shape_y(other.shape_y){
     this->data = other.data;
     other.data = nullptr;
 }
-RealMatrix::RealMatrix(std::initializer_list<std::initializer_list<double>> initial):
+matrix::matrix(std::initializer_list<std::initializer_list<double>> initial):
     shape_y(initial.size()),shape_x((initial.begin())->size()){
     this->data = new double[this->shape_x * this->shape_y];
     size_t i{0},j{0};
@@ -83,24 +83,24 @@ RealMatrix::RealMatrix(std::initializer_list<std::initializer_list<double>> init
             (*this)[i][j] = *ij;
     }
 }
-RealMatrix::~RealMatrix(){
+matrix::~matrix(){
     if(data!=nullptr)
         delete[] data;
 }
-RealMatrix RealMatrix::traspose(const RealMatrix &m){
-    RealMatrix traposed( m.shape_x, m.shape_y );
+matrix matrix::traspose(const matrix &m){
+    matrix traposed( m.shape_x, m.shape_y );
     for( size_t i = 0; i < m.shape_y; ++i )
         for( size_t j = 0; j < m.shape_x; ++j )
             traposed[j][i] = m[i][j];
     return traposed;
 }
-RealMatrix RealMatrix::identity(const size_t n){
-    RealMatrix identity(n,n);
+matrix matrix::identity(const size_t n){
+    matrix identity(n,n);
     for( size_t i = 0; i < n; ++i )identity[i][i]=1;
     return identity;
 }
-RealMatrix RealMatrix::tridiag(const size_t n, double (*low)(const int i), double (*dig)(const int i), double (*up)(const int i)){
-    RealMatrix trid(n,n);
+matrix matrix::tridiag(const size_t n, double (*low)(const int i), double (*dig)(const int i), double (*up)(const int i)){
+    matrix trid(n,n);
     for( size_t i = 0; i < n; ++i ){
         if(i>0)trid[i][i-1] = low(i);
         trid[i][i] = dig(i);
@@ -108,8 +108,8 @@ RealMatrix RealMatrix::tridiag(const size_t n, double (*low)(const int i), doubl
     }
     return trid;
 }
-RealMatrix RealMatrix::tridiag(const size_t n, const double low,const double dig, const double up){
-    RealMatrix trid(n,n);
+matrix matrix::tridiag(const size_t n, const double low,const double dig, const double up){
+    matrix trid(n,n);
     for( size_t i = 0; i < n; ++i ){
         if(i>0)trid[i][i-1] = low;
         trid[i][i] = dig;
@@ -117,29 +117,40 @@ RealMatrix RealMatrix::tridiag(const size_t n, const double low,const double dig
     }
     return trid;
 }
-RealVector RealMatrix::operator[](const size_t &row){ return RealVector(data + row * shape_x, shape_x); }
-double &RealMatrix::operator()(const size_t row, const size_t col){ return this->data[row*shape_x+col]; }
-const double &RealMatrix::operator()(const size_t row, const size_t col) const { return this->data[row*shape_x+col]; }
-const RealVector RealMatrix::operator[](const size_t &row) const { return RealVector(data + row * shape_x, shape_x); }
-vector_iterator RealMatrix::begin(const size_t row){
+matrix matrix::pendiag(const size_t n, const double coef[5]){
+    matrix trid(n,n);
+    for( size_t i = 0; i < n; ++i ){
+        if(i>1)trid(i,i-2) = coef[0];
+        if(i>0)trid(i,i-1) = coef[1];
+        trid(i,i) = coef[2];
+        if(i+1<=n-1)trid(i,i+1) = coef[3];
+        if(i+2<=n-1)trid(i,i+2) = coef[4];
+    }
+    return trid;
+}
+vector matrix::operator[](const size_t &row){ return vector(data + row * shape_x, shape_x); }
+double &matrix::operator()(const size_t row, const size_t col){ return this->data[row*shape_x+col]; }
+const double &matrix::operator()(const size_t row, const size_t col) const { return this->data[row*shape_x+col]; }
+const vector matrix::operator[](const size_t &row) const { return vector(data + row * shape_x, shape_x); }
+vector_iterator matrix::begin(const size_t row){
     return vector_iterator(data + row * shape_x, row, 0);
 }
-vector_iterator RealMatrix::end(const size_t row){
+vector_iterator matrix::end(const size_t row){
     return vector_iterator(data + row * shape_x, row, shape_x);
 }
-const_vector_iterator RealMatrix::begin(const size_t row) const{
+const_vector_iterator matrix::begin(const size_t row) const{
     return const_vector_iterator(data + row * shape_x, row, 0);
 }
-const_vector_iterator RealMatrix::end(const size_t row) const{
+const_vector_iterator matrix::end(const size_t row) const{
     return const_vector_iterator(data + row * shape_x, row, shape_x);
 }
-RealVector &RealMatrix::operator*=(RealVector &vec) const{
+vector &matrix::operator*=(vector &vec) const{
     auto cpy = (*this)*vec;
     vec = cpy;
     return vec;
 }
-RealVector RealMatrix::operator*(const RealVector &vec) const{
-    RealVector result(vec.size);
+vector matrix::operator*(const vector &vec) const{
+    vector result(vec.size);
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
     #endif
@@ -157,8 +168,8 @@ RealVector RealMatrix::operator*(const RealVector &vec) const{
     }
     return result;
 }
-RealVector RealMatrix::operator*(const RealMatrix::Column &vec) const{
-    RealVector result(vec.size);
+vector matrix::operator*(const matrix::Column &vec) const{
+    vector result(vec.size);
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
     #endif
@@ -176,8 +187,8 @@ RealVector RealMatrix::operator*(const RealMatrix::Column &vec) const{
     }
     return result;
 }
-RealVector MatrixTraspose::operator*(const RealVector &vec) const{
-    RealVector result(vec.size);
+vector MatrixTraspose::operator*(const vector &vec) const{
+    vector result(vec.size);
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
     #endif
@@ -195,12 +206,12 @@ RealVector MatrixTraspose::operator*(const RealVector &vec) const{
     }
     return result;
 }
-RealMatrix &RealMatrix::operator*=(const RealMatrix &other){
+matrix &matrix::operator*=(const matrix &other){
     auto cpy = (*this)*other;
     (*this) = cpy;
     return *this;
 }
-RealMatrix &RealMatrix::operator*=(const double coef){
+matrix &matrix::operator*=(const double coef){
     for (size_t i = 0; i < this->shape_y; i++){
         (*this)[i]*=coef;
     }
@@ -213,8 +224,8 @@ RealMatrix &RealMatrix::operator*=(const double coef){
 //     }
 //     return *this;
 // }
-RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
-    auto cpy = RealMatrix(this->shape_y,other.shape_x);
+matrix matrix::operator*(const matrix &other) const{
+    auto cpy = matrix(this->shape_y,other.shape_x);
     std::vector<std::future<void>> futures;
     for(size_t i = 0; i < this->shape_y; ++i){
         #ifndef NO_ASYNC
@@ -233,8 +244,8 @@ RealMatrix RealMatrix::operator*(const RealMatrix &other) const{
     }
     return cpy;
 }
-RealMatrix RealMatrix::prod_as_band(const RealMatrix &other, const size_t height, const size_t width){
-    auto cpy = RealMatrix(this->shape_y,other.shape_x);
+matrix matrix::prod_as_band(const matrix &other, const size_t height, const size_t width){
+    auto cpy = matrix(this->shape_y,other.shape_x);
     size_t begin,end;
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
@@ -259,11 +270,11 @@ RealMatrix RealMatrix::prod_as_band(const RealMatrix &other, const size_t height
     }
     return cpy;
 }
-RealMatrix &RealMatrix::operator=(const RealMatrix &other){
+matrix &matrix::operator=(const matrix &other){
     memcpy(this->data, other.data, this->shape_x * this->shape_y *sizeof(double));
     return *this;
 }
-RealMatrix &RealMatrix::operator-=(const RealMatrix &other){
+matrix &matrix::operator-=(const matrix &other){
     for(int i = 0; i < this->shape_y; i++){
         for(int j = 0; j < this->shape_x; j++){
             (*this)[i][j] -= other[i][j];
@@ -271,12 +282,12 @@ RealMatrix &RealMatrix::operator-=(const RealMatrix &other){
     }
     return *this;
 }
-RealMatrix RealMatrix::operator-(const RealMatrix &other) const{
+matrix matrix::operator-(const matrix &other) const{
     auto cpy = *this;
     cpy-=other;
     return cpy;
 }
-RealMatrix &RealMatrix::prod_as_band(const double coef, const size_t height, const size_t width){
+matrix &matrix::prod_as_band(const double coef, const size_t height, const size_t width){
     size_t begin,end;
     for (size_t i = 0; i < this->shape_y; i++){
         begin = i - height;
@@ -289,8 +300,8 @@ RealMatrix &RealMatrix::prod_as_band(const double coef, const size_t height, con
     }
     return *this;
 }
-RealVector RealMatrix::prod_as_band(RealVector &vec , const size_t height, const size_t width) const{
-    RealVector result(vec.size);
+vector matrix::prod_as_band(vector &vec , const size_t height, const size_t width) const{
+    vector result(vec.size);
     size_t begin,end;
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
@@ -314,46 +325,46 @@ RealVector RealMatrix::prod_as_band(RealVector &vec , const size_t height, const
     }
     return result;
 }
-void RealMatrix::fwrite( const char* filename, const RealMatrix& matrix){
+void matrix::fwrite( const char* filename, const matrix& matrix){
     std::ofstream f(filename, std::ofstream::out | std::ofstream::binary);
     f.write( (char*)(&(matrix.shape_y)), sizeof(size_t) );
     f.write( (char*)(&(matrix.shape_x)), sizeof(size_t) );
     f.write( (char*)(matrix.data), sizeof(double)*matrix.shape_y*matrix.shape_x );
     f.close();
 }
-void RealVector::fwrite( const char* filename, const RealVector& vector){
+void vector::fwrite( const char* filename, const vector& vector){
     std::ofstream f(filename, std::ofstream::out | std::ofstream::binary);
     f.write( (char*)(&(vector.size)), sizeof(size_t) );
     f.write( (char*)(vector.data), sizeof(double)*vector.size );
     f.close();
 }
-RealMatrix RealMatrix::fread( const char* filename){
+matrix matrix::fread( const char* filename){
     size_t shape_x, shape_y;
     std::ifstream f(filename, std::ifstream::in | std::ifstream::binary);
     f.read( (char*)(&(shape_y)), sizeof(size_t) );
     f.read( (char*)(&(shape_x)), sizeof(size_t) );
-    RealMatrix matrix(shape_y, shape_x);
+    matrix matrix(shape_y, shape_x);
     f.read( (char*)(matrix.data), sizeof(double)*shape_y*shape_y );
     f.close();
     return matrix;
 }
-RealVector RealVector::fread( const char* filename){
+vector vector::fread( const char* filename){
     size_t size;
     std::ifstream f(filename, std::ifstream::in | std::ifstream::binary);
     f.read( (char*)(&(size)), sizeof(size_t) );
-    RealVector vector(size);
+    vector vector(size);
     f.read( (char*)(vector.data), sizeof(double)*size );
     f.close();
     return vector;
 }
-void abs(RealMatrix &A){
+void abs(matrix &A){
     for(size_t k=0; k<A.shape_y; ++k){
         for(auto i = A[k].begin(); i<A[k].end(); ++i){
             *i = std::abs(*i);
         }
     }
 }
-void abs(RealVector &V){
+void abs(vector &V){
     for(auto i = V.begin(); i<V.end(); ++i){
         *i = std::abs(*i);
     }
@@ -362,25 +373,25 @@ void abs(RealVector &V){
 const double &MatrixTraspose::operator()(size_t row, size_t col) const{
     return t[col][row];
 }
-MatrixTraspose::MatrixTraspose(const RealMatrix &m):t(m),shape_y(m.shape_x),shape_x(m.shape_y)  { }
+MatrixTraspose::MatrixTraspose(const matrix &m):t(m),shape_y(m.shape_x),shape_x(m.shape_y)  { }
 MatrixTraspose::MatrixTraspose(const MatrixTraspose &other):t(other.t),shape_y(other.shape_y),shape_x(other.shape_x) { }
-RealMatrix::Column RealMatrix::column(const size_t col){
-    return RealMatrix::Column(data+col, shape_y, shape_x);
+matrix::Column matrix::column(const size_t col){
+    return matrix::Column(data+col, shape_y, shape_x);
 }
-const RealMatrix::Column RealMatrix::column(const size_t col) const{
-    return RealMatrix::Column(data+col, shape_y, shape_x);
+const matrix::Column matrix::column(const size_t col) const{
+    return matrix::Column(data+col, shape_y, shape_x);
 }
 }
-mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const double c){
-    mymtx::RealMatrix cpy = mtx;
+mymtx::matrix operator*(const mymtx::matrix &mtx, const double c){
+    mymtx::matrix cpy = mtx;
     cpy*=c;
     return cpy;
 }
-mymtx::RealMatrix operator*(const double c, const mymtx::RealMatrix &mtx){
+mymtx::matrix operator*(const double c, const mymtx::matrix &mtx){
     return mtx*c;
 }
-mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const mymtx::MatrixTraspose &mtxt){
-    mymtx::RealMatrix res(mtx.shape_y,mtxt.shape_x);
+mymtx::matrix operator*(const mymtx::matrix &mtx, const mymtx::MatrixTraspose &mtxt){
+    mymtx::matrix res(mtx.shape_y,mtxt.shape_x);
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
     #endif
@@ -400,8 +411,8 @@ mymtx::RealMatrix operator*(const mymtx::RealMatrix &mtx, const mymtx::MatrixTra
     }
     return res;
 }
-mymtx::RealMatrix operator*(const mymtx::MatrixTraspose &mtxt, const mymtx::RealMatrix &mtx){
-    mymtx::RealMatrix res(mtxt.shape_y,mtx.shape_x);
+mymtx::matrix operator*(const mymtx::MatrixTraspose &mtxt, const mymtx::matrix &mtx){
+    mymtx::matrix res(mtxt.shape_y,mtx.shape_x);
     #ifndef NO_ASYNC
     std::vector<std::future<void>> futures;
     #endif
@@ -421,5 +432,5 @@ mymtx::RealMatrix operator*(const mymtx::MatrixTraspose &mtxt, const mymtx::Real
     }
     return res;
 }
-#include "real_vector.cpp"
-#include "real_vector_iterator.cpp"
+#include "vector.cpp"
+#include "vector_iterator.cpp"

@@ -7,21 +7,17 @@ PolyFunction interpolate_line(const mymtx::RealVector &X, const mymtx::RealVecto
 PolyFunction interpolate_poly(const mymtx::RealVector &X, const mymtx::RealVector &Y, unsigned int grade){
     mymtx::RealVector ab(grade+1);
     mymtx::RealVector yx(grade+1);
-    mymtx::RealVector YX(Y.size);
-    mymtx::RealVector Xpow(Y.size);
     mymtx::RealMatrix A(grade+1,grade+1);
     double xpow;
 
     for (size_t i = 0; i <= grade; i++){
-        for(size_t j = 0; j < X.size; j++) YX[j] = Y[j]*pow(X[j], i);
-        yx[i] = mymtx::reduce(YX, [](double acc, double cur){return acc+cur;},0);
-        
+        for(size_t j = 0; j < X.size; j++) 
+            yx[i] += Y[j]*pow(X[j], i);        
     }
     for (size_t i = 0; i <= grade*2; i++){
-        for (size_t j = 0; j < Xpow.size; j++){
-            Xpow[j] = std::pow(X[j],i);
+        for (size_t j = 0; j < X.size; j++){
+            xpow += std::pow(X[j],i);
         }
-        xpow = mymtx::reduce(Xpow, [](double acc, double cur){return acc+cur;},0);
         size_t current = i, qty = current + 1;
         size_t start = 0;
         if( current >= A.shape_x ){

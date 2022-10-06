@@ -1,6 +1,7 @@
 #include "funcion_matriz.hpp"
+#include "matrix.hpp"
 
-void crout(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+void crout(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx){
     const size_t size = A_mtx.shape_y;
     auto calcular_factor_inferior = [&](const int &i, const int &j){
         L_mtx(i,j) = A_mtx(i,j);
@@ -22,7 +23,7 @@ void crout(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
         if(L_mtx(i,i) == 0) throw cant_factor_exception();
     }
 }
-void doolittle(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+void doolittle(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx){
     const size_t size = A_mtx.shape_y;
     auto calcular_factor_superior = [&](const int &i, const int &j){
         U_mtx(i,j) = A_mtx(i,j);
@@ -44,7 +45,7 @@ void doolittle(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
         if(L_mtx(j,j) == 0) throw cant_factor_exception();
     }
 }
-void LDU_factor(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &D_mtx, RealMatrix &U_mtx){
+void LDU_factor(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &D_mtx, mymtx::matrix &U_mtx){
     const size_t size = A_mtx.shape_y;
     auto calcular_factor_inferior = [&](const int &i, const int &j){
         L_mtx(i,j) = A_mtx(i,j);
@@ -75,7 +76,7 @@ void LDU_factor(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &D_mtx, RealMat
 const char* cant_factor_exception::what() const throw(){
     return "zero found in diagonal";
 }
-void crout_as_band(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx,
+void crout_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx,
         int height, int width){
     const size_t size = A_mtx.shape_y;
     auto calcular_factor_inferior = [&](const int &i, const int &j, unsigned int begin_row, unsigned int begin_col){
@@ -102,7 +103,7 @@ void crout_as_band(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx,
         calcular_factor_inferior(i,i,begin_row,begin_col);
     }
 }
-void doolittle_as_band(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx,
+void doolittle_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx,
         int height, int width){
     const size_t size = A_mtx.shape_y;
     auto calcular_factor_superior = [&](const int &i, const int &j,int begin_row, int begin_col){
@@ -129,7 +130,7 @@ void doolittle_as_band(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx,
         calcular_factor_superior(j,j,begin_row,begin_col);
     }
 }
-void crout_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+void crout_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx){
     L_mtx(0,0) = A_mtx(0,0);
     if(L_mtx(0,0) == 0) throw cant_factor_exception();
     for (size_t i = 1; i < A_mtx.shape_y; i++){
@@ -139,7 +140,7 @@ void crout_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
         if(L_mtx(i-1,i-1) == 0) throw cant_factor_exception();
     }
 }
-void doolittle_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_mtx){
+void doolittle_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx){
     U_mtx(0,0) = A_mtx(0,0);
     if(U_mtx(0,0) == 0) throw cant_factor_exception();
     for (size_t i = 1; i < A_mtx.shape_y; i++){
@@ -149,7 +150,7 @@ void doolittle_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &U_m
         if(U_mtx(i-1,i-1) == 0) throw cant_factor_exception();
     }
 }
-void LDU_factor_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &D_mtx, RealMatrix &U_mtx){
+void LDU_factor_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &D_mtx, mymtx::matrix &U_mtx){
     D_mtx(0,0) = A_mtx(0,0);
     for (size_t i = 1; i < A_mtx.shape_y; i++){
         U_mtx[i-1][i] = A_mtx[i-1][i] / D_mtx(i,i);
@@ -159,7 +160,7 @@ void LDU_factor_tridiagonal(RealMatrix &A_mtx, RealMatrix &L_mtx, RealMatrix &D_
     }
 }
 
-void factor_cholesky(const mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
+void factor_cholesky(const mymtx::matrix &matix, mymtx::matrix &triangular){
     auto reduce_triangular = [&](const size_t i, const size_t j){
         double &current = triangular(i,j) = matix(i,j);
         auto l_ik =triangular[i].begin();
@@ -185,7 +186,7 @@ void factor_cholesky(const mymtx::RealMatrix &matix, mymtx::RealMatrix &triangul
         reduce_diagonal(i);
     }
 }
-void factor_cholesky_as_band(const mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular, 
+void factor_cholesky_as_band(const mymtx::matrix &matix, mymtx::matrix &triangular, 
         int height){
     auto reduce_triangular = [&](const size_t i, const size_t j,int begin_col){
         double &current = triangular(i,j) = matix(i,j);
@@ -214,7 +215,7 @@ void factor_cholesky_as_band(const mymtx::RealMatrix &matix, mymtx::RealMatrix &
         reduce_diagonal(i,begin_col);
     }
 }
-void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
+void factor_cholesky_tridiag(mymtx::matrix &matix, mymtx::matrix &triangular){
     triangular(0,0) = std::sqrt(matix(0,0));
     for(int i=1; i<matix.shape_y; i++){
         triangular[i][i-1] = matix[i][i-1]/triangular(i-1,i-1);
@@ -224,12 +225,12 @@ void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triang
         red = std::sqrt(red);
     }
 }
-void qr_decomposition(const mymtx::RealMatrix& A, mymtx::RealMatrix&Q, mymtx::RealMatrix&R){
-    mymtx::RealVector col0 = A.column(0).as_vector();
+void qr_decomposition(const mymtx::matrix& A, mymtx::matrix&Q, mymtx::matrix&R){
+    mymtx::vector col0 = A.column(0).as_vector();
     R(0,0)=normalize(col0);
     Q.column(0) = col0;
-    RealMatrix E(A.shape_y,A.shape_x);
-    RealVector u(A.shape_y);
+    mymtx::matrix E(A.shape_y,A.shape_x);
+    mymtx::vector u(A.shape_y);
     for (size_t j = 1; j < A.shape_x; j++){
         u = 0;
         //calc R_ij

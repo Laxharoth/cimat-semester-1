@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdio>
 
-void factor_cholesky(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
+void factor_cholesky(mymtx::matrix &matix, mymtx::matrix &triangular){
     auto reduce_triangular = [&](const size_t i, const size_t j){
         double &current = triangular[i][j] = matix[i][j];
         auto l_ik =triangular[i].begin();
@@ -29,7 +29,7 @@ void factor_cholesky(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
         reduce_diagonal(i);
     }
 }
-void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triangular){
+void factor_cholesky_tridiag(mymtx::matrix &matix, mymtx::matrix &triangular){
     triangular[0][0] = std::sqrt(matix[0][0]);
     for(int i=1; i<matix.shape_y; i++){
         triangular[i][i-1] = matix[i][i-1]/triangular[i-1][i-1];
@@ -41,12 +41,12 @@ void factor_cholesky_tridiag(mymtx::RealMatrix &matix, mymtx::RealMatrix &triang
 }
 #define ITER 1000
 #define TOLER 1E-10
-void solve_jacobi(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx::RealVector &solutions, double *error){
+void solve_jacobi(mymtx::matrix &matix, mymtx::vector &variables, mymtx::vector &solutions, double *error){
     double sum, numerator, denominator,toler;
     const size_t n = solutions.size;
     size_t i,j;
-    mymtx::RealVector vv(n);
-    mymtx::RealVector &vn=variables;
+    mymtx::vector vv(n);
+    mymtx::vector &vn=variables;
     for( size_t i = 0; i < n; ++i ){
         vv[i] = solutions[i] / matix[i][i];
     }
@@ -68,12 +68,12 @@ for(  unsigned int iter = 0; iter < ITER; ++iter){
     }
 }
 }
-void solve_gauss_seidel(mymtx::RealMatrix &matix, mymtx::RealVector &variables, mymtx::RealVector &solutions, double *error){
+void solve_gauss_seidel(mymtx::matrix &matix, mymtx::vector &variables, mymtx::vector &solutions, double *error){
     double sum, numerator, denominator,toler;
     const size_t n = solutions.size;
     size_t i,j;
-    mymtx::RealVector vv(n);
-    mymtx::RealVector &vn=variables;
+    mymtx::vector vv(n);
+    mymtx::vector &vn=variables;
     for( size_t i = 0; i < n; ++i ){
         vv[i] = vn[i] = solutions[i] / matix[i][i];
     }
@@ -96,8 +96,8 @@ for(  unsigned int iter = 0; iter < ITER; ++iter){
 }
 }
 
-void solve_cholesky(mymtx::RealMatrix &cholesky_factored,mymtx::RealVector &variables, mymtx::RealVector &solutions){
-    mymtx::RealVector tmp(solutions.size);
+void solve_cholesky(mymtx::matrix &cholesky_factored,mymtx::vector &variables, mymtx::vector &solutions){
+    mymtx::vector tmp(solutions.size);
     solucion_triangular_inf(cholesky_factored,tmp,solutions);
     solucion_triangular_sup(cholesky_factored,variables,tmp);
 }

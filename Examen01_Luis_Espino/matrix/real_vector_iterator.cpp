@@ -1,4 +1,4 @@
-#include "real_matrix.hpp"
+#include "matrix.hpp"
 namespace mymtx{
 vector_iterator::vector_iterator(double *data, const size_t row, const size_t col):data(data),row(row),col(col){}
 vector_iterator::vector_iterator(const vector_iterator &other):data(other.data),row(other.row),col(other.col){}

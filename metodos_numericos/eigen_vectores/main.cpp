@@ -1,5 +1,5 @@
-#include "matrix_like/real_matrix.hpp"
-#include "funcion_matriz.hpp"
+#include "matrix_like/matrix.hpp"
+#include "matrix_like/funcion_matriz.hpp"
 #include "macros.hpp"
 
 #define PI 3.141592653589793
@@ -9,10 +9,10 @@ auto phi_i_j= [](const int i, const int j){ return std::sin(i*j*h*PI); };
 
 int main(int argc, char const *argv[])
 {
-    auto mtx = mymtx::RealMatrix::tridiag(1000,1,-2,1);
-    auto V0rig = mymtx::RealVector::normal(1000);
+    auto mtx = mymtx::matrix::tridiag(1000,1,-2,1);
+    auto V0rig = mymtx::vector::normal(1000);
     auto V0 = V0rig;
-    mymtx::RealVector V1(1000);
+    mymtx::vector V1(1000);
     double val = 0.0;
     ANNOUNCE_TEST("1 valor");
     strm_out("power iteration")
@@ -21,7 +21,7 @@ int main(int argc, char const *argv[])
     );
 
     auto biggest_l = 3.9546266935713628;
-    mymtx::RealVector biggest_v(1000);
+    mymtx::vector biggest_v(1000);
     for (auto i = biggest_v.begin(); i != biggest_v.end(); ++i) *i = phi_i_j(1,i.get_col());
     normalize(biggest_v);
     normalize(V1);
@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
     );
 
     auto smallest = 0.1742732695496015;
-    mymtx::RealVector smallest_v(1);
+    mymtx::vector smallest_v(1);
 
     strm_out("error smallest eigen");
     strm_out("value");

@@ -1,7 +1,5 @@
-#include "matrix_like/matrix_like.tcc"
-#include "matrix_like/real_matrix.hpp"
-#include "funcion_matriz.hpp"
-#include "factorizacion.hpp"
+#include "matrix_like/matrix.hpp"
+#include "matrix_like/funcion_matriz.hpp"
 #include "macros.hpp"
 
 #include <fstream>
@@ -14,7 +12,7 @@ int main(int argc, char **argv){
     size_t cols;
     f_matriz >> rows;
     f_matriz >> cols;
-    RealMatrix matriz(rows, cols);
+    mymtx::matrix matriz(rows, cols);
     for(size_t i = 0; i < rows; ++i){
         for(size_t j = 0; j < cols; ++j){
             f_matriz >> matriz[i][j];
@@ -27,12 +25,12 @@ int main(int argc, char **argv){
     f_matriz >> rows;
     f_matriz >> cols;
 
-    mymtx::RealVector vec(rows);
+    mymtx::vector vec(rows);
     for(size_t i = 0; i < rows; ++i){
         f_matriz >> vec[i];
     }
     f_vector.close();
-    mymtx::RealVector variables(vec.size);
+    mymtx::vector variables(vec.size);
     {
         auto cpy = matriz;
         ANNOUNCE_TEST("Metodo: Gauss")
