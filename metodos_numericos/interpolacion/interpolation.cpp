@@ -1,13 +1,11 @@
 #include "interpolation.hpp"
-#include "funcion_matriz.hpp"
-#include "matrix_like/real_matrix.hpp"
-PolyFunction interpolate_line(const mymtx::RealVector &X, const mymtx::RealVector &Y){
+PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y){
     return interpolate_poly(X,Y,1);
 }
-PolyFunction interpolate_poly(const mymtx::RealVector &X, const mymtx::RealVector &Y, unsigned int grade){
-    mymtx::RealVector ab(grade+1);
-    mymtx::RealVector yx(grade+1);
-    mymtx::RealMatrix A(grade+1,grade+1);
+PolyFunction interpolate_poly(const mymtx::vector &X, const mymtx::vector &Y, unsigned int grade){
+    mymtx::vector ab(grade+1);
+    mymtx::vector yx(grade+1);
+    mymtx::matrix A(grade+1,grade+1);
     double xpow;
 
     for (size_t i = 0; i <= grade; i++){
@@ -33,10 +31,10 @@ PolyFunction interpolate_poly(const mymtx::RealVector &X, const mymtx::RealVecto
     solucion_crout(A, ab,yx);
     return PolyFunction(ab);
 }
-MultiFunctionWrapper interpolate_funcs(const mymtx::RealVector &X, const mymtx::RealVector &Y, std::vector<FunctionWrapper *>fns){
-    mymtx::RealVector cs(fns.size());
-    mymtx::RealVector ys(cs.size);
-    mymtx::RealMatrix A(cs.size, cs.size);
+MultiFunctionWrapper interpolate_funcs(const mymtx::vector &X, const mymtx::vector &Y, std::vector<FunctionWrapper *>fns){
+    mymtx::vector cs(fns.size());
+    mymtx::vector ys(cs.size);
+    mymtx::matrix A(cs.size, cs.size);
     for (size_t i = 0; i < fns.size(); i++){
         for (size_t j = 0; j < X.size; j++){
             A(i,0) += fns[i]->eval(X[j]) * fns[0]->eval(X[j]);
@@ -52,25 +50,25 @@ MultiFunctionWrapper interpolate_funcs(const mymtx::RealVector &X, const mymtx::
     solucion_crout(A, cs,ys);
     return MultiFunctionWrapper(fns,cs);
 }
-PolyFunction interpolate_poly_2(const mymtx::RealVector &X, const mymtx::RealVector &Y){
-    mymtx::RealMatrix A(X.size,X.size);
-    mymtx::RealVector ys=Y;
-    mymtx::RealVector as=Y;
+PolyFunction interpolate_poly_2(const mymtx::vector &X, const mymtx::vector &Y){
+    mymtx::matrix A(X.size,X.size);
+    mymtx::vector ys=Y;
+    mymtx::vector as=Y;
     for (size_t i = 0; i < X.size; i++){
         for (size_t j = 0; j < X.size; j++){
             A(i,j) = std::pow(X[i],j);
         }
     }
-    RealMatrix Q(A.shape_y,A.shape_x);
-    RealMatrix R = Q;
+    mymtx::matrix Q(A.shape_y,A.shape_x);
+    mymtx::matrix R = Q;
     qr_decomposition(A,Q,R);
     solve_qr(Q,R, as,ys);
     return PolyFunction(as);
 }
-LagramFunction interpolate_lagram(const mymtx::RealVector &X, const mymtx::RealVector &Y){
+LagramFunction interpolate_lagram(const mymtx::vector &X, const mymtx::vector &Y){
     return LagramFunction(X,Y);
 }
-NewtonPolyFunction interpolate_newton(const mymtx::RealVector &X, const mymtx::RealVector &Y){
+NewtonPolyFunction interpolate_newton(const mymtx::vector &X, const mymtx::vector &Y){
     return NewtonPolyFunction(X,Y);
 }
 double PolyFunction::eval(const double &x) {
@@ -83,7 +81,7 @@ double PolyFunction::eval(const double &x) const{
     
     return sum;
 }
-PolyFunction::PolyFunction(const mymtx::RealVector &v):A(mymtx::RealVector(v)){}
+PolyFunction::PolyFunction(const mymtx::vector &v):A(mymtx::vector(v)){}
 double MultiFunctionWrapper::eval(const double &x){
     return const_cast<MultiFunctionWrapper *>(this)->eval(x);
 }
@@ -95,8 +93,8 @@ double MultiFunctionWrapper::eval(const double &x) const{
     }
     return sum;
 }
-MultiFunctionWrapper::MultiFunctionWrapper(std::vector<FunctionWrapper *> fns, mymtx::RealVector coef):fns(fns),coef(coef){}
-LagramFunction::LagramFunction(const mymtx::RealVector &X, const mymtx::RealVector &Y):X(mymtx::RealVector(X)),Y(mymtx::RealVector(Y)){}
+MultiFunctionWrapper::MultiFunctionWrapper(std::vector<FunctionWrapper *> fns, mymtx::vector coef):fns(fns),coef(coef){}
+LagramFunction::LagramFunction(const mymtx::vector &X, const mymtx::vector &Y):X(mymtx::vector(X)),Y(mymtx::vector(Y)){}
 double LagramFunction::eval(const double &x){
     return const_cast<LagramFunction *>(this)->eval(x);
 }
@@ -127,29 +125,29 @@ double NewtonPolyFunction::NewtonPolyFunction::eval(const double &x) const{
     }
     return sum;
 }
-double divided_difference(mymtx::RealMatrix &computed,const mymtx::RealVector &X,const mymtx::RealVector &Y, unsigned int from, unsigned int to){
+double divided_difference(mymtx::matrix &computed,const mymtx::vector &X,const mymtx::vector &Y, unsigned int from, unsigned int to){
     if(from == to) computed(from,to) = Y[from];
     if(!computed(from,to) && from != to){ 
         computed(from,to) = (divided_difference(computed,X,Y,from + 1, to) - divided_difference(computed,X,Y,from,to-1)) / (X[to] - X[from]);
     }
     return computed(from,to);
 };
-NewtonPolyFunction::NewtonPolyFunction(const mymtx::RealVector &X, const mymtx::RealVector &Y):X(mymtx::RealVector(X)),Y(mymtx::RealVector(Y)),as(mymtx::RealVector(X.size)){
-    mymtx::RealMatrix computed(X.size,X.size);
+NewtonPolyFunction::NewtonPolyFunction(const mymtx::vector &X, const mymtx::vector &Y):X(mymtx::vector(X)),Y(mymtx::vector(Y)),as(mymtx::vector(X.size)){
+    mymtx::matrix computed(X.size,X.size);
     divided_difference(computed,X,Y,0,X.size-1);
     as = computed[0];
 }
 
 namespace mymtx{
-    RealVector map(const RealVector &v, FunctionWrapper *fn){
-        RealVector v_new(v.size);
+    vector map(const vector &v, FunctionWrapper *fn){
+        vector v_new(v.size);
         auto i = v.begin();
         for(auto j =v_new.begin(); j !=v_new.end();++i,++j)
             *j = fn->eval(*i);
         return v_new;
     }
-    RealVector map(const RealVector &v, const FunctionWrapper &fn){
-        RealVector v_new(v.size);
+    vector map(const vector &v, const FunctionWrapper &fn){
+        vector v_new(v.size);
         auto i = v.begin();
         for(auto j =v_new.begin(); j !=v_new.end();++i,++j)
             *j = fn.eval(*i);
