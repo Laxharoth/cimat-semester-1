@@ -1,8 +1,8 @@
-#include "funcion_matriz.hpp"
 #include "function_wrapper/function_wrapper.hpp"
 #include "interpolation.hpp"
+#include "matrix_like/funcion_matriz.hpp"
+#include "matrix_like/matrix.hpp"
 #include "matrix_like/print.cpp"
-#include "matrix_like/real_matrix.hpp"
 
 #include <cmath>
 
@@ -53,32 +53,28 @@ class func_2 : public FunctionWrapper {
 
 int main(int argc, const char **argv) {
   /* Sample 5*/ {
-    mymtx::RealVector X_sample(5);
+    mymtx::vector X_sample(5);
     randomize(X_sample);
     normalize(X_sample);
-    mymtx::RealVector Y_sample = mymtx::map(X_sample, func_1());
-    mymtx::RealVector::fwrite("vec_out/" FN1 "xs_point" SIZE_5 ".vec",
-                              X_sample);
-    mymtx::RealVector::fwrite("vec_out/" FN1 "ys_point" SIZE_5 ".vec",
-                              Y_sample);
+    mymtx::vector Y_sample = mymtx::map(X_sample, func_1());
+    mymtx::vector::fwrite("vec_out/" FN1 "xs_point" SIZE_5 ".vec", X_sample);
+    mymtx::vector::fwrite("vec_out/" FN1 "ys_point" SIZE_5 ".vec", Y_sample);
     /* Sample END */
     Count count(-1, 1, 1000);
-    mymtx::RealVector X_graph = mymtx::map(mymtx::RealVector(1001), &count);
-    mymtx::RealVector::fwrite("vec_out/"
-                              "xs.vec",
-                              X_graph);
+    mymtx::vector X_graph = mymtx::map(mymtx::vector(1001), &count);
+    mymtx::vector::fwrite("vec_out/"
+                          "xs.vec",
+                          X_graph);
     /* fn_1 n = 5*/ {
       {
         const FunctionWrapper &fn = interpolate_line(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "line_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "line_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly(X_sample, Y_sample, 4);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         std::vector<FunctionWrapper *> fns;
@@ -92,57 +88,51 @@ int main(int argc, const char **argv) {
         // fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
         const FunctionWrapper &fn = interpolate_funcs(X_sample, Y_sample, fns);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "fns_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "fns_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly_2(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "poli2_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "poli2_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_lagram(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "lagr_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "lagr_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_newton(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "newt_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "newt_ys" SIZE_5 ".vec", Y_graph);
       }
     }
   }
   /* Sample 100 */ {
-    mymtx::RealVector X_sample(100);
+    mymtx::vector X_sample(100);
     randomize(X_sample);
     normalize(X_sample);
-    mymtx::RealVector Y_sample = mymtx::map(X_sample, func_1());
-    mymtx::RealVector::fwrite("vec_out/" FN1 "xs_point" SIZE_100 ".vec",
-                              X_sample);
-    mymtx::RealVector::fwrite("vec_out/" FN1 "ys_point" SIZE_100 ".vec",
-                              Y_sample);
+    mymtx::vector Y_sample = mymtx::map(X_sample, func_1());
+    mymtx::vector::fwrite("vec_out/" FN1 "xs_point" SIZE_100 ".vec", X_sample);
+    mymtx::vector::fwrite("vec_out/" FN1 "ys_point" SIZE_100 ".vec", Y_sample);
     /* Sample END */
     Count count(-1, 1, 1000);
-    mymtx::RealVector X_graph = mymtx::map(mymtx::RealVector(1001), &count);
-    mymtx::RealVector::fwrite("vec_out/"
-                              "xs.vec",
-                              X_graph);
+    mymtx::vector X_graph = mymtx::map(mymtx::vector(1001), &count);
+    mymtx::vector::fwrite("vec_out/"
+                          "xs.vec",
+                          X_graph);
     /* fn_1 n = 5*/ {
       {
         const FunctionWrapper &fn = interpolate_line(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "line_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "line_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly(X_sample, Y_sample, 4);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         std::vector<FunctionWrapper *> fns;
@@ -156,57 +146,54 @@ int main(int argc, const char **argv) {
         // fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
         const FunctionWrapper &fn = interpolate_funcs(X_sample, Y_sample, fns);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "fns_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "fns_ys" SIZE_100 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly_2(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "poli2_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "poli2_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_lagram(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "lagr_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "lagr_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_newton(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "newt_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "newt_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
     }
   }
   /* Sample 1000 */ {
-    mymtx::RealVector X_sample(1000);
+    mymtx::vector X_sample(1000);
     randomize(X_sample);
     normalize(X_sample);
-    mymtx::RealVector Y_sample = mymtx::map(X_sample, func_1());
-    mymtx::RealVector::fwrite("vec_out/" FN1 "xs_point" SIZE_1000 ".vec",
-                              X_sample);
-    mymtx::RealVector::fwrite("vec_out/" FN1 "ys_point" SIZE_1000 ".vec",
-                              Y_sample);
+    mymtx::vector Y_sample = mymtx::map(X_sample, func_1());
+    mymtx::vector::fwrite("vec_out/" FN1 "xs_point" SIZE_1000 ".vec", X_sample);
+    mymtx::vector::fwrite("vec_out/" FN1 "ys_point" SIZE_1000 ".vec", Y_sample);
     /* Sample END */
     Count count(-1, 1, 1000);
-    mymtx::RealVector X_graph = mymtx::map(mymtx::RealVector(1001), &count);
-    mymtx::RealVector::fwrite("vec_out/"
-                              "xs.vec",
-                              X_graph);
+    mymtx::vector X_graph = mymtx::map(mymtx::vector(1001), &count);
+    mymtx::vector::fwrite("vec_out/"
+                          "xs.vec",
+                          X_graph);
     /* fn_1 n = 5*/ {
       {
         const FunctionWrapper &fn = interpolate_line(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "line_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "line_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly(X_sample, Y_sample, 4);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "poly1_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         std::vector<FunctionWrapper *> fns;
@@ -220,57 +207,53 @@ int main(int argc, const char **argv) {
         // fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
         const FunctionWrapper &fn = interpolate_funcs(X_sample, Y_sample, fns);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "fns_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "fns_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly_2(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "poli2_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "poli2_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_lagram(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "lagr_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "lagr_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_newton(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN1 "newt_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN1 "newt_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
     }
   }
   /* Sample 5*/ {
-    mymtx::RealVector X_sample(5);
+    mymtx::vector X_sample(5);
     randomize(X_sample);
     normalize(X_sample);
-    mymtx::RealVector Y_sample = mymtx::map(X_sample, func_2());
-    mymtx::RealVector::fwrite("vec_out/" FN2 "xs_point" SIZE_5 ".vec",
-                              X_sample);
-    mymtx::RealVector::fwrite("vec_out/" FN2 "ys_point" SIZE_5 ".vec",
-                              Y_sample);
+    mymtx::vector Y_sample = mymtx::map(X_sample, func_2());
+    mymtx::vector::fwrite("vec_out/" FN2 "xs_point" SIZE_5 ".vec", X_sample);
+    mymtx::vector::fwrite("vec_out/" FN2 "ys_point" SIZE_5 ".vec", Y_sample);
     /* Sample END */
     Count count(-1, 1, 1000);
-    mymtx::RealVector X_graph = mymtx::map(mymtx::RealVector(1001), &count);
-    mymtx::RealVector::fwrite("vec_out/"
-                              "xs.vec",
-                              X_graph);
+    mymtx::vector X_graph = mymtx::map(mymtx::vector(1001), &count);
+    mymtx::vector::fwrite("vec_out/"
+                          "xs.vec",
+                          X_graph);
     /* fn_1 n = 5*/ {
       {
         const FunctionWrapper &fn = interpolate_line(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "line_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "line_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly(X_sample, Y_sample, 4);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         std::vector<FunctionWrapper *> fns;
@@ -284,57 +267,51 @@ int main(int argc, const char **argv) {
         // fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
         const FunctionWrapper &fn = interpolate_funcs(X_sample, Y_sample, fns);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "fns_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "fns_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly_2(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "poli2_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "poli2_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_lagram(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "lagr_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "lagr_ys" SIZE_5 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_newton(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "newt_ys" SIZE_5 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "newt_ys" SIZE_5 ".vec", Y_graph);
       }
     }
   }
   /* Sample 100 */ {
-    mymtx::RealVector X_sample(100);
+    mymtx::vector X_sample(100);
     randomize(X_sample);
     normalize(X_sample);
-    mymtx::RealVector Y_sample = mymtx::map(X_sample, func_2());
-    mymtx::RealVector::fwrite("vec_out/" FN2 "xs_point" SIZE_100 ".vec",
-                              X_sample);
-    mymtx::RealVector::fwrite("vec_out/" FN2 "ys_point" SIZE_100 ".vec",
-                              Y_sample);
+    mymtx::vector Y_sample = mymtx::map(X_sample, func_2());
+    mymtx::vector::fwrite("vec_out/" FN2 "xs_point" SIZE_100 ".vec", X_sample);
+    mymtx::vector::fwrite("vec_out/" FN2 "ys_point" SIZE_100 ".vec", Y_sample);
     /* Sample END */
     Count count(-1, 1, 1000);
-    mymtx::RealVector X_graph = mymtx::map(mymtx::RealVector(1001), &count);
-    mymtx::RealVector::fwrite("vec_out/"
-                              "xs.vec",
-                              X_graph);
+    mymtx::vector X_graph = mymtx::map(mymtx::vector(1001), &count);
+    mymtx::vector::fwrite("vec_out/"
+                          "xs.vec",
+                          X_graph);
     /* fn_1 n = 5*/ {
       {
         const FunctionWrapper &fn = interpolate_line(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "line_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "line_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly(X_sample, Y_sample, 4);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         std::vector<FunctionWrapper *> fns;
@@ -348,57 +325,54 @@ int main(int argc, const char **argv) {
         // fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
         const FunctionWrapper &fn = interpolate_funcs(X_sample, Y_sample, fns);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "fns_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "fns_ys" SIZE_100 ".vec", Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly_2(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "poli2_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "poli2_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_lagram(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "lagr_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "lagr_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_newton(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "newt_ys" SIZE_100 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "newt_ys" SIZE_100 ".vec",
+                              Y_graph);
       }
     }
   }
   /* Sample 1000 */ {
-    mymtx::RealVector X_sample(1000);
+    mymtx::vector X_sample(1000);
     randomize(X_sample);
     normalize(X_sample);
-    mymtx::RealVector Y_sample = mymtx::map(X_sample, func_2());
-    mymtx::RealVector::fwrite("vec_out/" FN2 "xs_point" SIZE_1000 ".vec",
-                              X_sample);
-    mymtx::RealVector::fwrite("vec_out/" FN2 "ys_point" SIZE_1000 ".vec",
-                              Y_sample);
+    mymtx::vector Y_sample = mymtx::map(X_sample, func_2());
+    mymtx::vector::fwrite("vec_out/" FN2 "xs_point" SIZE_1000 ".vec", X_sample);
+    mymtx::vector::fwrite("vec_out/" FN2 "ys_point" SIZE_1000 ".vec", Y_sample);
     /* Sample END */
     Count count(-1, 1, 1000);
-    mymtx::RealVector X_graph = mymtx::map(mymtx::RealVector(1001), &count);
-    mymtx::RealVector::fwrite("vec_out/"
-                              "xs.vec",
-                              X_graph);
+    mymtx::vector X_graph = mymtx::map(mymtx::vector(1001), &count);
+    mymtx::vector::fwrite("vec_out/"
+                          "xs.vec",
+                          X_graph);
     /* fn_1 n = 5*/ {
       {
         const FunctionWrapper &fn = interpolate_line(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "line_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "line_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly(X_sample, Y_sample, 4);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "poly1_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         std::vector<FunctionWrapper *> fns;
@@ -412,27 +386,27 @@ int main(int argc, const char **argv) {
         // fns.push_back(&fn3);fns.push_back(&fn4);
         fns.push_back(&fn5);
         const FunctionWrapper &fn = interpolate_funcs(X_sample, Y_sample, fns);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "fns_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "fns_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_poly_2(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "poli2_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "poli2_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_lagram(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "lagr_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "lagr_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
       {
         const FunctionWrapper &fn = interpolate_newton(X_sample, Y_sample);
-        mymtx::RealVector Y_graph = mymtx::map(X_graph, fn);
-        mymtx::RealVector::fwrite("vec_out/" FN2 "newt_ys" SIZE_1000 ".vec",
-                                  Y_graph);
+        mymtx::vector Y_graph = mymtx::map(X_graph, fn);
+        mymtx::vector::fwrite("vec_out/" FN2 "newt_ys" SIZE_1000 ".vec",
+                              Y_graph);
       }
     }
   }
