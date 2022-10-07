@@ -6,17 +6,18 @@
 
 #include "point.hpp"
 
-#include <cstdlib>
 #include <array>
-#include <float.h>
-#include <exception>
 #include <cmath>
+#include <cstdlib>
+#include <exception>
+#include <float.h>
 
 /**
  * @brief Obtiene un conjunto de puntos de una funcion.
  * El numero de puntos esta definido por la macro PARTITIONS_NUM
- * Tambien obtiene el minimo y maximo valor de la funcion en el intervalo proporcionado
- * 
+ * Tambien obtiene el minimo y maximo valor de la funcion en el intervalo
+ * proporcionado
+ *
  * @param func la funcion a evaluar
  * @param left el valor minimo de "x"
  * @param right el valor maximo de "x"
@@ -24,6 +25,9 @@
  * @param max_y Devuelve el valor maximo de "y"
  * @param points Devuelve los puntos evaluados.
  */
-void analize_single_var_function( double (*func)(double x), const double left, const double right ,double &min_y, double &max_y, std::array<point, PARTITIONS_NUM+1> &points );
+void analize_single_var_function(double (*func)(double x), const double left,
+                                 const double right, double &min_y,
+                                 double &max_y,
+                                 std::array<point, PARTITIONS_NUM + 1> &points);
 
-#endif 
+#endif

@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <unistd.h>
 
 #ifndef Cores
 #define CORES 4
