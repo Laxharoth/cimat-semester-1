@@ -1,9 +1,13 @@
-object_files = real_matrix.o function_wrapper.o funcion_matriz.o factorizacion.o 
+object_files = matrix.o function_wrapper.o funcion_matriz.o
 
 main: main.run
 	./main.run
 main.run :main_interpolacion.cpp interpolation.cpp $(object_files)
 	g++ -O2 -pthread -g -o main.run main_interpolacion.cpp interpolation.cpp $(object_files)
+main2: main.run
+	./main2.run
+main2.run :main_interpolacion.cpp interpolation.cpp $(object_files)
+	g++ -O2 -pthread -g -o main2.run main_interpolacion2.cpp interpolation.cpp $(object_files)
 test: test.run
 	./test.run
 test.run :test.cpp interpolation.cpp $(object_files)
