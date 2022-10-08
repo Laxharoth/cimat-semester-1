@@ -1,9 +1,11 @@
 #include "huffman.h"
+#include "mystruct.h"
+#include "tree.h"
 #include <stdio.h>
 #include <string.h>
 
-byte_position *get_sorted_positions(unsigned int *abcedary);
-Tree *gen_tree(byte_position *positions, unsigned int *leafs);
+TreeNode **get_leaf_nodes(unsigned int *abcedary);
+Tree *gen_tree(TreeNode **positions, size_t *leafs);
 void fill_table(TreeNode *node, byte_code **current, char *code,
                 unsigned int bit);
 unsigned int search_in_table_by_value(const byte_code *table, const byte value);
@@ -11,10 +13,10 @@ unsigned int search_in_table_by_code(const byte_code *table, const char *code,
                                      unsigned int table_size);
 int compress(const byte *file_buffer, unsigned long size,
              const char *output_file) {
-  unsigned int leafs, index;
+  size_t leafs, index;
   unsigned long bit = 0, write_bytes;
   unsigned int *abcedary = handle_my_file(file_buffer, size);
-  byte_position *positions = get_sorted_positions(abcedary);
+  TreeNode **positions = get_leaf_nodes(abcedary);
   Tree *tree = gen_tree(positions, &leafs);
 
   unsigned int current_size = 100;
@@ -26,8 +28,8 @@ int compress(const byte *file_buffer, unsigned long size,
   byte_code table[leafs];
   byte_code *current = table;
   char code[leafs];
-  for (size_t i = 0; i < 0; i++) {
-    memset(table[i].code, 0, leafs + 1);
+  for (size_t i = 0; i < leafs; i++) {
+    memset(table[i].code, 0, leafs / 2 + 1);
   }
   fill_table(tree->root, &current, code, 0);
   for (size_t i = 0; i < size; i++) {
@@ -77,7 +79,7 @@ int compress(const byte *file_buffer, unsigned long size,
   }
 #ifdef PRINT_TABLE
   printf("byte,codigo,frecuencia,tamano esperado\n");
-  for (unsigned int i = 0; i < 255; i++) {
+  for (unsigned int i = 0; i < BITS_COMB; i++) {
     if (abcedary[i] == 0)
       continue;
     index = search_in_table_by_value(table, i);
@@ -89,8 +91,6 @@ int compress(const byte *file_buffer, unsigned long size,
   // cleanup
   fclose(f);
   free(output_buffer);
-  for (size_t i = 0; i < 0; i++)
-    free(table[i].code);
   delete_Tree(tree);
   free(positions);
   free(abcedary);
@@ -160,55 +160,50 @@ unsigned int *handle_my_file(const byte *buffer, unsigned long size) {
   return abcedary;
 }
 int cmp_byte_count(void *a, void *b) {
-  byte_position *aa = (byte_position *)a;
-  byte_position *bb = (byte_position *)b;
-  return aa->count - bb->count;
+  TreeNode **aa = (TreeNode **)a;
+  TreeNode **bb = (TreeNode **)b;
+  return (*aa)->data.count - (*bb)->data.count;
 }
 void swap_byte_count(void *a, void *b) {
-  byte_position c;
-  byte_position *aa = (byte_position *)a;
-  byte_position *bb = (byte_position *)b;
+  TreeNode *c;
+  TreeNode **aa = (TreeNode **)a;
+  TreeNode **bb = (TreeNode **)b;
   c = *aa;
   *aa = *bb;
   *bb = c;
 }
-byte_position *get_sorted_positions(unsigned int *abcedary) {
-  byte_position *positions = malloc(sizeof(byte_position) * BITS_COMB);
+TreeNode **get_leaf_nodes(unsigned int *abcedary) {
+  TreeNode **positions = malloc(sizeof(TreeNode) * BITS_COMB);
   for (unsigned int i = 0; i < BITS_COMB; i++) {
-    positions[i].count = abcedary[i];
-    positions[i].position = i;
+    byte_position position;
+    position.count = abcedary[i];
+    position.position = i;
+    positions[i] = new_TreeNode(position);
   }
-  quicksort(positions, 0, BITS_COMB, sizeof(byte_position), cmp_byte_count,
-            swap_byte_count);
   return positions;
 }
-Tree *gen_tree(byte_position *positions, unsigned int *leafs) {
-  *leafs = BITS_COMB;
-  Tree *tree = new_tree();
-  unsigned int start = 0;
-  // skip bytes with no repetitions
-  while (positions[start].count == 0) {
-    start++;
-    (*leafs)--;
-  };
-  TreeNode *lhs = new_TreeNode(positions[start]);
+Tree *gen_tree(TreeNode **positions, size_t *leafs) {
+  size_t start = 0;
+  size_t end = BITS_COMB - 1;
   byte_position parent_data;
-  TreeNode *rhs;
-  TreeNode *parent;
-  for (unsigned int i = start + 1; i < BITS_COMB; ++i) {
-    rhs = new_TreeNode(positions[i]);
-    parent = new_TreeNode(parent_data);
-    parent_data.count = rhs->data.count + lhs->data.count;
-    if (lhs->data.count < rhs->data.count) {
-      parent->left = lhs;
-      parent->right = rhs;
-    } else {
-      parent->left = rhs;
-      parent->right = lhs;
-    }
-    lhs = parent;
+  quicksort(positions, start, BITS_COMB, sizeof(TreeNode *), cmp_byte_count,
+            swap_byte_count);
+  while ((*positions[start]).data.count == 0) {
+    delete_TreeNode(positions[start]);
+    ++start;
   }
-  tree->root = parent;
+  *leafs = end - start + 1;
+  for (size_t i = start; i < end; i++) {
+    quicksort(positions, i, BITS_COMB, sizeof(TreeNode *), cmp_byte_count,
+              swap_byte_count);
+    parent_data.count = positions[i]->data.count + positions[i + 1]->data.count;
+    TreeNode *parent = new_TreeNode(parent_data);
+    parent->left = positions[i];
+    parent->right = positions[i + 1];
+    positions[i + 1] = parent;
+  }
+  Tree *tree = new_tree();
+  tree->root = positions[BITS_COMB - 1];
   return tree;
 }
 
@@ -230,8 +225,9 @@ void fill_table(TreeNode *node, byte_code **current, char *code,
 }
 unsigned int search_in_table_by_value(const byte_code *table, const byte val) {
   unsigned int index = 0;
-  while (val != table[index].value)
+  while (val != table[index].value) {
     ++index;
+  }
   return index;
 }
 unsigned int search_in_table_by_code(const byte_code *table, const char *code,
