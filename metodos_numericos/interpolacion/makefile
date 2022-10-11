@@ -4,9 +4,9 @@ main: main.run
 	./main.run
 main.run :main_interpolacion.cpp interpolation.cpp $(object_files)
 	g++ -O2 -pthread -g -o main.run main_interpolacion.cpp interpolation.cpp $(object_files)
-main2: main.run
+main2: main2.run
 	./main2.run
-main2.run :main_interpolacion.cpp interpolation.cpp $(object_files)
+main2.run :main_interpolacion2.cpp interpolation.cpp $(object_files)
 	g++ -O2 -pthread -g -o main2.run main_interpolacion2.cpp interpolation.cpp $(object_files)
 test: test.run
 	./test.run
