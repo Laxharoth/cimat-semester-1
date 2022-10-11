@@ -1,7 +1,8 @@
 #include "funcion_matriz.hpp"
 #include "matrix.hpp"
 
-void crout(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx) {
+void crout(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+           mymtx::matrix &U_mtx) {
   const size_t size = A_mtx.shape_y;
   auto calcular_factor_inferior = [&](const int &i, const int &j) {
     L_mtx(i, j) = A_mtx(i, j);
@@ -24,7 +25,7 @@ void crout(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx, mymtx::matrix &U_mtx) {
       throw cant_factor_exception();
   }
 }
-void doolittle(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void doolittle(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                mymtx::matrix &U_mtx) {
   const size_t size = A_mtx.shape_y;
   auto calcular_factor_superior = [&](const int &i, const int &j) {
@@ -48,7 +49,7 @@ void doolittle(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
       throw cant_factor_exception();
   }
 }
-void LDU_factor(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void LDU_factor(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                 mymtx::matrix &D_mtx, mymtx::matrix &U_mtx) {
   const size_t size = A_mtx.shape_y;
   auto calcular_factor_inferior = [&](const int &i, const int &j) {
@@ -81,7 +82,7 @@ void LDU_factor(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
 const char *cant_factor_exception::what() const throw() {
   return "zero found in diagonal";
 }
-void crout_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void crout_as_band(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                    mymtx::matrix &U_mtx, int height, int width) {
   const size_t size = A_mtx.shape_y;
   auto calcular_factor_inferior = [&](const int &i, const int &j,
@@ -112,7 +113,7 @@ void crout_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
     calcular_factor_inferior(i, i, begin_row, begin_col);
   }
 }
-void doolittle_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void doolittle_as_band(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                        mymtx::matrix &U_mtx, int height, int width) {
   const size_t size = A_mtx.shape_y;
   auto calcular_factor_superior = [&](const int &i, const int &j, int begin_row,
@@ -141,7 +142,7 @@ void doolittle_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
     calcular_factor_superior(j, j, begin_row, begin_col);
   }
 }
-void crout_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void crout_tridiagonal(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                        mymtx::matrix &U_mtx) {
   L_mtx(0, 0) = A_mtx(0, 0);
   if (L_mtx(0, 0) == 0)
@@ -154,7 +155,7 @@ void crout_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
       throw cant_factor_exception();
   }
 }
-void doolittle_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void doolittle_tridiagonal(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                            mymtx::matrix &U_mtx) {
   U_mtx(0, 0) = A_mtx(0, 0);
   if (U_mtx(0, 0) == 0)
@@ -167,7 +168,7 @@ void doolittle_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
       throw cant_factor_exception();
   }
 }
-void LDU_factor_tridiagonal(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void LDU_factor_tridiagonal(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                             mymtx::matrix &D_mtx, mymtx::matrix &U_mtx) {
   D_mtx(0, 0) = A_mtx(0, 0);
   for (size_t i = 1; i < A_mtx.shape_y; i++) {

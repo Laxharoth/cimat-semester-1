@@ -19,26 +19,30 @@ void solucion_diagonal(const mymtx::matrix &matriz, mymtx::vector &incognitas,
 double determinante_diagonal(mymtx::matrix &matriz_diagonal);
 void inversa_diagonal(mymtx::matrix &matriz_diagonal, mymtx::vector &inversa);
 double determinante_triangular(mymtx::matrix &matriz_triangular);
-void solucion_triangular_inf(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result, bool);
-void solucion_triangular_inf(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result);
-void solucion_triangular_sup(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result, bool);
-void solucion_triangular_sup(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result);
+void solucion_triangular_inf(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result, bool);
+void solucion_triangular_inf(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result);
+void solucion_triangular_sup(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result, bool);
+void solucion_triangular_sup(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result);
 void gauss(mymtx::matrix &matriz, mymtx::vector &variables,
            mymtx::vector &resultados);
 void solucion_LDU(mymtx::matrix &matriz, mymtx::vector &incognitas,
                   mymtx::vector &result);
-void solucion_crout(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                    mymtx::vector &result);
-void solucion_doolittle(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                        mymtx::vector &result);
+void solucion_crout(const mymtx::matrix &matriz, mymtx::vector &incognitas,
+                    const mymtx::vector &result);
+void solucion_doolittle(const mymtx::matrix &matriz, mymtx::vector &incognitas,
+                        const mymtx::vector &result);
 void solve_gauss_seidel(mymtx::matrix &matix, mymtx::vector &variables,
                         mymtx::vector &solutions, double *error);
-void solve_cholesky(mymtx::matrix &cholesky_factored, mymtx::vector &variables,
-                    mymtx::vector &solutions);
+void solve_cholesky(const mymtx::matrix &cholesky_factored,
+                    mymtx::vector &variables, const mymtx::vector &solutions);
 double normalize(mymtx::vector &vec);
 void randomize(mymtx::vector &vec);
 void power_iteration(const mymtx::matrix &A, mymtx::vector &V1,
@@ -64,22 +68,23 @@ void conjugate_gradient_jacobi(const mymtx::matrix &A, mymtx::vector &var,
 
 // factorizacion
 
-void crout(mymtx::matrix &matriz, mymtx::matrix &matriz_inferior,
+void crout(const mymtx::matrix &matriz, mymtx::matrix &matriz_inferior,
            mymtx::matrix &matriz_superior);
-void crout_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void crout_as_band(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                    mymtx::matrix &U_mtx, int height, int width);
-void crout_tridiagonal(mymtx::matrix &matriz, mymtx::matrix &matriz_inferior,
+void crout_tridiagonal(const mymtx::matrix &matriz,
+                       mymtx::matrix &matriz_inferior,
                        mymtx::matrix &matriz_superior);
-void doolittle(mymtx::matrix &matriz, mymtx::matrix &matriz_inferior,
+void doolittle(const mymtx::matrix &matriz, mymtx::matrix &matriz_inferior,
                mymtx::matrix &matriz_superior);
-void doolittle_as_band(mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
+void doolittle_as_band(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
                        mymtx::matrix &U_mtx, int height, int width);
-void doolittle_tridiagonal(mymtx::matrix &matriz,
+void doolittle_tridiagonal(const mymtx::matrix &matriz,
                            mymtx::matrix &matriz_inferior,
                            mymtx::matrix &matriz_superior);
-void LDU_factor(mymtx::matrix &matriz, mymtx::matrix &matriz_inferior,
+void LDU_factor(const mymtx::matrix &matriz, mymtx::matrix &matriz_inferior,
                 mymtx::matrix &matriz_diagonal, mymtx::matrix &matriz_superior);
-void LDU_factor_tridiagonal(mymtx::matrix &matriz,
+void LDU_factor_tridiagonal(const mymtx::matrix &matriz,
                             mymtx::matrix &matriz_inferior,
                             mymtx::matrix &matriz_diagonal,
                             mymtx::matrix &matriz_superior);

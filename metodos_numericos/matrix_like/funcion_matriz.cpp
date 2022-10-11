@@ -13,7 +13,7 @@ class randgen {
   randgen() {
     rd = new std::random_device();
     gen = new std::mt19937((*rd)());
-    dis = new std::uniform_real_distribution<double>(-1, 1);
+    dis = new std::uniform_real_distribution<double>(0, 50);
   }
   ~randgen() {
     delete rd;
@@ -56,12 +56,15 @@ double determinante_triangular(mymtx::matrix &matriz_triangular) {
     result *= matriz_triangular[i][i];
   return result;
 }
-void solucion_triangular_inf(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result) {
+void solucion_triangular_inf(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result) {
   solucion_triangular_inf(matriz, incognitas, result, true);
 }
-void solucion_triangular_inf(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result, bool compute_diagonale) {
+void solucion_triangular_inf(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result,
+                             bool compute_diagonale) {
   const size_t size = matriz.shape_x;
   for (int i = 0; i < size; ++i) {
     incognitas[i] = result[i];
@@ -91,12 +94,15 @@ void solucion_triangular_inf_as_band(mymtx::matrix &matriz,
       incognitas[i] /= matriz[i][i];
   }
 }
-void solucion_triangular_sup(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result) {
+void solucion_triangular_sup(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result) {
   solucion_triangular_sup(matriz, incognitas, result, true);
 }
-void solucion_triangular_sup(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                             mymtx::vector &result, bool compute_diagonale) {
+void solucion_triangular_sup(const mymtx::matrix &matriz,
+                             mymtx::vector &incognitas,
+                             const mymtx::vector &result,
+                             bool compute_diagonale) {
   const size_t size = matriz.shape_x;
   for (int i = size - 1; i >= 0; --i) {
     incognitas[i] = result[i];
@@ -157,8 +163,8 @@ void solucion_LDU(mymtx::matrix &matriz, mymtx::vector &incognitas,
   solucion_diagonal(matriz, aux2, aux1);
   solucion_triangular_sup(matriz, incognitas, aux2, false);
 }
-void solucion_crout(mymtx::matrix &matriz, mymtx::vector &incognitas,
-                    mymtx::vector &result) {
+void solucion_crout(const mymtx::matrix &matriz, mymtx::vector &incognitas,
+                    const mymtx::vector &result) {
   mymtx::vector aux1(incognitas.size);
   solucion_triangular_inf(matriz, aux1, result);
   solucion_triangular_sup(matriz, incognitas, aux1, false);
@@ -515,20 +521,25 @@ void solve_qr(const mymtx::matrix &Q, mymtx::matrix &R, mymtx::vector &var,
 }
 void conjugate_gradient(const mymtx::matrix &A, mymtx::vector &x,
                         mymtx::vector &b) {
-  auto r = b;
-  auto p = r;
-  unsigned k{0};
-  mymtx::vector w(x.size);
-  double alpha, betha;
-  while (k < r.size * 2) {
-    w = A * p;
-    alpha = (p * r) / (p * w);
+  const int n = A.shape_y;
+  mymtx::vector r = b;
+  mymtx::vector p = r;
+  int k = 0;
+
+  mymtx::vector Rold(r);
+  while (k < n) {
+    Rold = r;
+    mymtx::vector AP = A * p;
+    double alpha = r * r / std::max(p * AP, ZERO_UMBRAL);
     x = x + alpha * p;
-    r = r - alpha * w;
-    if (std::sqrt(r * r) < ZERO_UMBRAL)
-      break;
-    betha = (p * r) / (p * p);
-    p = r + betha * p;
+    r = r - alpha * AP;
+
+    if (r.distance() < ZERO_UMBRAL)
+      break; // Convergence test
+
+    double beta = r * r / std::max(Rold * Rold, ZERO_UMBRAL);
+    p = r + beta * p;
+    k++;
   }
 }
 void conjugate_gradient_jacobi(const mymtx::matrix &A, mymtx::vector &x,
