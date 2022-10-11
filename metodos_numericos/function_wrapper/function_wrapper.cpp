@@ -1,6 +1,7 @@
 #ifndef FUNCTION_WRAPPER_CPP
 #define FUNCTION_WRAPPER_CPP
 #include "function_wrapper.hpp"
+#include <exception>
 
 Derivative::Derivative(FunctionWrapper *original)
     : original_function(original) {}
@@ -12,7 +13,9 @@ double Derivative::eval(const double &x) const {
   return (original_function->eval(x + DELTA_X) - original_function->eval(x)) /
          DELTA_X;
 }
-
+class cant_be_const : std::exception {
+  const char *what() const noexcept { return "Instance can't be const"; }
+};
 Count::Count() : current(-1), step(1) {}
 Count::Count(double start) : current(start - 1), step(1) {}
 Count::Count(double start, double step) : current(start - step), step(step) {}
@@ -21,5 +24,5 @@ Count::Count(double start, double end, unsigned int steps)
   current = start - step;
 }
 double Count::eval(const double &x) { return current += step; }
-double Count::eval(const double &x) const { return current; }
+double Count::eval(const double &x) const { throw cant_be_const(); }
 #endif /* FUNCTION_WRAPPER_CPP */
