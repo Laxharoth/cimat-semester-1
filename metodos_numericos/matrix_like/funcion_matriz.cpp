@@ -302,8 +302,8 @@ void inverse_power_iteration(const mymtx::matrix &A, mymtx::vector &V1,
     error = 1;
   }
 }
-void solve_cholesky(mymtx::matrix &cholesky_factored, mymtx::vector &variables,
-                    mymtx::vector &solutions) {
+void solve_cholesky(const mymtx::matrix &cholesky_factored,
+                    mymtx::vector &variables, const mymtx::vector &solutions) {
   mymtx::vector tmp(solutions.size);
   solucion_triangular_inf(cholesky_factored, tmp, solutions);
   solucion_triangular_sup(cholesky_factored, variables, tmp);
@@ -485,7 +485,6 @@ void subspace_ipow(const mymtx::matrix &A, mymtx::matrix &I_t,
     I_t[i] /= I_t[i].distance();
   }
 }
-
 void rayleigh_method(const mymtx::matrix &A, mymtx::vector &V1, double &val) {
   const auto identity = mymtx::matrix::identity(V1.size);
   if (((A - identity * val) * V1).distance() < ZERO_UMBRAL)
