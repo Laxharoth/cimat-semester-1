@@ -2,6 +2,7 @@
 #include "matrix_like/funcion_matriz.hpp"
 #include "matrix_like/matrix.hpp"
 #include <algorithm>
+#include <cstdio>
 #include <ratio>
 PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y) {
   return interpolate_poly(X, Y, 1);
@@ -61,7 +62,7 @@ PolyFunction interpolate_poly_2(const mymtx::vector &X,
                                 const mymtx::vector &Y) {
   mymtx::matrix A(X.size, X.size);
   mymtx::vector ys = Y;
-  mymtx::vector as = Y;
+  mymtx::vector as(Y.size);
   for (size_t i = 0; i < X.size; i++) {
     for (size_t j = 0; j < X.size; j++) {
       A(i, j) = std::pow(X[i], j);
@@ -159,7 +160,114 @@ NewtonPolyFunction::NewtonPolyFunction(const mymtx::vector &X,
   as = computed[0];
 }
 
+unsigned int binarySearch(const std::vector<point> &arr, double x);
+LineSpline::LineSpline(const std::vector<point> &points) : points(points) {
+  std::sort(this->points.begin(), this->points.end(),
+            [](const point &a, const point &b) { return a.x < b.x; });
+}
+double LineSpline::eval(const double &x) {
+  return static_cast<const LineSpline *>(this)->eval(x);
+}
+double LineSpline::eval(const double &x) const {
+  unsigned int n = binarySearch(points, x);
+  return points[n].y + (points[n + 1].y - points[n].y) /
+                           (points[n + 1].x - points[n].x) * (x - points[n].x);
+}
+
+CuadraticSpline::CuadraticSpline(const std::vector<point> &points)
+    : points(points), Si(mymtx::vector(points.size())) {
+  std::sort(this->points.begin(), this->points.end(),
+            [](const point &a, const point &b) { return a.x < b.x; });
+  mymtx::vector ti(Si.size - 1);
+  mymtx::matrix A(ti.size, ti.size);
+  for (size_t i = 0; i < ti.size; i++) {
+    ti[i] = points[i + 1].y - points[i].y;
+    auto Ai = (points[i + 2].x - points[i + 1].x) / 2;
+    if (i > 0)
+      A(i, i - 1) = Ai;
+    A(i, i) = Ai;
+  }
+  auto subSi = Si.subvector(1, Si.size - 1);
+  crout(A, A, A);
+  solucion_crout(A, subSi, ti);
+}
+double CuadraticSpline::eval(const double &x) {
+  return static_cast<const CuadraticSpline *>(this)->eval(x);
+}
+double CuadraticSpline::eval(const double &x) const {
+  unsigned int n = binarySearch(points, x);
+  const double dx = x - points[n].x;
+  return (Si[n + 1] - Si[n]) / (2 * (points[n + 1].x - points[n].x)) * dx * dx +
+         Si[n] * dx + points[n].y;
+}
+
+CubicSpline::CubicSpline(const std::vector<point> &points)
+    : points(points), Si(mymtx::vector(points.size())) {
+  std::sort(this->points.begin(), this->points.end(),
+            [](const point &a, const point &b) { return a.x < b.x; });
+  mymtx::vector ti(points.size() - 2);
+  mymtx::matrix A(ti.size, ti.size);
+  double hinext, hinow, tinext, tinow;
+  hinow = points[1].x - points[0].x;
+  tinow = points[0].y - points[1].y;
+  hinext = points[2].x - points[1].x;
+  tinext = points[2].y - points[1].y;
+  for (size_t i = 0; i < ti.size; i++) {
+    hinow = points[i + 2].x - points[i + 1].x;
+    tinow = points[i + 2].y - points[i + 1].y;
+
+    ti[i] = tinext / hinext - tinow / hinow;
+
+    if (i > 0)
+      A(i, i - 1) = hinow / 6;
+    A(i, i) = (hinow + hinext) / 3;
+    if (i < ti.size - 1)
+      A(i, i + 1) = hinext / 6;
+
+    hinow = hinext;
+    tinow = tinext;
+  }
+  auto subSi = Si.subvector(1, Si.size - 2);
+  crout(A, A, A);
+  // conjugate_gradient(A, subSi, ti);
+  solucion_crout(A, subSi, ti);
+}
+double CubicSpline::eval(const double &x) {
+  return static_cast<const CubicSpline *>(this)->eval(x);
+}
+double CubicSpline::eval(const double &x) const {
+  unsigned int n = binarySearch(points, x);
+  double dx = x - points[n].x;
+  double dxn = x - points[n + 1].x;
+  double dy = points[n + 1].y - points[n].y;
+  return (Si[n] * (-dxn * dxn * dxn) + Si[n + 1] * (dx)) / (6 * dx) +
+         (dy / dx - (Si[n + 1] - Si[n]) * dx / 6) * dx + points[n].y -
+         Si[n] * dx * dx / 6;
+}
+
+unsigned int binarySearch(const std::vector<point> &arr, double x) {
+  unsigned int p = 0;
+  unsigned int r = arr.size() - 1;
+  if (x <= arr[p].x)
+    return p;
+  if (x >= arr[r].x)
+    return r - 1;
+  while (p < r) {
+    const unsigned int mid = (p + r) / 2;
+    if (arr[mid].x == x)
+      return mid;
+    if (arr[mid].x > x) {
+      r = mid - 1;
+      continue;
     }
+    if (arr[mid].x < x)
+      p = mid + 1;
+  }
+  if (x < arr[p].x)
+    return p - 1;
+  return p;
+}
+
 namespace mymtx {
 vector map(const vector &v, FunctionWrapper *fn) {
   vector v_new(v.size);

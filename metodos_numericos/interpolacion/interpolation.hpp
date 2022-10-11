@@ -43,6 +43,32 @@ public:
   double eval(const double &x) const;
   MultiFunctionWrapper(std::vector<FunctionWrapper *> fns, mymtx::vector coef);
 };
+class LineSpline : public FunctionWrapper {
+  std::vector<point> points;
+
+public:
+  double eval(const double &x);
+  double eval(const double &x) const;
+  LineSpline(const std::vector<point> &points);
+};
+class CuadraticSpline : public FunctionWrapper {
+  std::vector<point> points;
+  mymtx::vector Si;
+
+public:
+  double eval(const double &x);
+  double eval(const double &x) const;
+  CuadraticSpline(const std::vector<point> &points);
+};
+
+class CubicSpline : public FunctionWrapper {
+  std::vector<point> points;
+  mymtx::vector Si;
+
+public:
+  double eval(const double &x);
+  double eval(const double &x) const;
+  CubicSpline(const std::vector<point> &points);
 };
 
 PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y);
