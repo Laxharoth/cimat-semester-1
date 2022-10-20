@@ -4,6 +4,10 @@
 #include <exception>
 #include <vector>
 
+double FunctionWrapper::operator()(const double &x) { return this->eval(x); }
+double FunctionWrapper::operator()(const double &x) const {
+  return this->eval(x);
+}
 Derivative::Derivative(FunctionWrapper *original)
     : original_function(original) {}
 
@@ -26,6 +30,11 @@ Count::Count(double start, double end, unsigned int steps)
 }
 double Count::eval(const double &x) { return current += step; }
 double Count::eval(const double &x) const { throw cant_be_const(); }
+
+LambdaWrapper::LambdaWrapper(std::function<double(const double &)> fn)
+    : fn(fn) {}
+double LambdaWrapper::eval(const double &x) { return fn(x); }
+double LambdaWrapper::eval(const double &x) const { return fn(x); }
 std::vector<double>
 MultiVarFunctionWrapper::operator()(const std::vector<double> &x) {
   return eval(x);

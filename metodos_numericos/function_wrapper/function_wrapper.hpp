@@ -1,7 +1,9 @@
 #ifndef FUNCTION_WRAPPER_HPP
 #define FUNCTION_WRAPPER_HPP
 
+#include <functional>
 #include <vector>
+
 #ifndef DELTA_X
 #define DELTA_X 0.00001
 #endif
@@ -10,8 +12,17 @@ class FunctionWrapper {
 public:
   virtual double eval(const double &x) = 0;
   virtual double eval(const double &x) const = 0;
+  double operator()(const double &x);
+  double operator()(const double &x) const;
 };
+class LambdaWrapper : public FunctionWrapper {
+  std::function<double(const double &)> fn;
 
+public:
+  LambdaWrapper(std::function<double(const double &)> fn);
+  double eval(const double &x);
+  double eval(const double &x) const;
+};
 class Derivative : public FunctionWrapper {
   FunctionWrapper *original_function;
 
