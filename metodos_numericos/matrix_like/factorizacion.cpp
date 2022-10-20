@@ -247,7 +247,6 @@ void qr_decomposition(const mymtx::matrix &A, mymtx::matrix &Q,
   mymtx::vector col0 = A.column(0).as_vector();
   R(0, 0) = normalize(col0);
   Q.column(0) = col0;
-  mymtx::matrix E(A.shape_y, A.shape_x);
   mymtx::vector u(A.shape_y);
   for (size_t j = 1; j < A.shape_x; j++) {
     u = 0;
