@@ -2,9 +2,18 @@
 #include "interpolation.hpp"
 #include "macros.hpp"
 #include <cmath>
+#include <vector>
 class sine : public FunctionWrapper {
   double eval(const double &x) const { return std::sin(x); }
   double eval(const double &x) { return std::sin(x); }
+};
+class fffn : public MultiVarFunctionWrapper {
+  std::vector<double> eval(const std::vector<double> &x) const {
+    return std::vector<double>{x[0] + x[1]};
+  }
+  std::vector<double> eval(const std::vector<double> &x) {
+    return std::vector<double>{x[0] + x[1]};
+  }
 };
 int main(int argc, const char **argv) {
   sine fn;
@@ -41,9 +50,13 @@ int main(int argc, const char **argv) {
                .distance());
     mymtx::vector::fwrite("vec_out/finite/finite.vec", Ys);
   }
+  strm_out("area pi:" << area_montecarlo(fn, 0, M_PI));
+  strm_out("area 2pi:" << area_montecarlo(fn, 0, 2 * M_PI));
 
-  strm_out("area pi:" << area_montecarlo_2d(fn, 0, M_PI));
-  strm_out("area 2pi:" << area_montecarlo_2d(fn, 0, 2 * M_PI));
+  point p0{0, 0};
+  point p1{10, 10};
+  fffn mvfn;
+  strm_out("area:" << volum_montecarlo(mvfn, p0, p1));
 
   return 0;
 }
