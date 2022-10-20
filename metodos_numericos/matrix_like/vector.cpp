@@ -1,7 +1,9 @@
 #include "matrix.hpp"
 #include <cmath>
 #include <cstddef>
+#include <cstring>
 #include <future>
+#include <vector>
 namespace mymtx {
 vector::vector(const size_t size) : size(size), allocated(true) {
   this->data = new double[this->size];
@@ -351,6 +353,11 @@ double reduce(const vector &v, double (*callback)(double acc, const double cur),
 }
 vector vector::subvector(size_t from, size_t size) {
   return vector(data + from, size);
+}
+std::vector<double> vector::as_std_vector() const {
+  std::vector<double> v(this->size);
+  memcpy(v.data(), this->data, this->size * sizeof(double));
+  return v;
 }
 } // namespace mymtx
 mymtx::vector operator*(const mymtx::vector &v, const double c) {

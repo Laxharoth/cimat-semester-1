@@ -120,6 +120,7 @@ public:
   matrix cross_product(const vector &other) const;
   double distance() const;
   matrix as_matrix() const;
+  std::vector<double> as_std_vector() const;
   static vector normal(const size_t size);
   static void sort(vector &v);
   static void fwrite(const char *filename, const vector &vector);
