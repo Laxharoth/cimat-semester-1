@@ -34,6 +34,21 @@ public:
   double generate(const double from, const double to) {
     return std::uniform_real_distribution<double>(from, to)(*gen);
   }
+  mymtx::vector sample(unsigned size) {
+    mymtx::vector s(size);
+    for (auto &&v : s) {
+      v = (*dis)(*gen);
+    }
+    return s;
+  }
+  mymtx::vector sample(unsigned size, const double from, const double to) {
+    mymtx::vector s(size);
+    auto dis = std::uniform_real_distribution<double>(from, to);
+    for (auto &&v : s) {
+      v = dis(*gen);
+    }
+    return s;
+  }
   static randgen &get_randgen() {
     static randgen rng;
     return rng;
