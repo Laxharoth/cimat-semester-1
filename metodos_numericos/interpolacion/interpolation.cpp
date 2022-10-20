@@ -1,9 +1,5 @@
 #include "interpolation.hpp"
-#include "matrix_like/funcion_matriz.hpp"
-#include "matrix_like/matrix.hpp"
-#include <algorithm>
-#include <cstdio>
-#include <ratio>
+
 PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y) {
   return interpolate_poly(X, Y, 1);
 }
@@ -170,6 +166,7 @@ double LineSpline::eval(const double &x) {
 }
 double LineSpline::eval(const double &x) const {
   unsigned int n = binarySearch(points, x);
+  // TODO: programacion dinamica para m
   const double m =
       (points[n + 1].y - points[n].y) / (points[n + 1].x - points[n].x);
   return points[n].y + m * (x - points[n].x);
@@ -196,6 +193,7 @@ double CuadraticSpline::eval(const double &x) {
   return static_cast<const CuadraticSpline *>(this)->eval(x);
 }
 double CuadraticSpline::eval(const double &x) const {
+  // TODO: programacion dinamica para a
   unsigned int n = binarySearch(points, x);
   const double dx = x - points[n].x;
   const double h = points[n + 1].x - points[n].x;
@@ -241,6 +239,7 @@ double CubicSpline::eval(const double &x) {
 }
 double CubicSpline::eval(const double &x) const {
   unsigned int n = binarySearch(points, x);
+  // TODO: programacion dinamica para b y d
   const double h = points[n + 1].x - points[n].x;
   const double t = points[n + 1].y - points[n].y;
   const double dx = x - points[n].x;

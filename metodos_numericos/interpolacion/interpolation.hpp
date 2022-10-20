@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#define EP 1E-8
 
 class PolyFunction : public FunctionWrapper {
   const mymtx::vector A;
@@ -111,4 +112,7 @@ struct fn_interval {
 double bisection(FunctionWrapper &fn, double, double);
 double area_montecarlo_2d(FunctionWrapper &fn, const double x0,
                           const double x1);
+std::vector<double> NewtonMultivar(MultiFunctionWrapper &fn,
+                                   std::vector<double> &start_guess);
+
 #endif /* INTERPOLATION_HPP */
