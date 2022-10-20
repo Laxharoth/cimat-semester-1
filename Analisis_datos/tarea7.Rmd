@@ -12,11 +12,16 @@ library(plotly)
 problema 3
 ```{r}
 u1 <- runif(500, 0, 1)
-u2 <- runif(500, 0, 1)
+u2 <- log10(u1)
+cov(u1, u2)
 cor(u1, u2)
 
 
 plot(u1, u2)
+legend(
+  "bottomright",
+  c("covarianza : 0.1124 ", "correlacion: 0.8559")
+)
 ```
 
 
@@ -30,18 +35,18 @@ plot(u1, u2)
 
 problema 5
 ```{r}
-sample1 <- read_csv("area1.csv") %>% mutate( sample = 1  )
-sample2 <- read_csv("area2.csv") %>% mutate( sample = 2  )
-sample3 <- read_csv("area3.csv") %>% mutate( sample = 3  )
+sample1 <- read_csv("area1.csv") %>% mutate(sample = 1)
+sample2 <- read_csv("area2.csv") %>% mutate(sample = 2)
+sample3 <- read_csv("area3.csv") %>% mutate(sample = 3)
 
-sample <- rbind(sample1,sample2,sample3) %>% mutate(sample = as.character(sample))
-
+sample <- rbind(sample1, sample2, sample3) %>%
+  mutate(sample = as.character(sample))
 ```
 
 ```{r}
 ggpairs(sample,
   columns = c("R", "G", "B"),
-  aes( color=sample, alpha=0.2  )
+  aes(color = sample, alpha = 0.2)
 )
 ```
 
@@ -49,19 +54,19 @@ ggpairs(sample,
 ```{r}
 ggpairs(sample2,
   columns = c("R", "G", "B"),
-  aes( alpha=0.2, )
+  aes(alpha = 0.2, )
 )
 ```
 ```{r}
 ggpairs(sample3,
   columns = c("R", "G", "B"),
-  aes( alpha=0.2  )
+  aes(alpha = 0.2)
 )
 ```
 problema 6
 ```{r}
 
-fn <- function(x) 2*(sqrt(log(1 / (1 - x))))
+fn <- function(x) 2 * (sqrt(log(1 / (1 - x))))
 
 u <- runif(200, 0, 1)
 x <- mapply(fn, u)
@@ -110,7 +115,4 @@ df %>%
   geom_tile(aes(fill = gdpPercap)) +
   scale_fill_gradient(low = "blue", high = "red") +
   ggtitle(" gdp Percap por pais")
-
 ```
-
-
