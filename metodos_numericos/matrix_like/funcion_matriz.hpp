@@ -14,6 +14,32 @@ struct eigen {
   double val;
 };
 
+class randgen {
+  std::random_device *rd;
+  std::mt19937 *gen;
+  std::uniform_real_distribution<double> *dis;
+  randgen() {
+    rd = new std::random_device();
+    gen = new std::mt19937((*rd)());
+    dis = new std::uniform_real_distribution<double>(0, 50);
+  }
+  ~randgen() {
+    delete rd;
+    delete gen;
+    delete dis;
+  }
+
+public:
+  double generate() { return (*dis)(*gen); }
+  double generate(const double from, const double to) {
+    return std::uniform_real_distribution<double>(from, to)(*gen);
+  }
+  static randgen &get_randgen() {
+    static randgen rng;
+    return rng;
+  }
+};
+
 void solucion_diagonal(const mymtx::matrix &matriz, mymtx::vector &incognitas,
                        mymtx::vector &result);
 double determinante_diagonal(mymtx::matrix &matriz_diagonal);
