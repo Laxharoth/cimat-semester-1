@@ -370,7 +370,6 @@ double area_montecarlo(FunctionWrapper &fn, const double x0, const double x1) {
   return area;
 }
 double _area_montecarlo_2d(FunctionWrapper &fn, fn_interval interval) {
-  // TODO: GET INTERVAL AREA;
   // find max
   const double tolerance = 1E-5;
   Derivative dfn(&fn);
@@ -425,6 +424,79 @@ double _area_montecarlo_2d(FunctionWrapper &fn, fn_interval interval) {
   // return area
   return current_area;
 }
+double _vol_montecarlo(MultiVarFunctionWrapper &fn, point p0, point p1,
+                       double height);
+double volum_montecarlo(MultiVarFunctionWrapper &fn, point p0, point p1) {
+  double area = 0;
+  std::vector<double> point(2);
+  std::vector<double> point_min(2);
+  double val_min = 0;
+  std::vector<double> point_max(2);
+  double val_max = 0;
+  const double delta = 0.05;
+  if (p0.x > p1.x)
+    std::swap(p0.x, p1.x);
+  if (p0.y > p1.y)
+    std::swap(p0.y, p1.y);
+  // find min and max
+  for (double x = p0.x; x <= p1.x + EP; x += delta) {
+    for (double y = p0.y; y <= p1.y + EP; y += delta) {
+      point[0] = x;
+      point[1] = y;
+      const double cur_eval = fn(point)[0];
+      if (cur_eval > val_max) {
+        val_max = cur_eval;
+        point_max = point;
+      }
+      if (cur_eval < val_min) {
+        val_min = cur_eval;
+        point_min = point;
+      }
+    }
+  }
+  val_max = fn(point_max)[0];
+  val_min = fn(point_min)[0];
+  if (val_max > 0)
+    area += _vol_montecarlo(fn, p0, p1, val_max);
+  if (val_min < 0)
+    area += _vol_montecarlo(fn, p0, p1, val_min);
+
+  return area;
+}
+double _vol_montecarlo(MultiVarFunctionWrapper &fn, point p0, point p1,
+                       double max_eval) {
+  const unsigned long points_increment = 10000;
+  unsigned long total_points = 0;
+  unsigned long coutn_in = 0;
+  double current_area = 0;
+  double prev_area;
+  const double height = std::abs(max_eval * 2);
+  const double total_volum = (p1.y - p0.y) * (p1.x - p0.x) * height;
+  const double sign = (max_eval < 0) ? -1 : 1;
+  auto &rng = randgen::get_randgen();
+  std::vector<double> point(2);
+  do {
+    auto xs = rng.sample(points_increment, p0.x, p1.x);
+    auto ys = rng.sample(points_increment, p0.y, p1.y);
+    auto zs = rng.sample(points_increment, 0, height);
+    auto xi = xs.begin();
+    auto yi = ys.begin();
+    auto zi = zs.begin();
+    for (; xi != xs.end(); ++xi, ++yi, ++zi) {
+      point[0] = *xi;
+      point[1] = *yi;
+      double vali = fn(point)[0];
+      if (*zi < sign * vali)
+        coutn_in++;
+    }
+    total_points += points_increment;
+    prev_area = current_area;
+    current_area =
+        ((double)(coutn_in * total_volum)) / ((double)(total_points));
+  } while (std::abs(current_area - prev_area) < EP);
+
+  return current_area;
+}
 double bisection(FunctionWrapper &funcion, double x_inferior,
                  double x_superior) {
   auto calc_err = [](double &anterior, double &actual) {
@@ -459,8 +531,32 @@ double bisection(FunctionWrapper &funcion, double x_inferior,
     } else {
       x_superior = x_medio;
     }
-    printf("%d\n", *real_iter);
   }
   return x_medio;
 }
 
+std::vector<double> NewtonMultivar(MultiVarFunctionWrapper &fn,
+                                   const std::vector<double> &start_guess) {
+  Gradient dfn(&fn);
+  auto current_guess = start_guess;
+  for (size_t i = 0; i < 100; i++) {
+    double v = fn(start_guess)[0];
+    if (std::abs(v) < EP)
+      return current_guess;
+    auto dv = dfn(start_guess);
+    double dv_norm = norm(dv);
+    current_guess = current_guess - (dv * v / (dv_norm * dv_norm));
+  }
+  if (std::any_of(current_guess.begin(), current_guess.end(),
+                  [](double v) { return std::isnan(v) || std::isinf(v); }))
+    current_guess = start_guess;
+  return current_guess;
+}
+
+double norm(std::vector<double> &vec) {
+  double sum{0};
+  for (auto &&v : vec) {
+    sum += v * v;
+  }
+  return std::sqrt(sum);
+}
