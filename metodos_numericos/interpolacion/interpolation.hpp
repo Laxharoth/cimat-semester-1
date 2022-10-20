@@ -110,9 +110,9 @@ struct fn_interval {
 };
 
 double bisection(FunctionWrapper &fn, double, double);
-double area_montecarlo_2d(FunctionWrapper &fn, const double x0,
-                          const double x1);
-std::vector<double> NewtonMultivar(MultiFunctionWrapper &fn,
-                                   std::vector<double> &start_guess);
-
+double area_montecarlo(FunctionWrapper &fn, const double x0, const double x1);
+std::vector<double> NewtonMultivar(MultiVarFunctionWrapper &fn,
+                                   const std::vector<double> &start_guess);
+double volum_montecarlo(MultiVarFunctionWrapper &fn, const point p0,
+                        const point p1);
 #endif /* INTERPOLATION_HPP */

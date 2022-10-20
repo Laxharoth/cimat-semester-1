@@ -335,10 +335,8 @@ vector map(const vector &v, const FunctionWrapper &fn) {
   return v_new;
 }
 } // namespace mymtx
-
 double _area_montecarlo_2d(FunctionWrapper &fn, fn_interval);
-double area_montecarlo_2d(FunctionWrapper &fn, const double x0,
-                          const double x1) {
+double area_montecarlo(FunctionWrapper &fn, const double x0, const double x1) {
   std::vector<fn_interval> intervlas;
   const double dx = (x1 - x0) / 1000;
   double area = 0;
