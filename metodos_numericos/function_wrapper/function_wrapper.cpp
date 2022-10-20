@@ -67,5 +67,29 @@ std::vector<double> Gradient::eval(const std::vector<double> &x) const {
   }
   return result;
 }
-
+std::vector<double> operator*(const std::vector<double> &x0, const double x1) {
+  auto cpy = x0;
+  for (auto &&v : cpy) {
+    v *= x1;
+  }
+  return cpy;
+}
+std::vector<double> operator*(const double x1, const std::vector<double> &x0) {
+  return x0 * x1;
+}
+std::vector<double> operator/(const std::vector<double> &x0, const double x1) {
+  const double recip = 1 / x1;
+  return x0 * recip;
+}
+std::vector<double> operator/(const double x1, const std::vector<double> &x0) {
+  return x0 / x1;
+}
+std::vector<double> operator-(const std::vector<double> &x0,
+                              const std::vector<double> &x1) {
+  std::vector<double> cpy = x0;
+  for (unsigned int i = 0; i < cpy.size(); ++i) {
+    cpy[i] -= x1[i];
+  }
+  return cpy;
+}
 #endif /* FUNCTION_WRAPPER_CPP */

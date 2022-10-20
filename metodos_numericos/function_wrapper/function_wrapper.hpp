@@ -31,7 +31,6 @@ public:
   double eval(const double &x);
   double eval(const double &x) const;
 };
-
 class Count : public FunctionWrapper {
   double current, step;
 
@@ -43,7 +42,6 @@ public:
   double eval(const double &x);
   double eval(const double &x) const;
 };
-
 struct point {
   double x;
   double y;
@@ -67,4 +65,8 @@ public:
 double norm(std::vector<double> &);
 std::vector<double> operator-(const std::vector<double> &x0,
                               const std::vector<double> &x1);
+std::vector<double> operator*(const std::vector<double> &x0, const double x1);
+std::vector<double> operator*(const double x1, const std::vector<double> &x0);
+std::vector<double> operator/(const std::vector<double> &x0, const double x1);
+std::vector<double> operator/(const double x1, const std::vector<double> &x0);
 #endif /* FUNCTION_WRAPPER_HPP */
