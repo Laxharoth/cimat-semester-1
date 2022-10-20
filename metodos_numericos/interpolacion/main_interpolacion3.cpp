@@ -1,0 +1,49 @@
+#include "function_wrapper/function_wrapper.hpp"
+#include "interpolation.hpp"
+#include "macros.hpp"
+#include <cmath>
+class sine : public FunctionWrapper {
+  double eval(const double &x) const { return std::sin(x); }
+  double eval(const double &x) { return std::sin(x); }
+};
+int main(int argc, const char **argv) {
+  sine fn;
+
+  auto normal_density = [](const double x) {
+    return 1 / (10 * M_2_SQRTPI) * std::exp(-.5 * (x * x) / 100);
+  };
+  auto testfn = [](const double x) { return x + x * std::sin(x / 2) / 3; };
+
+  auto mfn = &testfn;
+
+  mymtx::vector xs(30);
+  randomize(xs);
+  const mymtx::vector ys = mymtx::map(xs, *mfn);
+  std::vector<point> points(xs.size);
+  Count count(0, 50, 100);
+  const mymtx::vector Xs = mymtx::map(mymtx::vector(101), &count);
+  mymtx::vector::fwrite("vec_out/finite/xs.vec", Xs);
+  mymtx::vector::fwrite("vec_out/finite/ys.vec", mymtx::map(Xs, *mfn));
+  for (size_t i = 0; i < xs.size; i++) {
+    points[i].x = xs[i];
+    points[i].y = ys[i];
+  }
+  // line splines
+  FiniteElement line(points, 100, 0.2);
+  {
+    mymtx::vector Ys = mymtx::map(Xs, &line);
+    double error = (ys - mymtx::map(xs, &line)).distance();
+    mymtx::vector errorvec(100);
+    randomize(errorvec);
+    strm_out(
+        "Error (line normal density):"
+        << (mymtx::map(errorvec, line) - mymtx::map(errorvec, normal_density))
+               .distance());
+    mymtx::vector::fwrite("vec_out/finite/finite.vec", Ys);
+  }
+
+  strm_out("area pi:" << area_montecarlo_2d(fn, 0, M_PI));
+  strm_out("area 2pi:" << area_montecarlo_2d(fn, 0, 2 * M_PI));
+
+  return 0;
+}
