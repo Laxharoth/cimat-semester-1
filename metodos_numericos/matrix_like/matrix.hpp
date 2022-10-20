@@ -112,8 +112,8 @@ public:
   double operator*(const vector &other) const;
   vector operator+(const vector &other);
   vector &operator+=(const vector &other);
-  vector operator-(const vector &other);
   vector &operator-=(const vector &other);
+  vector operator-(const vector &other) const;
   vector &operator=(const vector &other);
   vector &operator=(const double coef);
   vector subvector(size_t from, size_t size);
