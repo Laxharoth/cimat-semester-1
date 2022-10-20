@@ -46,8 +46,7 @@ MultiVarFunctionWrapper::operator()(const std::vector<double> &x) const {
 Gradient::Gradient(MultiVarFunctionWrapper *const original)
     : original_function(original) {}
 std::vector<double> Gradient::eval(const std::vector<double> &x) {
-  std::vector<double> result;
-  result.reserve(x.size());
+  std::vector<double> result(x.size());
   for (unsigned int i = 0; i < x.size(); ++i) {
     auto cpy = x;
     cpy[i] += DELTA_X;
@@ -57,8 +56,7 @@ std::vector<double> Gradient::eval(const std::vector<double> &x) {
   return result;
 }
 std::vector<double> Gradient::eval(const std::vector<double> &x) const {
-  std::vector<double> result;
-  result.reserve(x.size());
+  std::vector<double> result(x.size());
   for (unsigned int i = 0; i < x.size(); ++i) {
     auto cpy = x;
     cpy[i] += DELTA_X;
