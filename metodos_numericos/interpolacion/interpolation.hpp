@@ -100,4 +100,15 @@ vector map(const vector &v, FunctionWrapper *fn);
 vector map(const vector &v, const FunctionWrapper &fn);
 } // namespace mymtx
 
+enum sign { POSITIVE = 1, NEGATIVE = -1 };
+
+struct fn_interval {
+  const double x0;
+  const double x1;
+  sign area_sign;
+};
+
+double bisection(FunctionWrapper &fn, double, double);
+double area_montecarlo_2d(FunctionWrapper &fn, const double x0,
+                          const double x1);
 #endif /* INTERPOLATION_HPP */

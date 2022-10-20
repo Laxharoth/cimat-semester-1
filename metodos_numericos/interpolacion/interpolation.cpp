@@ -336,3 +336,134 @@ vector map(const vector &v, const FunctionWrapper &fn) {
   return v_new;
 }
 } // namespace mymtx
+
+double _area_montecarlo_2d(FunctionWrapper &fn, fn_interval);
+double area_montecarlo_2d(FunctionWrapper &fn, const double x0,
+                          const double x1) {
+  std::vector<fn_interval> intervlas;
+  const double dx = (x1 - x0) / 1000;
+  double area = 0;
+  double init_interval = x0;
+  double current;
+  double next = x0;
+  for (current = next; current < x1; current = next) {
+    next = std::min(current + dx, x1);
+    if (fn(current) * fn(next) < 0) {
+      const double end_interval = bisection(fn, current, next);
+      fn_interval interval = {
+          .x0 = init_interval, .x1 = end_interval, .area_sign = sign::POSITIVE};
+      if (fn((init_interval + end_interval) / 2) < 0)
+        interval.area_sign = sign::NEGATIVE;
+      intervlas.push_back(interval);
+      next = init_interval = end_interval;
+    }
+  }
+  if (init_interval != x1) {
+    fn_interval interval = {
+        .x0 = init_interval, .x1 = x1, .area_sign = sign::POSITIVE};
+    if (fn((init_interval + x1) / 2) < 0)
+      interval.area_sign = sign::NEGATIVE;
+    intervlas.push_back(interval);
+  }
+  for (auto &&i : intervlas) {
+    double interval_area = 0;
+    interval_area = _area_montecarlo_2d(fn, i);
+    area += interval_area * i.area_sign;
+  }
+  return area;
+}
+double _area_montecarlo_2d(FunctionWrapper &fn, fn_interval interval) {
+  // TODO: GET INTERVAL AREA;
+  // find max
+  const double tolerance = 1E-5;
+  Derivative dfn(&fn);
+  double current = interval.x0;
+  double max_current = interval.x0;
+  double max_eval = std::abs(fn(max_current));
+  const unsigned iters = 1000;
+  const double inc = (interval.x1 - interval.x0) / (iters - 1);
+  current += inc;
+  for (unsigned i = 0; i < iters; ++i, current += inc) {
+    const double eval = std::abs(fn(current));
+    if (eval > max_eval) {
+      max_current = current;
+      max_eval = eval;
+    }
+  }
+  // if max local find max with bisection
+  if ((std::abs(fn(max_current - inc)) - max_eval) *
+          (std::abs(fn(max_current + inc)) - max_eval) >
+      0)
+    max_current = bisection(dfn, max_current - inc, max_current + inc);
+  // make sure it stays in the range after bisection
+  if (max_current < interval.x0)
+    max_current = interval.x0;
+  if (max_current > interval.x1)
+    max_current = interval.x1;
+  max_eval = std::abs(fn(max_current));
+  // calculate percent loop
+  const unsigned long points_increment = 3000;
+  unsigned long total_points = 0;
+  unsigned long coutn_in = 0;
+  double current_area = 0;
+  double prev_area;
+  const double height = max_eval * 2;
+  const double square_area = (interval.x1 - interval.x0) * height;
+  double error = 1;
+  randgen &rng = randgen::get_randgen();
+
+  do {
+    prev_area = current_area;
+    total_points += points_increment;
+    for (unsigned long i = 0; i < points_increment; ++i) {
+      const double x = rng.generate(interval.x0, interval.x1);
+      const double y = rng.generate(0, height);
+      if (y <= std::abs(fn(x)))
+        ++coutn_in;
+    }
+    current_area =
+        ((double)(coutn_in * square_area)) / ((double)(total_points));
+    error = std::abs(current_area - prev_area);
+  } while (error < tolerance);
+  // return area
+  return current_area;
+}
+double bisection(FunctionWrapper &funcion, double x_inferior,
+                 double x_superior) {
+  auto calc_err = [](double &anterior, double &actual) {
+    return std::abs((actual - anterior)) / std::abs(actual);
+  };
+  int inner_iter{0};
+  int *real_iter;
+  if (x_inferior == x_superior)
+    throw - 1;
+  if (x_inferior > x_superior) {
+    std::swap(x_inferior, x_superior);
+  }
+  double y_inferior = funcion(x_inferior);
+  double y_superior = funcion(x_superior);
+  if (std::abs(y_inferior) <= EP)
+    return x_inferior;
+  if (std::abs(y_superior) <= EP)
+    return x_superior;
+  double x_medio{}, y_medio{};
+  real_iter = &inner_iter;
+
+  while ((*real_iter) < 1000) {
+    ++(*real_iter);
+    if (y_inferior * y_superior > 0)
+      throw - 1;
+    x_medio = (x_inferior + x_superior) / 2;
+    y_medio = funcion(x_medio);
+    if (std::abs(y_medio) <= EP)
+      return x_medio;
+    if (y_medio * y_inferior > 0) {
+      x_inferior = x_medio;
+    } else {
+      x_superior = x_medio;
+    }
+    printf("%d\n", *real_iter);
+  }
+  return x_medio;
+}
+
