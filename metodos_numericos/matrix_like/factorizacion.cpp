@@ -4,23 +4,20 @@
 void crout(const mymtx::matrix &A_mtx, mymtx::matrix &L_mtx,
            mymtx::matrix &U_mtx) {
   const size_t size = A_mtx.shape_y;
-  auto calcular_factor_inferior = [&](const int &i, const int &j) {
-    L_mtx(i, j) = A_mtx(i, j);
-    for (int k = 0; k <= j - 1; ++k)
-      L_mtx(i, j) -= L_mtx(i, k) * U_mtx(k, j);
-  };
-  auto calcular_factor_superior = [&](const int &i, const int &j) {
-    U_mtx(i, j) = A_mtx(i, j);
-    for (int k = 0; k <= i - 1; ++k)
-      U_mtx(i, j) -= L_mtx(i, k) * U_mtx(k, j);
-    U_mtx(i, j) /= L_mtx(i, i);
-  };
+  double sum = 0;
   for (int i = 0; i < size; ++i) {
     for (int j = 0; j < i; ++j) {
-      calcular_factor_inferior(i, j);
-      calcular_factor_superior(j, i);
+      sum = 0;
+      for (int k = 0; k < j; ++k)
+        sum += L_mtx(i, k) * U_mtx(k, j);
+      L_mtx(i, j) -= sum;
+      U_mtx(j, i) -= sum;
+      U_mtx(j, i) /= L_mtx(j, j);
     }
-    calcular_factor_inferior(i, i);
+    sum = 0;
+    for (int k = 0; k < i; ++k)
+      sum += L_mtx(i, k) * U_mtx(k, i);
+    L_mtx(i, i) -= sum;
     if (L_mtx(i, i) == 0)
       throw cant_factor_exception();
   }
