@@ -189,7 +189,7 @@ vector &vector::operator-=(const vector &other) {
   }
   return *this;
 }
-vector vector::operator-(const vector &other) {
+vector vector::operator-(const vector &other) const {
   auto cpy = *this;
   cpy -= other;
   return cpy;
