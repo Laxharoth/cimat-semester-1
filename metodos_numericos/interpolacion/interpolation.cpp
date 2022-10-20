@@ -274,6 +274,52 @@ unsigned int binarySearch(const std::vector<point> &arr, double x) {
   return p;
 }
 
+FiniteElement::FiniteElement(const std::vector<point> &p_points,
+                             const unsigned int nodes, const double lambda)
+    : points(p_points), phi(mymtx::vector(nodes)) {
+  std::sort(points.begin(), points.end(),
+            [](const point &a, const point &b) { return a.x < b.x; });
+  increment = ((points[points.size() - 1].x - points[0].x) / nodes);
+  mymtx::matrix N_mtx(nodes, nodes);
+  mymtx::vector yi(nodes);
+  // compute Ni and ys
+  size_t current_point_i = 0;
+  double current_x = points[0].x;
+  for (size_t diagonal = 0; diagonal < nodes - 1; ++diagonal) {
+    N_mtx(diagonal, diagonal) += lambda / increment;
+    N_mtx(diagonal + 1, diagonal + 1) += lambda / increment;
+    N_mtx(diagonal + 1, diagonal) -= lambda / increment;
+    N_mtx(diagonal, diagonal + 1) -= lambda / increment;
+    while (current_point_i < points.size() &&
+           points[current_point_i].x < current_x + increment) {
+      double Ni = 1 - (points[current_point_i].x - current_x) / increment;
+      double Ni_p_1 = (points[current_point_i].x - current_x) / increment;
+      N_mtx(diagonal, diagonal) += Ni * Ni;
+      N_mtx(diagonal + 1, diagonal + 1) += Ni_p_1 * Ni_p_1;
+      N_mtx(diagonal + 1, diagonal) += Ni * Ni_p_1;
+      N_mtx(diagonal, diagonal + 1) += Ni * Ni_p_1;
+      yi[diagonal] += Ni * points[current_point_i].y;
+      yi[diagonal + 1] += Ni_p_1 * points[current_point_i].y;
+      ++current_point_i;
+    }
+    current_x += increment;
+  }
+  factor_cholesky(N_mtx, N_mtx);
+  solve_cholesky(N_mtx, phi, yi);
+}
+double FiniteElement::eval(const double &x) const {
+  double first = points[0].x;
+  size_t index{0};
+  while (first + increment <= x) {
+    first += increment;
+    ++index;
+  }
+  return phi[index] + ((x - first) / increment) * (phi[index + 1] - phi[index]);
+}
+double FiniteElement::eval(const double &x) {
+  return static_cast<const FiniteElement *>(this)->eval(x);
+}
+
 namespace mymtx {
 vector map(const vector &v, FunctionWrapper *fn) {
   vector v_new(v.size);

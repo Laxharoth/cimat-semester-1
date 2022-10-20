@@ -70,6 +70,17 @@ public:
   double eval(const double &x) const;
   CubicSpline(const std::vector<point> &points);
 };
+class FiniteElement : public FunctionWrapper {
+  std::vector<point> points;
+  mymtx::vector phi;
+  double increment;
+
+public:
+  FiniteElement(const std::vector<point> &points, const unsigned int nodes,
+                const double lambda);
+  double eval(const double &x) const;
+  double eval(const double &x);
+};
 
 PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y);
 PolyFunction interpolate_poly(const mymtx::vector &X, const mymtx::vector &Y,
