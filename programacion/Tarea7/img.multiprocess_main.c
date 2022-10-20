@@ -33,16 +33,18 @@
 #define FORK_SIZE 2
 #endif // !FORK_SIZE
 
+#define IMG "foto.pgm"
+
 // pgm1 se modifico para usar apuntador simple
 void fork_replace(char *mtx, int dim_y, int dim_x, filter fnc, int window_size,
                   size_t forks);
 int main(int argc, char const *argv[]) {
   int cols, rows;
-  char *img = (char *)pgmRead("fractal_tree.ascii.pgm", &rows, &cols);
+  char *img = (char *)pgmRead(IMG, &rows, &cols);
 // replace( img, rows,cols,median, 9 );
 #ifndef MEASURE_TIME
   fork_replace(img, rows, cols, median, WINDOW_SIZE, FORK_SIZE);
-  pgmWrite("fractal_tree.2.ascii.pgm", rows, cols, (unsigned char *)img, "");
+  pgmWrite("2." IMG, rows, cols, (unsigned char *)img, "");
 #else
   int window_size[] = {3, 5, 7, 9};
   int forks[] = {1, 2, 3, 4, 9};
