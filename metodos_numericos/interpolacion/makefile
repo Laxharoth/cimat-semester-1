@@ -1,3 +1,13 @@
+##################################
+#
+# para ejecutar el programa de interpolacion con
+#  splines utilizar el comando `make main2`
+#
+# para visualizar las graficas de los splines
+#  utilizar el notebook interpolation2.ipynb
+#
+###################################
+
 object_files = matrix.o function_wrapper.o funcion_matriz.o
 
 main: main.run
@@ -8,6 +18,10 @@ main2: main2.run
 	./main2.run
 main2.run :main_interpolacion2.cpp interpolation.cpp $(object_files)
 	g++ -O2 -pthread -g -o main2.run main_interpolacion2.cpp interpolation.cpp $(object_files)
+main3: main3.run
+	./main3.run
+main3.run :main_interpolacion3.cpp interpolation.cpp $(object_files)
+	g++ -O2 -pthread -g -o main3.run main_interpolacion3.cpp interpolation.cpp $(object_files) -lm
 test: test.run
 	./test.run
 test.run :test.cpp interpolation.cpp $(object_files)
