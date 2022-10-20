@@ -37,3 +37,6 @@ function_wrapper.o: function_wrapper/function_wrapper.hpp function_wrapper/funct
 	mv function_wrapper/function_wrapper.o .
 interpolation.o: interpolation.hpp interpolation.cpp matrix_like/real_matrix.hpp function_wrapper/function_wrapper.hpp funcion_matriz.hpp
 	g++ -O2  -c interpolation.cpp
+clean:
+	rm -f *.o
+	rm -f *.run
