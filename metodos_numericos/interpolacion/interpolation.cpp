@@ -170,8 +170,9 @@ double LineSpline::eval(const double &x) {
 }
 double LineSpline::eval(const double &x) const {
   unsigned int n = binarySearch(points, x);
-  return points[n].y + (points[n + 1].y - points[n].y) /
-                           (points[n + 1].x - points[n].x) * (x - points[n].x);
+  const double m =
+      (points[n + 1].y - points[n].y) / (points[n + 1].x - points[n].x);
+  return points[n].y + m * (x - points[n].x);
 }
 
 CuadraticSpline::CuadraticSpline(const std::vector<point> &points)
@@ -197,8 +198,11 @@ double CuadraticSpline::eval(const double &x) {
 double CuadraticSpline::eval(const double &x) const {
   unsigned int n = binarySearch(points, x);
   const double dx = x - points[n].x;
-  return (Si[n + 1] - Si[n]) / (2 * (points[n + 1].x - points[n].x)) * dx * dx +
-         Si[n] * dx + points[n].y;
+  const double h = points[n + 1].x - points[n].x;
+  const double a = (Si[n + 1] - Si[n]) / (2 * h);
+  const double b = Si[n];
+  const double c = points[n].y;
+  return a * dx * dx + b * dx + c;
 }
 
 CubicSpline::CubicSpline(const std::vector<point> &points)
@@ -237,12 +241,14 @@ double CubicSpline::eval(const double &x) {
 }
 double CubicSpline::eval(const double &x) const {
   unsigned int n = binarySearch(points, x);
-  double dx = x - points[n].x;
-  double dxn = x - points[n + 1].x;
-  double dy = points[n + 1].y - points[n].y;
-  return (Si[n] * (-dxn * dxn * dxn) + Si[n + 1] * (dx)) / (6 * dx) +
-         (dy / dx - (Si[n + 1] - Si[n]) * dx / 6) * dx + points[n].y -
-         Si[n] * dx * dx / 6;
+  const double h = points[n + 1].x - points[n].x;
+  const double t = points[n + 1].y - points[n].y;
+  const double dx = x - points[n].x;
+  const double a = points[n].y;
+  const double b = t / h - h / 3 * ((2 * Si[n] + Si[n + 1]) / 2);
+  const double c = Si[n] / 2;
+  const double d = (Si[n + 1] - Si[n]) / (3 * h);
+  return a + b * dx + c * dx * dx + d * dx * dx * dx;
 }
 
 unsigned int binarySearch(const std::vector<point> &arr, double x) {
