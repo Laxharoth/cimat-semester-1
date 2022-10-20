@@ -5,55 +5,54 @@ library(tidyverse)
 ```{r}
 data <- rnorm(2000, 1, 3)
 var_list <- list(
-  var1 = c(4,16,32),
-  var2 = c("green","blue","red")
+  var1 = c(4, 16, 32),
+  var2 = c("green", "blue", "red")
 )
-
-
 ```
 ```{r}
 d <- density(x = data, bw = 1 / 8, kernel = "rectangular")
-plot(d, main = "Rectangle",xlab = "")
-for( i in 1:length(var_list$var1 ) ){
+plot(d, main = "Rectangle", xlab = "")
+for (i in 1:length(var_list$var1)) {
   print(v$var1[i])
-  lines(density(x = data, bw = var_list$var1[i] / 8, 
-                kernel = "rectangular"), col=var_list$var2[i],
-        )
+  lines(density(
+    x = data, bw = var_list$var1[i] / 8,
+    kernel = "rectangular"
+  ), col = var_list$var2[i], )
 }
 legend("topleft",
-  c("1/8","1/2","2","4"),
-  fill=c("black","green","blue","red")
+  c("1/8", "1/2", "2", "4"),
+  fill = c("black", "green", "blue", "red")
 )
 ```
 
 ```{r}
 d <- density(x = data, bw = 1 / 8, kernel = "gaussian")
-plot(d, main = "Gaussian",xlab = "")
-for( i in 1:length(var_list$var1 ) ){
+plot(d, main = "Gaussian", xlab = "")
+for (i in 1:seq_along(var_list$var1)) {
   print(v$var1[i])
-  lines(density(x = data, bw = var_list$var1[i] / 8, 
-                kernel = "rectangular"), col=var_list$var2[i],
-        )
+  lines(density(
+    x = data, bw = var_list$var1[i] / 8,
+    kernel = "rectangular"
+  ), col = var_list$var2[i], )
 }
 legend("topleft",
-  c("1/8","1/2","2","4"),
-  fill=c("black","green","blue","red")
+  c("1/8", "1/2", "2", "4"),
+  fill = c("black", "green", "blue", "red")
 )
-
 ```
 ```{r}
 d <- density(x = data, bw = 1 / 8, kernel = "triangular")
-plot(d, main = "Triangular",xlab = "")
-for( i in 1:length(var_list$var1 ) ){
+plot(d, main = "Triangular", xlab = "")
+for (i in 1:length(var_list$var1)) {
   print(v$var1[i])
-  lines(density(x = data, bw = var_list$var1[i] / 8, 
-                kernel = "rectangular"), col=var_list$var2[i],
-        )
+  lines(density(
+    x = data, bw = var_list$var1[i] / 8,
+    kernel = "rectangular"
+  ), col = var_list$var2[i], )
 }
 legend("topleft",
-  c("1/8","1/2","2","4"),
-  fill=c("black","green","blue","red")
+  c("1/8", "1/2", "2", "4"),
+  fill = c("black", "green", "blue", "red")
 )
-
 ```
 
