@@ -217,8 +217,8 @@ CubicSpline::CubicSpline(const std::vector<point> &points)
   hinext = points[2].x - points[1].x;
   tinext = points[2].y - points[1].y;
   for (size_t i = 0; i < ti.size; i++) {
-    hinow = points[i + 2].x - points[i + 1].x;
-    tinow = points[i + 2].y - points[i + 1].y;
+    hinext = points[i + 2].x - points[i + 1].x;
+    tinext = points[i + 2].y - points[i + 1].y;
 
     ti[i] = tinext / hinext - tinow / hinow;
 
