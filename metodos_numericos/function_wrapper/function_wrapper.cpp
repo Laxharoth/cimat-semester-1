@@ -2,6 +2,7 @@
 #define FUNCTION_WRAPPER_CPP
 #include "function_wrapper.hpp"
 #include <exception>
+#include <vector>
 
 Derivative::Derivative(FunctionWrapper *original)
     : original_function(original) {}
@@ -25,4 +26,37 @@ Count::Count(double start, double end, unsigned int steps)
 }
 double Count::eval(const double &x) { return current += step; }
 double Count::eval(const double &x) const { throw cant_be_const(); }
+std::vector<double>
+MultiVarFunctionWrapper::operator()(const std::vector<double> &x) {
+  return eval(x);
+}
+std::vector<double>
+MultiVarFunctionWrapper::operator()(const std::vector<double> &x) const {
+  return eval(x);
+}
+Gradient::Gradient(MultiVarFunctionWrapper *const original)
+    : original_function(original) {}
+std::vector<double> Gradient::eval(const std::vector<double> &x) {
+  std::vector<double> result;
+  result.reserve(x.size());
+  for (unsigned int i = 0; i < x.size(); ++i) {
+    auto cpy = x;
+    cpy[i] += DELTA_X;
+    result[i] =
+        ((*original_function)(cpy)[0] - (*original_function)(x)[0]) / DELTA_X;
+  }
+  return result;
+}
+std::vector<double> Gradient::eval(const std::vector<double> &x) const {
+  std::vector<double> result;
+  result.reserve(x.size());
+  for (unsigned int i = 0; i < x.size(); ++i) {
+    auto cpy = x;
+    cpy[i] += DELTA_X;
+    result[i] =
+        ((*original_function)(cpy)[0] - (*original_function)(x)[0]) / DELTA_X;
+  }
+  return result;
+}
+
 #endif /* FUNCTION_WRAPPER_CPP */
