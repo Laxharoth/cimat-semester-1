@@ -1,0 +1,116 @@
+---
+title: "Tarea 7"
+output: html_notebook
+---
+```{r}
+library(gapminder)
+library(tidyverse)
+library(GGally)
+library(plotly)
+```
+
+problema 3
+```{r}
+u1 <- runif(500, 0, 1)
+u2 <- runif(500, 0, 1)
+cor(u1, u2)
+
+
+plot(u1, u2)
+```
+
+
+```{r}
+u1 <- runif(500, 0, 1)
+u2 <- 2 * u1
+cor(u1, u2)
+
+plot(u1, u2)
+```
+
+problema 5
+```{r}
+sample1 <- read_csv("area1.csv") %>% mutate( sample = 1  )
+sample2 <- read_csv("area2.csv") %>% mutate( sample = 2  )
+sample3 <- read_csv("area3.csv") %>% mutate( sample = 3  )
+
+sample <- rbind(sample1,sample2,sample3) %>% mutate(sample = as.character(sample))
+
+```
+
+```{r}
+ggpairs(sample,
+  columns = c("R", "G", "B"),
+  aes( color=sample, alpha=0.2  )
+)
+```
+
+
+```{r}
+ggpairs(sample2,
+  columns = c("R", "G", "B"),
+  aes( alpha=0.2, )
+)
+```
+```{r}
+ggpairs(sample3,
+  columns = c("R", "G", "B"),
+  aes( alpha=0.2  )
+)
+```
+problema 6
+```{r}
+
+fn <- function(x) 2*(sqrt(log(1 / (1 - x))))
+
+u <- runif(200, 0, 1)
+x <- mapply(fn, u)
+
+qqnorm(x, ylab = "u", xlab = "X")
+qqline(x)
+```
+
+problema 7
+```{r}
+df <- gapminder
+df <- df %>% mutate(GDP = gdpPercap * pop)
+
+work_countries <- unique(df[order(df$gdpPercap), ]$country)
+
+df[df$country %in% work_countries[0:5], ] %>%
+  mutate(GDP = gdpPercap * pop) %>%
+  transform(year = as.character(year)) %>%
+  ggplot(aes(y = country, size = gdpPercap, x = year)) +
+  geom_point() +
+  ggtitle(" Paises con menor gdp Percap: ")
+df[df$country %in% work_countries[0:5], ] %>%
+  transform(year = as.character(year)) %>%
+  ggplot(aes(y = country, x = year)) +
+  geom_tile(aes(fill = GDP), colour = "white") +
+  scale_fill_gradient(low = "blue", high = "red") +
+  ggtitle(" Paises con menor gdp Percap: ")
+
+work_countries <- unique(df[order(df$GDP), ]$country)
+df[df$country %in% work_countries[0:5], ] %>%
+  mutate(GDP = gdpPercap * pop) %>%
+  transform(year = as.character(year)) %>%
+  ggplot(aes(y = country, size = gdpPercap, x = year)) +
+  geom_point() +
+  ggtitle(" Paises con menor GDP: ")
+df[df$country %in% work_countries[0:5], ] %>%
+  transform(year = as.character(year)) %>%
+  ggplot(aes(y = country, x = year)) +
+  geom_tile(aes(fill = GDP), colour = "white") +
+  scale_fill_gradient(low = "blue", high = "red") +
+  ggtitle(" Paises con menor GDP: ")
+
+df %>%
+  transform(year = as.character(year)) %>%
+  ggplot(aes(y = country, x = year)) +
+  geom_tile(aes(fill = gdpPercap)) +
+  scale_fill_gradient(low = "blue", high = "red") +
+  ggtitle(" gdp Percap por pais")
+
+```
+
+
