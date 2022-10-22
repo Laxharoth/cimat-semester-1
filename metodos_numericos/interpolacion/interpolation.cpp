@@ -313,6 +313,7 @@ double FiniteElement::eval(const double &x) const {
     first += increment;
     ++index;
   }
+  index = std::min(index, points.size() - 2);
   return phi[index] + ((x - first) / increment) * (phi[index + 1] - phi[index]);
 }
 double FiniteElement::eval(const double &x) {
@@ -335,93 +336,64 @@ vector map(const vector &v, const FunctionWrapper &fn) {
   return v_new;
 }
 } // namespace mymtx
-double _area_montecarlo_2d(FunctionWrapper &fn, fn_interval);
-double area_montecarlo(FunctionWrapper &fn, const double x0, const double x1) {
-  std::vector<fn_interval> intervlas;
-  const double dx = (x1 - x0) / 1000;
+double _area_montecarlo_2d(FunctionWrapper &fn, const double x0,
+                           const double x1, double max_eval, sign s);
+double area_montecarlo(FunctionWrapper &fn, double x0, double x1) {
   double area = 0;
-  double init_interval = x0;
-  double current;
-  double next = x0;
-  for (current = next; current < x1; current = next) {
-    next = std::min(current + dx, x1);
-    if (fn(current) * fn(next) < 0) {
-      const double end_interval = bisection(fn, current, next);
-      fn_interval interval = {
-          .x0 = init_interval, .x1 = end_interval, .area_sign = sign::POSITIVE};
-      if (fn((init_interval + end_interval) / 2) < 0)
-        interval.area_sign = sign::NEGATIVE;
-      intervlas.push_back(interval);
-      next = init_interval = end_interval;
+  double x_min;
+  double val_min = 0;
+  double x_max;
+  double val_max = 0;
+  const double delta = 0.05;
+  if (x0 > x1)
+    std::swap(x0, x1);
+  // find min and max
+  for (double x = x0; x <= x1 + EP; x += delta) {
+    {
+      const double cur_eval = fn(x);
+      if (cur_eval > val_max) {
+        val_max = cur_eval;
+        x_max = x;
+      }
+      if (cur_eval < val_min) {
+        val_min = cur_eval;
+        x_min = x;
+      }
     }
   }
-  if (init_interval != x1) {
-    fn_interval interval = {
-        .x0 = init_interval, .x1 = x1, .area_sign = sign::POSITIVE};
-    if (fn((init_interval + x1) / 2) < 0)
-      interval.area_sign = sign::NEGATIVE;
-    intervlas.push_back(interval);
-  }
-  for (auto &&i : intervlas) {
-    double interval_area = 0;
-    interval_area = _area_montecarlo_2d(fn, i);
-    area += interval_area * i.area_sign;
-  }
+  if (val_min < 0)
+    area += _area_montecarlo_2d(fn, x0, x1, val_min, sign::NEGATIVE);
+  if (val_max > 0)
+    area += _area_montecarlo_2d(fn, x0, x1, val_max, sign::POSITIVE);
   return area;
 }
-double _area_montecarlo_2d(FunctionWrapper &fn, fn_interval interval) {
-  // find max
-  const double tolerance = 1E-5;
-  Derivative dfn(&fn);
-  double current = interval.x0;
-  double max_current = interval.x0;
-  double max_eval = std::abs(fn(max_current));
-  const unsigned iters = 1000;
-  const double inc = (interval.x1 - interval.x0) / (iters - 1);
-  current += inc;
-  for (unsigned i = 0; i < iters; ++i, current += inc) {
-    const double eval = std::abs(fn(current));
-    if (eval > max_eval) {
-      max_current = current;
-      max_eval = eval;
-    }
-  }
-  // if max local find max with bisection
-  if ((std::abs(fn(max_current - inc)) - max_eval) *
-          (std::abs(fn(max_current + inc)) - max_eval) >
-      0)
-    max_current = bisection(dfn, max_current - inc, max_current + inc);
-  // make sure it stays in the range after bisection
-  if (max_current < interval.x0)
-    max_current = interval.x0;
-  if (max_current > interval.x1)
-    max_current = interval.x1;
-  max_eval = std::abs(fn(max_current));
-  // calculate percent loop
+double _area_montecarlo_2d(FunctionWrapper &fn, const double x0,
+                           const double x1, double max_eval, sign s) {
   const unsigned long points_increment = 3000;
   unsigned long total_points = 0;
   unsigned long coutn_in = 0;
   double current_area = 0;
   double prev_area;
-  const double height = max_eval * 2;
-  const double square_area = (interval.x1 - interval.x0) * height;
-  double error = 1;
-  randgen &rng = randgen::get_randgen();
-
+  const double sign = (max_eval < 0) ? -1 : 1;
+  const double height = std::abs(max_eval * 2);
+  const double total_area = (x1 - x0) * height * sign;
+  auto &rng = randgen::get_randgen();
+  std::vector<double> point(2);
   do {
-    prev_area = current_area;
-    total_points += points_increment;
-    for (unsigned long i = 0; i < points_increment; ++i) {
-      const double x = rng.generate(interval.x0, interval.x1);
-      const double y = rng.generate(0, height);
-      if (y <= std::abs(fn(x)))
-        ++coutn_in;
+    auto xs = rng.sample(points_increment, x0, x1);
+    auto ys = rng.sample(points_increment, 0, height);
+    auto xi = xs.begin();
+    auto yi = ys.begin();
+    for (; xi != xs.end(); ++xi, ++yi) {
+      double vali = fn(*xi);
+      if (*yi < sign * vali)
+        coutn_in++;
     }
-    current_area =
-        ((double)(coutn_in * square_area)) / ((double)(total_points));
-    error = std::abs(current_area - prev_area);
-  } while (error < tolerance);
-  // return area
+    total_points += points_increment;
+    prev_area = current_area;
+    current_area = ((double)(coutn_in * total_area)) / ((double)(total_points));
+  } while (std::abs(current_area - prev_area) < EP);
+
   return current_area;
 }
 double _vol_montecarlo(MultiVarFunctionWrapper &fn, point p0, point p1,
@@ -470,9 +442,9 @@ double _vol_montecarlo(MultiVarFunctionWrapper &fn, point p0, point p1,
   unsigned long coutn_in = 0;
   double current_area = 0;
   double prev_area;
-  const double height = std::abs(max_eval * 2);
-  const double total_volum = (p1.y - p0.y) * (p1.x - p0.x) * height;
   const double sign = (max_eval < 0) ? -1 : 1;
+  const double height = std::abs(max_eval * 2);
+  const double total_volum = (p1.y - p0.y) * (p1.x - p0.x) * height * sign;
   auto &rng = randgen::get_randgen();
   std::vector<double> point(2);
   do {
