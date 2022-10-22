@@ -25,7 +25,7 @@ int main(int argc, const char **argv) {
 
   auto mfn = &testfn;
 
-  mymtx::vector xs(30);
+  mymtx::vector xs(150);
   randomize(xs);
   const mymtx::vector ys = mymtx::map(xs, *mfn);
   std::vector<point> points(xs.size);
@@ -40,23 +40,22 @@ int main(int argc, const char **argv) {
   // line splines
   FiniteElement line(points, 100, 0.2);
   {
+    mymtx::vector xs(30);
+    randomize(xs);
     mymtx::vector Ys = mymtx::map(Xs, &line);
-    double error = (ys - mymtx::map(xs, &line)).distance();
+    double error = (mymtx::map(xs, testfn) - mymtx::map(xs, &line)).distance();
     mymtx::vector errorvec(100);
     randomize(errorvec);
-    strm_out(
-        "Error (line normal density):"
-        << (mymtx::map(errorvec, line) - mymtx::map(errorvec, normal_density))
-               .distance());
+    strm_out("Error (Diferencias Finitas):" << error);
     mymtx::vector::fwrite("vec_out/finite/finite.vec", Ys);
   }
-  strm_out("area pi:" << area_montecarlo(fn, 0, M_PI));
-  strm_out("area 2pi:" << area_montecarlo(fn, 0, 2 * M_PI));
+  strm_out("area (sin(x)) from 0 to pi:" << area_montecarlo(fn, 0, M_PI));
+  strm_out("area (sin(x)) from 0 to 2pi:" << area_montecarlo(fn, 0, 2 * M_PI));
 
   point p0{0, 0};
   point p1{10, 10};
   fffn mvfn;
-  strm_out("area:" << volum_montecarlo(mvfn, p0, p1));
+  strm_out("volumen (x+y) from 0  to 10:" << volum_montecarlo(mvfn, p0, p1));
 
   return 0;
 }
