@@ -41,6 +41,10 @@ sample3 <- read_csv("area3.csv") %>% mutate(sample = 3)
 
 sample <- rbind(sample1, sample2, sample3) %>%
   mutate(sample = as.character(sample))
+library(entropy)
+mi.plugin(sample[c("R", "G")])
+mi.plugin(sample[c("R", "B")])
+mi.plugin(sample[c("G", "B")])
 ```
 
 ```{r}
