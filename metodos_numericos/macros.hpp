@@ -38,7 +38,7 @@ using namespace std::chrono;
     what;                                                                      \
     auto end = high_resolution_clock::now();                                   \
     auto duration = duration_cast<microseconds>(end - start);                  \
-    (*(macros::out)) << "time: " << duration.count() << "micro s"              \
+    (*(macros::out)) << "time: " << duration.count() << " micro s"             \
                      << std::endl;                                             \
   }
 #define out_vector(vector, filename)                                           \
