@@ -49,13 +49,19 @@ int main(int argc, const char **argv) {
     strm_out("Error (Diferencias Finitas):" << error);
     mymtx::vector::fwrite("vec_out/finite/finite.vec", Ys);
   }
-  strm_out("area (sin(x)) from 0 to pi:" << area_montecarlo(fn, 0, M_PI));
-  strm_out("area (sin(x)) from 0 to 2pi:" << area_montecarlo(fn, 0, 2 * M_PI));
+  measure_time(
+      strm_out("area (sin(x)) from 0 to pi:" << area_montecarlo(fn, 0, M_PI));)
+      measure_time(strm_out("area (sin(x)) from 0 to 2pi:"
+                            << area_montecarlo(fn, 0, 2 * M_PI));)
 
+          point p_1{-10, -10};
   point p0{0, 0};
   point p1{10, 10};
   fffn mvfn;
-  strm_out("volumen (x+y) from 0  to 10:" << volum_montecarlo(mvfn, p0, p1));
+  measure_time(strm_out("volumen (x+y) from 0  to 10:"
+                        << volum_montecarlo(mvfn, p0, p1));)
+      measure_time(strm_out("volumen (x+y) from -10  to 10:"
+                            << volum_montecarlo(mvfn, p_1, p1));)
 
-  return 0;
+          return 0;
 }
