@@ -1,4 +1,11 @@
 #include "interpolation.hpp"
+#include "function_wrapper/function_wrapper.hpp"
+#include "matrix_like/matrix.hpp"
+#include <cmath>
+#include <cstddef>
+#include <functional>
+#include <tuple>
+#include <vector>
 
 PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y) {
   return interpolate_poly(X, Y, 1);
@@ -531,4 +538,66 @@ double norm(std::vector<double> &vec) {
     sum += v * v;
   }
   return std::sqrt(sum);
+}
+
+double integral_newton_cotes(FunctionWrapper &fn, const double from,
+                             const double to, const unsigned grade) {
+  /* clang-format off */
+  static const std::vector<std::vector<double>> cotes_constans{
+		{1/2.0   , 1/2.0},
+		{1/3.0   , 4/3.0    , 1/3.0},
+		{3/8.0   , 9/8.0    , 9/8.0   , 3/8.0},
+		{14/45.0  , 64/45.0  , 24/45.0 , 64/45.0  , 14/45.0},
+		{5.0/288 * 19, 5.0/288 * 75, 5.0/288 * 50, 5.0/288 * 50, 5.0/288 * 50, 5.0/288 * 75, 5.0/288 * 19 },
+		{1.0/140 * 41, 1.0/140 * 216, 1.0/140 * 27, 1.0/140 * 272, 1.0/140 * 27, 1.0/140 * 216, 1.0/140 * 41},
+	};
+  /* clang-format on */
+  double integral{0};
+  const double increment = (to - from) / (grade);
+  double x = from;
+  for (auto &&c : cotes_constans[grade - 1]) {
+    integral += c * fn(x);
+    x += increment;
+  }
+  return integral * increment;
+}
+double romberg_method(FunctionWrapper &fn, const double from, const double to,
+                      const int maxRows, const double tolerance) {
+  return richardson_extrapolation(fn, from, to, maxRows, tolerance, 1);
+}
+double richardson_extrapolation(FunctionWrapper &f, double from, double to,
+                                const int maxRows, const double tolerance,
+                                const unsigned int grade) {
+  // only require current row and previous
+  mymtx::vector buff1(maxRows);
+  mymtx::vector buff2(maxRows);
+  mymtx::vector *_row = &buff1;
+  mymtx::vector *_row_prev = &buff2;
+  double h = (to - from);
+  (*_row_prev)[0] = integral_newton_cotes(f, from, from + h, grade);
+  for (size_t i = 1; i < maxRows; i++) {
+    // get references for cleaner code
+    mymtx::vector &row = *_row;
+    mymtx::vector &row_prev = *_row_prev;
+    h /= 2;
+    // initilize row (since is not 0 due to previous iterations)
+    row[0] = 0;
+    for (size_t j = 0; j < (2 << (i - 1)); j++) {
+      row[0] +=
+          integral_newton_cotes(f, from + j * h, from + (j + 1) * h, grade);
+    }
+    row[0] /= 2;
+    row[0] += row_prev[0] / 2;
+    for (size_t j = 1; j <= i; j++) {
+      int n_k = 2 << j;
+      row[j] = row[j - 1] + (row[j - 1] - row_prev[j - 1]) / (n_k - 1);
+    }
+    if (std::abs(row[i] - row_prev[i - 1]) < tolerance) {
+      return row[i];
+    }
+    // make current row previous and recycle previous as new current
+    std::swap(_row, _row_prev);
+  }
+  // because pointers were swaped last computed row is _row_prev
+  return (*_row_prev)[maxRows - 1];
 }
