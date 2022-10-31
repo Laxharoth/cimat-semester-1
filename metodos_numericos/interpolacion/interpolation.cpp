@@ -563,10 +563,12 @@ double integral_newton_cotes(FunctionWrapper &fn, const double from,
 }
 double romberg_method(FunctionWrapper &fn, const double from, const double to,
                       const int maxRows, const double tolerance) {
-  return richardson_extrapolation(fn, from, to, maxRows, tolerance, 1);
+  return richardson_extrapolation(fn, integral_newton_cotes, from, to, maxRows,
+                                  tolerance, 1);
 }
-double richardson_extrapolation(FunctionWrapper &f, double from, double to,
-                                const int maxRows, const double tolerance,
+double richardson_extrapolation(FunctionWrapper &f, aproximation_function aprox,
+                                double from, double to, const int maxRows,
+                                const double tolerance,
                                 const unsigned int grade) {
   // only require current row and previous
   mymtx::vector buff1(maxRows);
@@ -574,7 +576,7 @@ double richardson_extrapolation(FunctionWrapper &f, double from, double to,
   mymtx::vector *_row = &buff1;
   mymtx::vector *_row_prev = &buff2;
   double h = (to - from);
-  (*_row_prev)[0] = integral_newton_cotes(f, from, from + h, grade);
+  (*_row_prev)[0] = aprox(f, from, from + h, grade);
   for (size_t i = 1; i < maxRows; i++) {
     // get references for cleaner code
     mymtx::vector &row = *_row;
@@ -583,8 +585,7 @@ double richardson_extrapolation(FunctionWrapper &f, double from, double to,
     // initilize row (since is not 0 due to previous iterations)
     row[0] = 0;
     for (size_t j = 0; j < (2 << (i - 1)); j++) {
-      row[0] +=
-          integral_newton_cotes(f, from + j * h, from + (j + 1) * h, grade);
+      row[0] += aprox(f, from + j * h, from + (j + 1) * h, grade);
     }
     row[0] /= 2;
     row[0] += row_prev[0] / 2;

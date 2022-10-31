@@ -5,6 +5,7 @@
 #include "matrix_like/matrix.hpp"
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <vector>
 #define EP 1E-8
 
@@ -111,8 +112,12 @@ double volum_montecarlo(MultiVarFunctionWrapper &fn, const point p0,
                         const point p1);
 double integral_newton_cotes(FunctionWrapper &fn, const double from,
                              const double to, const unsigned grade);
-double richardson_extrapolation(FunctionWrapper &f, double from, double to,
-                                const int maxRows, const double tolerance,
+typedef std::function<double(FunctionWrapper &, const double, double,
+                             const unsigned)>
+    aproximation_function;
+double richardson_extrapolation(FunctionWrapper &f, aproximation_function aprox,
+                                double from, double to, const int maxRows,
+                                const double tolerance,
                                 const unsigned int grade);
 double romberg_method(FunctionWrapper &fn, const double a, const double b,
                       const int max_iter, const double toler);
