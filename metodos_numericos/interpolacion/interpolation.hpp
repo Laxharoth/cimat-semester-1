@@ -116,5 +116,6 @@ double richardson_extrapolation(FunctionWrapper &f, double from, double to,
                                 const unsigned int grade);
 double romberg_method(FunctionWrapper &fn, const double a, const double b,
                       const int max_iter, const double toler);
-
+double gaussian_cuadrature(FunctionWrapper &fn, const double from,
+                           const double to, const unsigned grade);
 #endif /* INTERPOLATION_HPP */

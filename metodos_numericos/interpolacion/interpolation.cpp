@@ -548,7 +548,7 @@ double integral_newton_cotes(FunctionWrapper &fn, const double from,
 		{1/3.0   , 4/3.0    , 1/3.0},
 		{3/8.0   , 9/8.0    , 9/8.0   , 3/8.0},
 		{14/45.0  , 64/45.0  , 24/45.0 , 64/45.0  , 14/45.0},
-		{5.0/288 * 19, 5.0/288 * 75, 5.0/288 * 50, 5.0/288 * 50, 5.0/288 * 50, 5.0/288 * 75, 5.0/288 * 19 },
+		{5.0/288 * 19, 5.0/288 * 75, 5.0/288 * 50, 5.0/288 * 50, 5.0/288 * 75, 5.0/288 * 19 },
 		{1.0/140 * 41, 1.0/140 * 216, 1.0/140 * 27, 1.0/140 * 272, 1.0/140 * 27, 1.0/140 * 216, 1.0/140 * 41},
 	};
   /* clang-format on */
@@ -600,4 +600,36 @@ double richardson_extrapolation(FunctionWrapper &f, double from, double to,
   }
   // because pointers were swaped last computed row is _row_prev
   return (*_row_prev)[maxRows - 1];
+}
+struct gaussian_cuadrature_pair {
+  double weight;
+  double point;
+};
+double gaussian_cuadrature(FunctionWrapper &fn, const double from,
+                           const double to, const unsigned grade) {
+  typedef gaussian_cuadrature_pair gp;
+  static const std::vector<std::vector<gp>> gauss_constans{
+      {gp{2, 0}},
+      {gp{1, -1 / std::sqrt(3)}, gp{1, 1 / std::sqrt(3)}},
+      {
+          gp{5 / 9.0, -3 / std::sqrt(5)},
+          gp{8 / 9.0, 0},
+          gp{5 / 9.0, 3 / std::sqrt(5)},
+      },
+      {
+          gp{(18 - std::sqrt(30)) / 36,
+             -std::sqrt(1 / 7.0 * (3 + 2 * std::sqrt(6 / 5.0)))},
+          gp{(18 + std::sqrt(30)) / 36,
+             -std::sqrt(1 / 7.0 * (3 - 2 * std::sqrt(6 / 5.0)))},
+          gp{(18 + std::sqrt(30)) / 36,
+             std::sqrt(1 / 7.0 * (3 - 2 * std::sqrt(6 / 5.0)))},
+          gp{(18 - std::sqrt(30)) / 36,
+             std::sqrt(1 / 7.0 * (3 + 2 * std::sqrt(6 / 5.0)))},
+      }};
+  const int points = (grade + 1) / 2;
+  double aprox = 0.0;
+  for (auto &&pair : gauss_constans[points]) {
+    aprox += pair.weight * fn((to - from) / 2 * pair.point + (from + to / 2));
+  }
+  return aprox * (to - from) / 2;
 }
