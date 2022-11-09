@@ -1,23 +1,95 @@
 #ifndef FUNCTION_WRAPPER_CPP
 #define FUNCTION_WRAPPER_CPP
 #include "function_wrapper.hpp"
-#include <exception>
-#include <vector>
 
 double FunctionWrapper::operator()(const double &x) { return this->eval(x); }
 double FunctionWrapper::operator()(const double &x) const {
   return this->eval(x);
 }
 Derivative::Derivative(FunctionWrapper *original)
-    : original_function(original) {}
+    : original_function(original) {
+  this->dy = [this](const double &x) {
+    return (this->original_function->eval(x + DELTA_X) -
+            this->original_function->eval(x)) /
+           DELTA_X;
+  };
+}
+class NotDerivativeStrategy : public std::exception {
+  char *err;
+
+public:
+  NotDerivativeStrategy(Derivative::DerivativeStrategy s) {
+    std::stringstream ss;
+    ss << s << "is not a valid Derivative Strategy";
+    err = new char[100];
+    std::strcpy(err, ss.str().c_str());
+  };
+  ~NotDerivativeStrategy() { delete[] err; }
+  const char *what() const noexcept { return err; }
+};
+Derivative::Derivative(FunctionWrapper *original, DerivativeStrategy strategy)
+    : original_function(original) {
+  switch (strategy) {
+  case DerivativeStrategy::FORWARD:
+    this->dy = [this](const double &x) {
+      return (this->original_function->eval(x + DELTA_X) -
+              this->original_function->eval(x)) /
+             DELTA_X;
+    };
+    break;
+  case DerivativeStrategy::BACKWARD:
+    this->dy = [this](const double &x) {
+      return (this->original_function->eval(x) -
+              this->original_function->eval(x - DELTA_X)) /
+             DELTA_X;
+    };
+    break;
+  case DerivativeStrategy::CENTRAL:
+    this->dy = [this](const double &x) {
+      return (this->original_function->eval(x + DELTA_X) -
+              this->original_function->eval(x - DELTA_X)) /
+             (DELTA_X * 2);
+    };
+    break;
+  case DerivativeStrategy::FIVE_POINT_1ST:
+    this->dy = [this](const double &x) {
+      auto &f = *(this->original_function);
+      return (-f(x + 2 * DELTA_X) + 8 * f(x + DELTA_X) - 8 * f(x - DELTA_X) +
+              f(x - 2 * DELTA_X)) /
+             (12 * DELTA_X);
+    };
+    break;
+  case DerivativeStrategy::FIVE_POINT_2ND:
+    this->dy = [this](const double &x) {
+      auto &f = *(this->original_function);
+      return (f(x - DELTA_X) - 2 * f(x) + f(x + DELTA_X)) / (DELTA_X * DELTA_X);
+    };
+    break;
+  case DerivativeStrategy::FIVE_POINT_3RD:
+    this->dy = [this](const double &x) {
+      auto &f = *(this->original_function);
+      return (f(x + 2 * DELTA_X) - 2 * f(x + DELTA_X) + 2 * f(x - DELTA_X) -
+              f(x - 2 * DELTA_X)) /
+             (2 * DELTA_X * DELTA_X * DELTA_X);
+    };
+    break;
+  case DerivativeStrategy::FIVE_POINT_4TH:
+    this->dy = this->dy = [this](const double &x) {
+      auto &f = *(this->original_function);
+      return (f(x + 2 * DELTA_X) - 4 * f(x + DELTA_X) + 6 * f(x) -
+              4 * f(x - DELTA_X) - f(x - 2 * DELTA_X)) /
+             (DELTA_X * DELTA_X);
+    };
+    break;
+  default:
+    throw NotDerivativeStrategy(strategy);
+  }
+}
 
 double Derivative::eval(const double &x) {
-  return const_cast<Derivative *>(this)->eval(x);
+  return const_cast<const Derivative *>(this)->eval(x);
 }
-double Derivative::eval(const double &x) const {
-  return (original_function->eval(x + DELTA_X) - original_function->eval(x)) /
-         DELTA_X;
-}
+double Derivative::eval(const double &x) const { return dy(x); }
 class cant_be_const : std::exception {
   const char *what() const noexcept { return "Instance can't be const"; }
 };
