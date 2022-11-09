@@ -13,30 +13,37 @@ class exp : public FunctionWrapper {
 };
 
 class polyn : public FunctionWrapper {
-  double eval(const double &x) const { return x + x * x; }
-  double eval(const double &x) { return x + x * x; }
+  double eval(const double &x) const {
+    return (x * x + 3 * x + 3) * (2 * x * x - 9 * x + 7);
+  }
+  double eval(const double &x) {
+    return (x * x + 3 * x + 3) * (2 * x * x - 9 * x + 7);
+  }
 };
 
 int main(int argc, const char **argv) {
   class exp e;
   polyn p;
 
+  const double from = 0;
+  const double to = 5;
   FunctionWrapper *f = &p;
-  strm_out("poly");
-  measure_time(strm_out(
-      "Newton-Cotes grade 2    : " << integral_newton_cotes(*f, 0, 1, 2)));
-  measure_time(strm_out("Richardson Extrapolation: "
-                        << richardson_extrapolation(*f, 0, 1, 10, 1e-5, 2)));
-  measure_time(strm_out(
-      "Romberg Method          : " << romberg_method(*f, 0, 1, 10, 1e-5)));
-
+  {
+    strm_out("polynomial: (x^2+3x+3)(2x^2-9x+7) from 0 to 5");
+    const double integral_expected = 2735 / 12.0;
+    const double integral_actual = gaussian_cuadrature(*f, from, to, 4);
+    strm_out("expected:" << integral_expected);
+    strm_out("actual:" << integral_actual);
+    strm_out("error:" << std::abs(integral_actual - integral_expected));
+  }
   f = &e;
-  strm_out("exponencial");
-  measure_time(strm_out(
-      "Newton-Cotes grade 2    : " << integral_newton_cotes(*f, 0, 1, 2)));
-  measure_time(strm_out("Richardson Extrapolation: "
-                        << richardson_extrapolation(*f, 0, 1, 10, 1e-5, 6)));
-  measure_time(strm_out(
-      "Romberg Method          : " << romberg_method(*f, 0, 1, 10, 1e-5)));
+  {
+    strm_out("exponential xe^x from 0 to 5");
+    const double integral_expected = 1 + 4 * std::exp(5);
+    const double integral_actual = gaussian_cuadrature(*f, from, to, 4);
+    strm_out("expected:" << integral_expected);
+    strm_out("actual:" << integral_actual);
+    strm_out("error:" << std::abs(integral_actual - integral_expected));
+  }
   return 0;
 }
