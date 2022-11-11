@@ -476,5 +476,14 @@ mymtx::matrix operator*(const mymtx::MatrixTraspose &mtxt,
   }
   return res;
 }
+mymtx::matrix operator+(const mymtx::matrix &a, const mymtx::matrix &b) {
+  const size_t shape_y = std::min(a.shape_y, b.shape_y);
+  const size_t shape_x = std::min(a.shape_x, b.shape_x);
+  mymtx::matrix c(shape_y, shape_x);
+  for (size_t i = 0; i < shape_y; ++i) {
+    c[i] = a[i] + b[i];
+  }
+  return c;
+}
 #include "vector.cpp"
 #include "vector_iterator.cpp"
