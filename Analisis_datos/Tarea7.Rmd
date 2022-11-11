@@ -1,0 +1,106 @@
+Problema 2
+```{r}
+data <- c(
+  9.589602, 11.410870, 9.618796, 11.058610, 9.643948, 12.626794, 9.276928,
+  11.545544, 10.945854, 10.215046, 10.551223, 9.591871, 9.406003, 8.355287,
+  7.477295, 11.571839, 8.587103, 8.577009, 9.908821, 9.595157
+)
+```
+```{r}
+interval <- function(data, interval_prob) {
+  m <- mean(data)
+  standard_error <- sd(data) / length(data)
+  alpha <- 1 - interval_prob
+  margin <- qt(
+    alpha / 2,
+    length(data) - 1,
+    lower.tail = FALSE
+  )
+  margin <- margin * standard_error
+  hist(data)
+  abline(v = m - margin, col = "red")
+  abline(v = m + margin, col = "red")
+  c(
+    m - margin,
+    m + margin
+  )
+}
+resample <- function(data) {
+  data[mapply(function(x) floor(x), runif(length(data), 1, length(data)))]
+}
+bootstrap <- function(data, resamplings, interval_prob) {
+  resamples <- mapply(function(x) {
+    r <- resample(data)
+    sum(r) / length(data)
+  }, array(1:resamplings))
+  m <- mean(resamples)
+  varianze <- sum((resamples - m)^2) / (length(resamples) - 1)
+  out <- 1 - interval_prob
+
+  left <- qnorm(
+    out / 2,
+    mean = m,
+    sd = sqrt(varianze)
+  )
+  right <- qnorm(
+    interval_prob + out / 2,
+    mean = m,
+    sd = sqrt(varianze)
+  )
+  hist(resamples)
+  abline(v = left, col = "red")
+  abline(v = right, col = "red")
+  c(
+    left,
+    right
+  )
+}
+```
+```{r}
+interval(data, 0.95)
+bootstrap(data, 100000, 0.95)
+```
+Problema 3
+```{r}
+observ <- (245 * 367 / (218 * 170))
+mean <- 0
+variance <- 1 / 245 + 1 / 367 + 1 / 218 + 1 / 170
+normalized <- log(
+  245 * 367 / (218 * 170)
+) / sqrt(
+  1 / 245 + 1 / 367 + 1 / 218 + 1 / 170
+)
+pnorm(observ, mean, sqrt(variance))
+```
+
+Problema 6
+```{r}
+x1 <- c(
+  7.33, 7.49, 7.27, 7.93,
+  7.56, 7.81, 7.46, 6.94,
+  7.49, 7.44, 7.95, 7.04,
+  7.10, 7.64
+)
+x2 <- c(
+  7.53, 7.70, 7.46, 8.21,
+  7.81, 8.01, 7.72, 7.13,
+  7.68, 7.66, 8.11, 7.20,
+  7.25, 7.79
+)
+
+m1 <- mean(x1)
+m2 <- mean(x2)
+
+s1 <- var(x1)
+s2 <- var(x2)
+
+z <- abs(m2 - m1) / sqrt(s1 / 14 + s2 / 14)
+1 - pnorm(z)
+
+a <- qnorm(0.9, 0, sqrt(s1 / 14 + s2 / 14))
+
+power <- 1 - pnorm((a - 0.2) / sqrt(s1 / 14 + s2 / 14))
+
+z_2 <- (abs(m2 - m1 - 0.2)) / sqrt(s1 / 14 + s2 / 14)
+1 - pnorm(z)
+```
