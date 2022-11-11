@@ -157,11 +157,6 @@ vector &vector::operator+=(const vector &other) {
   }
   return *this;
 }
-vector vector::operator+(const vector &other) {
-  auto cpy = *this;
-  cpy += other;
-  return cpy;
-}
 vector &vector::operator-=(const vector &other) {
 #ifndef NO_ASYNC
   if (size > MIN_OPER_FOR_THREAD) {
@@ -411,4 +406,8 @@ mymtx::vector operator-(const mymtx::vector &v,
   for (size_t i = 0; i < c.size; i++)
     vr[i] = v[i] + c[i];
   return vr;
+}
+mymtx::vector operator+(const mymtx::vector &a, const mymtx::vector &b) {
+  mymtx::vector c = a;
+  return c += b;
 }

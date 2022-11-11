@@ -110,7 +110,6 @@ public:
   vector operator/(const double coef);
   vector &operator/=(const double coef);
   double operator*(const vector &other) const;
-  vector operator+(const vector &other);
   vector &operator+=(const vector &other);
   vector &operator-=(const vector &other);
   vector operator-(const vector &other) const;
@@ -208,6 +207,7 @@ mymtx::matrix operator*(const mymtx::matrix &mtx,
                         const mymtx::MatrixTraspose &mtxt);
 mymtx::matrix operator*(const mymtx::MatrixTraspose &mtxt,
                         const mymtx::matrix &mtx);
+mymtx::matrix operator+(const mymtx::matrix &a, const mymtx::matrix &b);
 mymtx::vector operator*(const mymtx::vector &v, const double c);
 mymtx::vector operator*(const double c, const mymtx::vector &v);
 double operator*(const mymtx::matrix::Column &c, const mymtx::vector &v);
@@ -218,4 +218,5 @@ mymtx::vector operator+(const mymtx::matrix::Column &c, const mymtx::vector &v);
 mymtx::vector operator+(const mymtx::vector &v, const mymtx::matrix::Column &c);
 mymtx::vector operator-(const mymtx::matrix::Column &c, const mymtx::vector &v);
 mymtx::vector operator-(const mymtx::vector &v, const mymtx::matrix::Column &c);
+mymtx::vector operator+(const mymtx::vector &a, const mymtx::vector &b);
 #endif /* REAL_MATRIX_HPP */
