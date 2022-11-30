@@ -1,11 +1,4 @@
 #include "interpolation.hpp"
-#include "function_wrapper/function_wrapper.hpp"
-#include "matrix_like/matrix.hpp"
-#include <cmath>
-#include <cstddef>
-#include <functional>
-#include <tuple>
-#include <vector>
 
 PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y) {
   return interpolate_poly(X, Y, 1);

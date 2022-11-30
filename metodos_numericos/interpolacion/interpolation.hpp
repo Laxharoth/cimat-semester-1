@@ -5,7 +5,10 @@
 #include "matrix_like/matrix.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
+#include <cstdio>
 #include <functional>
+#include <tuple>
 #include <vector>
 #define EP 1E-8
 
