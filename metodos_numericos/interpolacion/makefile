@@ -10,6 +10,14 @@
 
 object_files = matrix.o function_wrapper.o funcion_matriz.o
 
+int: int.run
+	@./int.run
+int.run :main_integration.cpp interpolation.cpp $(object_files)
+	g++ -Og -pthread -g -o int.run main_integration.cpp interpolation.cpp $(object_files)
+int2: int2.run
+	./int2.run
+int2.run :interpolation_finite2.cpp interpolation.cpp $(object_files)
+	g++ -Og -pthread -g -o int2.run interpolation_finite2.cpp interpolation.cpp $(object_files)
 main: main.run
 	./main.run
 main.run :main_interpolacion.cpp interpolation.cpp $(object_files)
