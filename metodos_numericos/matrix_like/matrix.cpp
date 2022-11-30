@@ -56,8 +56,11 @@ void mult_matrix_TM_row(mrowMT_data d) {
   }
 };
 void mult_mtx_vec_Row(mrowMV_data d) {
+  auto &mtx = *d.mtx;
+  auto &result = *d.result;
+  auto &vec = *d.vec;
   for (size_t j = d.begin; j < d.end; j++) {
-    (*d.result)[d.row] += (*d.mtx)[d.row][j] * (*d.vec)[j];
+    result[d.row] += mtx(d.row, j) * vec[j];
   }
 }
 void mult_mtx_col_Row(mrowMC_data d) {
@@ -186,18 +189,20 @@ vector matrix::operator*(const vector &vec) const {
 #ifndef NO_ASYNC
   std::vector<std::future<void>> futures;
 #endif
-  for (size_t i = 0; i < shape_y; ++i) {
 #ifndef NO_ASYNC
-    if (shape_y > MIN_OPER_FOR_THREAD)
+  if (shape_y > MIN_OPER_FOR_THREAD)
+    for (size_t i = 0; i < shape_y; ++i) {
       futures.push_back(
           std::async(std::launch::async, mult_mtx_vec_Row,
                      mrowMV_data{&vec, &result, this, i, 0, shape_x}));
-    else
+    }
+  else
 #endif
+    for (size_t i = 0; i < shape_y; ++i) {
       for (size_t j = 0; j < shape_x; j++) {
         result[i] += (*this)[i][j] * vec[j];
       }
-  }
+    }
   return result;
 }
 vector matrix::operator*(const matrix::Column &vec) const {
