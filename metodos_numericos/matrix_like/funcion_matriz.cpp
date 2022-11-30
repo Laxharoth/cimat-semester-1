@@ -1,7 +1,6 @@
 #include "funcion_matriz.hpp"
 #include "factorizacion.cpp"
-#include "matrix.hpp"
-#include <cstdio>
+#include <math.h>
 #define PI 3.141592653589793
 #define JACOBI_UMBRAL 10e-4
 #define ZERO_UMBRAL 10e-5
@@ -501,20 +500,20 @@ void conjugate_gradient(const mymtx::matrix &A, mymtx::vector &x,
   mymtx::vector r = b;
   mymtx::vector p = r;
   int k = 0;
-
-  mymtx::vector Rold(r);
+  double r_norm = r * r;
+  double r_norm_old = 0.0;
   while (k < n) {
-    Rold = r;
     mymtx::vector AP = A * p;
-    double alpha = r * r / std::max(p * AP, ZERO_UMBRAL);
-    x = x + alpha * p;
-    r = r - alpha * AP;
-
-    if (r.distance() < ZERO_UMBRAL)
+    double alpha = r_norm / std::max(p * AP, ZERO_UMBRAL);
+    x = x + (alpha * p);
+    r_norm_old = r_norm;
+    r = r - (alpha * AP);
+    r_norm = r * r;
+    if (std::sqrt(r_norm) < ZERO_UMBRAL)
       break; // Convergence test
 
-    double beta = r * r / std::max(Rold * Rold, ZERO_UMBRAL);
-    p = r + beta * p;
+    double beta = r_norm / std::max(r_norm_old, ZERO_UMBRAL);
+    p = r + (beta * p);
     k++;
   }
 }
@@ -532,12 +531,12 @@ void conjugate_gradient_jacobi(const mymtx::matrix &A, mymtx::vector &x,
     rzold = r * z;
     w = A * p;
     alpha = (rzold) / (p * w);
-    x = x + alpha * p;
-    r = r - alpha * w;
+    x = x + (alpha * p);
+    r = r - (alpha * w);
     if (std::sqrt(r * r) < ZERO_UMBRAL)
       break;
     solucion_diagonal(A, z, r);
     betha = (r * z) / (rzold);
-    p = r + (betha)*p;
+    p = r + (betha * p);
   }
 }
