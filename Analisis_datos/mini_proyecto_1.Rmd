@@ -1,0 +1,69 @@
+```{r}
+library(ISLR2)
+head(Carseats)
+```
+**A) Crear un Modelo para predecir ventas utilizando "Price" "Urban" y "US"**
+
+El Modelo resultante tendría la forma:
+
+**C) Escribir un modelo en forma de ecuación**
+Y = C1 + C2 X1 + C2X2 + C3X3
+
+X1 = Price
+
+X2 = Urban
+
+X3 = US
+
+Sin embargo X2 solo toma valores 1 cuando el valor de Urban es "Yes" y 0 de othra forma, de forma similar US toma el valor 1 cuando US es "Yes" y 0 de otra forma.
+
+```{r}
+model <- lm(Sales ~ Price+Urban+US, data = Carseats)
+plot(model)
+summary(model)
+```
+**B) Provee una interpretación para cada coeficiente del modelo**
+
+El valor del coeficiente de price es negativo, lo cual indica que a menor precio las ventas incrementa
+
+Como US es un indicador, su coeficiente indica que hay más ventas en US
+
+**D) Para que predictores se puede rechazar la hipotesis nula**
+El único predictor para el cual no se rechaza la hipotesis nula es el indicador Urban
+
+**E) Crear un nuevo modelo basandose en la respuesta de D)**
+```{r}
+model <- lm(Sales ~ Price+US, data = Carseats)
+plot(model)
+summary(model)
+
+
+```
+
+Residual standard error: 2.472 on 396 degrees of freedom
+Multiple R-squared:  0.2393,	Adjusted R-squared:  0.2335 
+F-statistic: 41.52 on 3 and 396 DF,  p-value: < 2.2e-16
+
+Residual standard error: 2.469 on 397 degrees of freedom
+Multiple R-squared:  0.2393,	Adjusted R-squared:  0.2354 
+F-statistic: 62.43 on 2 and 397 DF,  p-value: < 2.2e-16
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- read.csv("./datos.csv", sep = " ")
+head(df)
+```
+
+```{r}
+model = lm(vote ~ growth, data = df)
+plot(model)
+summary(model)
+model$terms
+newdat <- as.data.frame.list(c(0.2),col.names = attr(model$terms, "term.labels"))
+y_hat <- predict.lm(model, newdata = newdat)
+y_hat
+```
+
