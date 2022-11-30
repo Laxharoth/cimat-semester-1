@@ -1,10 +1,8 @@
 ##################################
 #
-# para ejecutar el programa de interpolacion con
-#  splines utilizar el comando `make main2`
-#
-# para visualizar las graficas de los splines
-#  utilizar el notebook interpolation2.ipynb
+# El programa realiza integrales numericas utilizando el método
+#   de Cuadratura Gaussiana
+#   para ejecutar el programa utilizar el comando `make int`
 #
 ###################################
 

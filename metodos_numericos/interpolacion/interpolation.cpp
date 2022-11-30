@@ -661,14 +661,14 @@ FiniteElement2::FiniteElement2(const std::vector<point3d> &points,
   const mymtx::matrix mtx_lambda =
       (calc_mtx_lambda_x() * (2 * lambda_x * increment_x / increment_y)) +
       (calc_mtx_lambda_y() * (2 * lambda_y * increment_y / increment_x));
-  for (size_t i = 0; i < nodes_x; i++) {
+  for (size_t i = 0; i < nodes_x - 1; i++) {
     const double cur_x = start.x + increment_x * i;
     auto end_y = current_point;
     while (end_y != end_x && (*end_y).x < cur_x + increment_x)
       ++end_y;
     std::sort(current_point, end_y,
               [](point3d &a, point3d &b) { return a.y < b.y; });
-    for (size_t j = 0; j < nodes_y; j++) {
+    for (size_t j = 0; j < nodes_y - 1; j++) {
       const double cur_y = start.y + increment_y * j;
       const unsigned int phi_1 = i + j * nodes_x;
       const unsigned int phi_2 = i + 1 + j * nodes_x;
