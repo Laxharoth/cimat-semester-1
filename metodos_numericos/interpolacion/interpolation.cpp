@@ -634,3 +634,13 @@ double gaussian_cuadrature(FunctionWrapper &fn, const double from,
   }
   return aprox * (to - from) / 2;
 }
+double gaussian_cuadrature(const std::function<double(double x)> &fn,
+                           const double from, const double to,
+                           const unsigned grade) {
+  double aprox = 0.0;
+  const int points = std::ceil((grade + 1) / 2.0);
+  for (auto &&pair : gauss_constans[points]) {
+    aprox += pair.weight * fn((to - from) / 2 * pair.point + (from + to / 2));
+  }
+  return aprox * (to - from) / 2;
+}
