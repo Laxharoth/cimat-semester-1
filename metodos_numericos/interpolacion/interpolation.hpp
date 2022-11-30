@@ -86,6 +86,27 @@ public:
   double eval(const double &x) const;
   double eval(const double &x);
 };
+class FiniteElement2 : public MultiVarFunctionWrapper {
+  std::vector<point3d> points;
+  mymtx::vector phi;
+  double increment;
+  point start;
+  double increment_x, increment_y;
+  unsigned int nodes_x;
+  unsigned int nodes_y;
+  double N1(double ro, double nu) const;
+  double N2(double ro, double nu) const;
+  double N3(double ro, double nu) const;
+  double N4(double ro, double nu) const;
+
+public:
+  FiniteElement2(const std::vector<point3d> &points, const point start,
+                 const point end, const unsigned int nodes_x,
+                 const unsigned int nodes_y, const double lambda_x,
+                 const double lambda_y);
+  std::vector<double> eval(const std::vector<double> &x) override;
+  std::vector<double> eval(const std::vector<double> &x) const override;
+};
 
 PolyFunction interpolate_line(const mymtx::vector &X, const mymtx::vector &Y);
 PolyFunction interpolate_poly(const mymtx::vector &X, const mymtx::vector &Y,

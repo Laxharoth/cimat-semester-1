@@ -637,3 +637,179 @@ double gaussian_cuadrature(const std::function<double(double x)> &fn,
   }
   return aprox * (to - from) / 2;
 }
+mymtx::matrix calc_mtx_lambda_x();
+mymtx::matrix calc_mtx_lambda_y();
+FiniteElement2::FiniteElement2(const std::vector<point3d> &points,
+                               const point start, const point end,
+                               const unsigned int nodes_x,
+                               const unsigned int nodes_y,
+                               const double lambda_x, const double lambda_y)
+    : phi(mymtx::vector(nodes_x * nodes_y)), points(points), start(start),
+      increment_x((end.x - start.x) / (nodes_x - 1)),
+      increment_y((end.y - start.y) / (nodes_y - 1)), nodes_x(nodes_x),
+      nodes_y(nodes_y)
+
+{
+  std::sort(this->points.begin(), this->points.end(),
+            [](point3d &a, point3d &b) { return a.x < b.x; });
+  mymtx::matrix A = mymtx::matrix::identity(phi.size);
+  mymtx::vector NiZ = this->phi;
+  auto current_point = this->points.begin();
+  while ((*current_point).x < start.x)
+    ++current_point;
+  auto end_x = this->points.end();
+  const mymtx::matrix mtx_lambda =
+      (calc_mtx_lambda_x() * (2 * lambda_x * increment_x / increment_y)) +
+      (calc_mtx_lambda_y() * (2 * lambda_y * increment_y / increment_x));
+  for (size_t i = 0; i < nodes_x; i++) {
+    const double cur_x = start.x + increment_x * i;
+    auto end_y = current_point;
+    while (end_y != end_x && (*end_y).x < cur_x + increment_x)
+      ++end_y;
+    std::sort(current_point, end_y,
+              [](point3d &a, point3d &b) { return a.y < b.y; });
+    for (size_t j = 0; j < nodes_y; j++) {
+      const double cur_y = start.y + increment_y * j;
+      const unsigned int phi_1 = i + j * nodes_x;
+      const unsigned int phi_2 = i + 1 + j * nodes_x;
+      const unsigned int phi_3 = i + 1 + (j + 1) * nodes_x;
+      const unsigned int phi_4 = i + (j + 1) * nodes_x;
+      double &N1Z = NiZ[phi_1];
+      double &N2Z = NiZ[phi_2];
+      double &N3Z = NiZ[phi_3];
+      double &N4Z = NiZ[phi_4];
+      while (current_point != end_x &&
+             (*current_point).x < cur_x + increment_x &&
+             (*current_point).y < cur_y + increment_y) {
+        double x = (*current_point).x;
+        double y = (*current_point).y;
+        double z = (*current_point).z;
+        ++current_point;
+        const double zeta = 2 * (x - cur_x) / increment_x - 1;
+        const double eta = 2 * (y - cur_y) / increment_y - 1;
+        const double c_N1 = N1(zeta, eta);
+        const double c_N2 = N2(zeta, eta);
+        const double c_N3 = N3(zeta, eta);
+        const double c_N4 = N4(zeta, eta);
+        {
+          A(phi_1, phi_1) += c_N1 * c_N1;
+          A(phi_2, phi_1) += c_N1 * c_N2;
+          A(phi_3, phi_1) += c_N1 * c_N3;
+          A(phi_4, phi_1) += c_N1 * c_N4;
+          A(phi_1, phi_2) += c_N2 * c_N1;
+          A(phi_2, phi_2) += c_N2 * c_N2;
+          A(phi_3, phi_2) += c_N2 * c_N3;
+          A(phi_4, phi_2) += c_N2 * c_N4;
+          A(phi_1, phi_3) += c_N3 * c_N1;
+          A(phi_2, phi_3) += c_N3 * c_N2;
+          A(phi_3, phi_3) += c_N3 * c_N3;
+          A(phi_4, phi_3) += c_N3 * c_N4;
+          A(phi_1, phi_4) += c_N4 * c_N1;
+          A(phi_2, phi_4) += c_N4 * c_N2;
+          A(phi_3, phi_4) += c_N4 * c_N3;
+          A(phi_4, phi_4) += c_N4 * c_N4;
+        }
+
+        N1Z += c_N1 * z;
+        N2Z += c_N2 * z;
+        N3Z += c_N3 * z;
+        N4Z += c_N4 * z;
+      }
+
+      {
+        A(phi_1, phi_1) += mtx_lambda(0, 0);
+        A(phi_2, phi_1) += mtx_lambda(1, 0);
+        A(phi_3, phi_1) += mtx_lambda(2, 0);
+        A(phi_4, phi_1) += mtx_lambda(3, 0);
+        A(phi_1, phi_2) += mtx_lambda(0, 1);
+        A(phi_2, phi_2) += mtx_lambda(1, 1);
+        A(phi_3, phi_2) += mtx_lambda(2, 1);
+        A(phi_4, phi_2) += mtx_lambda(3, 1);
+        A(phi_1, phi_3) += mtx_lambda(0, 2);
+        A(phi_2, phi_3) += mtx_lambda(1, 2);
+        A(phi_3, phi_3) += mtx_lambda(2, 2);
+        A(phi_4, phi_3) += mtx_lambda(3, 2);
+        A(phi_1, phi_4) += mtx_lambda(0, 3);
+        A(phi_2, phi_4) += mtx_lambda(1, 3);
+        A(phi_3, phi_4) += mtx_lambda(2, 3);
+        A(phi_4, phi_4) += mtx_lambda(3, 3);
+      }
+
+      if (current_point == end_x)
+        break;
+    }
+    if (current_point == end_x)
+      break;
+  }
+  crout(A, A, A);
+  solucion_crout(A, this->phi, NiZ);
+  // conjugate_gradient(A, this->phi, NiZ);
+}
+
+std::vector<double> FiniteElement2::eval(const std::vector<double> &x) {
+  return const_cast<const FiniteElement2 *>(this)->eval(x);
+};
+std::vector<double> FiniteElement2::eval(const std::vector<double> &v) const {
+  const double x = v[0];
+  const double y = v[1];
+  const unsigned int i = std::floor((x - start.x) / increment_x);
+  const unsigned int j = std::floor((y - start.y) / increment_y);
+  const double x0 = start.x + increment_x * i;
+  const double y0 = start.y + increment_y * j;
+  const double &phi_1 = phi[i + j * nodes_x];
+  const double &phi_2 = phi[i + 1 + j * nodes_x];
+  const double &phi_3 = phi[i + 1 + (j + 1) * nodes_x];
+  const double &phi_4 = phi[i + (j + 1) * nodes_x];
+
+  const double zeta = 2 * (x - x0) / increment_x - 1;
+  const double eta = 2 * (y - y0) / increment_y - 1;
+
+  return std::vector<double>{N1(zeta, eta) * phi_1 + N2(zeta, eta) * phi_2 +
+                             N3(zeta, eta) * phi_3 + N4(zeta, eta) * phi_4
+
+  };
+}
+
+double FiniteElement2::N1(double zeta, double eta) const {
+  return (1 - zeta) * (1 - eta) / 4;
+};
+double FiniteElement2::N2(double zeta, double eta) const {
+  return (1 + zeta) * (1 - eta) / 4;
+};
+double FiniteElement2::N3(double zeta, double eta) const {
+  return (1 + zeta) * (1 + eta) / 4;
+};
+double FiniteElement2::N4(double zeta, double eta) const {
+  return (1 - zeta) * (1 + eta) / 4;
+};
+
+mymtx::matrix calc_mtx_lambda_x() {
+  std::vector<std::function<double(double x)>> dNi_dr{
+      [](double x) { return -(1 - x); }, [](double x) { return (1 - x); },
+      [](double x) { return (1 + x); }, [](double x) { return -(1 + x); }};
+  mymtx::matrix integral(4, 4);
+  for (size_t i = 0; i < integral.shape_y; ++i) {
+    for (size_t j = 0; j < integral.shape_x; ++j) {
+      auto &Ni = dNi_dr[i];
+      auto &Nj = dNi_dr[j];
+      integral(i, j) = gaussian_cuadrature(
+          [&](double x) { return Ni(x) * Nj(x); }, -1, 1, 2);
+    }
+  }
+  return integral;
+}
+mymtx::matrix calc_mtx_lambda_y() {
+  std::vector<std::function<double(double x)>> dNi_dn{
+      [](double x) { return -(1 - x); }, [](double x) { return -(1 + x); },
+      [](double x) { return (1 + x); }, [](double x) { return (1 - x); }};
+  mymtx::matrix integral(4, 4);
+  for (size_t i = 0; i < integral.shape_y; ++i) {
+    for (size_t j = 0; j < integral.shape_x; ++j) {
+      auto &Ni = dNi_dn[i];
+      auto &Nj = dNi_dn[j];
+      integral(i, j) = gaussian_cuadrature(
+          [&](double x) { return Ni(x) * Nj(x); }, -1, 1, 2);
+    }
+  }
+  return integral;
+}
