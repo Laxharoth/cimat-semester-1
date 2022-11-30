@@ -606,28 +606,27 @@ struct gaussian_cuadrature_pair {
   double weight;
   double point;
 };
+typedef gaussian_cuadrature_pair gp;
+const std::vector<std::vector<gp>> gauss_constans{
+    {gp{2, 0}},
+    {gp{1, -1 / std::sqrt(3)}, gp{1, 1 / std::sqrt(3)}},
+    {
+        gp{5 / 9.0, -3 / std::sqrt(5)},
+        gp{8 / 9.0, 0},
+        gp{5 / 9.0, 3 / std::sqrt(5)},
+    },
+    {
+        gp{(18 - std::sqrt(30)) / 36,
+           -std::sqrt(1 / 7.0 * (3 + 2 * std::sqrt(6 / 5.0)))},
+        gp{(18 + std::sqrt(30)) / 36,
+           -std::sqrt(1 / 7.0 * (3 - 2 * std::sqrt(6 / 5.0)))},
+        gp{(18 + std::sqrt(30)) / 36,
+           std::sqrt(1 / 7.0 * (3 - 2 * std::sqrt(6 / 5.0)))},
+        gp{(18 - std::sqrt(30)) / 36,
+           std::sqrt(1 / 7.0 * (3 + 2 * std::sqrt(6 / 5.0)))},
+    }};
 double gaussian_cuadrature(FunctionWrapper &fn, const double from,
                            const double to, const unsigned grade) {
-  typedef gaussian_cuadrature_pair gp;
-  static const std::vector<std::vector<gp>> gauss_constans{
-      {gp{2, 0}},
-      {gp{1, -1 / std::sqrt(3)}, gp{1, 1 / std::sqrt(3)}},
-      {
-          gp{5 / 9.0, -3 / std::sqrt(5)},
-          gp{8 / 9.0, 0},
-          gp{5 / 9.0, 3 / std::sqrt(5)},
-      },
-      {
-          gp{(18 - std::sqrt(30)) / 36,
-             -std::sqrt(1 / 7.0 * (3 + 2 * std::sqrt(6 / 5.0)))},
-          gp{(18 + std::sqrt(30)) / 36,
-             -std::sqrt(1 / 7.0 * (3 - 2 * std::sqrt(6 / 5.0)))},
-          gp{(18 + std::sqrt(30)) / 36,
-             std::sqrt(1 / 7.0 * (3 - 2 * std::sqrt(6 / 5.0)))},
-          gp{(18 - std::sqrt(30)) / 36,
-             std::sqrt(1 / 7.0 * (3 + 2 * std::sqrt(6 / 5.0)))},
-      }};
-  const int points = (grade + 1) / 2;
   double aprox = 0.0;
   for (auto &&pair : gauss_constans[points]) {
     aprox += pair.weight * fn((to - from) / 2 * pair.point + (from + to / 2));
