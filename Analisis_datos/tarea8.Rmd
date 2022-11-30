@@ -1,0 +1,50 @@
+```{r}
+1 - sum(mapply(function(x) dbinom(x, 7, 0.5), c(4:7)))
+```
+
+```{r}
+1 - pnorm((16 / 25 - 0.5) / sqrt(.25 / 25))
+```
+
+```{r}
+find_changes <- function(l) {
+  sum(
+    mapply(
+      function(x, y) (x + y) %% 2,
+      l[2:length(l)], l[1:length(l) - 1]
+    )
+  )
+}
+samp <- mapply(
+  function(x) find_changes(l <- round(runif(100, 0, 1))),
+  c(1:100000)
+)
+hist(samp)
+mean(samp)
+var(samp)
+1 - pnorm(42, mean(samp), var(samp))
+``` 
+
+```{r}
+t <- 275 / 295
+t - 1.96 * sqrt(t * (1 - t) / 295)
+t + 1.96 * sqrt(t * (1 - t) / 295)
+
+t <- 160 / 205
+t - 1.96 * sqrt(t * (1 - t) / 295)
+t + 1.96 * sqrt(t * (1 - t) / 295)
+``` 
+```{r}
+1 - (pbinom(58, 100, 0.5) - pbinom(42, 100, 0.5))
+```
+
+```{r}
+epsilon <- function(x) rnorm(1, 0, x)[1]
+x <- runif(1000, 0, 5)
+y <- mapply(function(x) x + epsilon(x), x)
+betha <- sum(x / y) / 1000
+x2 <- c(0, 10)
+y2 <- betha * x2
+plot(x, y)
+lines(x2, y2, type = "o", col = "red", lwd = 3)
+```
